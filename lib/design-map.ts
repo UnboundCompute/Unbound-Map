@@ -59,7 +59,9 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && typeof meta.repository === 'string' && typeof meta.revision === 'string'
     && !!graph && typeof graph === 'object'
     && Array.isArray(graph.nodes)
-    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number');
+    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number')
+    && (!graph.modules || Array.isArray(graph.modules))
+    && (!graph.modules || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (!module.node_ids || Array.isArray(module.node_ids))));
 }
 
 export type DesignMapSnapshot = {
