@@ -68,6 +68,8 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   }
   const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const renderParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
+  const requestedRegion = renderParams.get('region');
+  const regionIsUnknown = Boolean(requestedRegion && !snapshot.regions.some((region) => region.id === requestedRegion));
   const activeBundle = renderParams.get('bundle') ?? initialBundle;
   const systemShapeParams = new URLSearchParams(renderParams);
   systemShapeParams.delete('region');
@@ -104,6 +106,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       <div className="map-bezel">
         <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
+        {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
         {snapshot.provenance === 'graph-backed' && !edges.length && <div className="map-banner map-banner-caution" role="status">Relationship evidence is not present in this bundle, so connections are intentionally not inferred.</div>}
         <div className="map-canvas" aria-label={`${snapshot.repository} architecture map`}>
           <div className="map-grid" aria-hidden="true" />
