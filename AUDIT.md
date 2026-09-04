@@ -53,6 +53,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `2f1a50b` | Add embeddable architecture map | Added a lightweight `/embed` route for README, issue, and social embeds, reusing the bounded map and hosted snapshot states with a clear link back to the full guide; map history now respects the embed route; checks passed. |
 | `1b56ee9` | Document shareable embed usage | README now lists the canonical flow and embed routes, explains when to use a normal link versus an iframe, and includes a ready-to-paste iframe snippet; route smoke testing confirmed `/embed` and social metadata (`og:title`, `twitter:card`, `Copy link`). |
 | `1fd5446` | Harden share fallback | Copy link now uses the native share sheet when available, falls back to the clipboard, handles user cancellation quietly, and clearly explains when browser permissions make copying unavailable; `npm run check` and `git diff --check` passed. |
+| `f9efbf2` | Add focused route metadata | Dynamic architecture-region and flow routes now emit repository/region/flow-specific titles and descriptions for search results and social previews; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
