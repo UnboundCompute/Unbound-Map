@@ -54,7 +54,7 @@ Normal text pairs must meet 4.5:1. Large text must meet 3:1. Muted tokens are no
 
 - Desktop: one reading column with a 240–260px documentation rail.
 - Start here should use editorial sections and a deliberate reading order, not a hero-plus-card dashboard.
-- The System Map may use a map frame and inspector, but it must have an adjacent ordered text summary for keyboard and mobile readers.
+- The Architecture map may use a map frame and inspector, but it must have an adjacent ordered text summary for keyboard and mobile readers.
 - Flow is a step-synchronized narrative with a linear text fallback; Trust is a searchable glossary/index.
 - Keep generous whitespace around sections. Avoid equal-height card matrices.
 - Mobile below 768px: the rail becomes a horizontal, scrollable navigation row; map geometry becomes an ordered list or a verified single-column path. Never depend on absolute positioning for comprehension.
