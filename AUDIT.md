@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `76a1663` | Add descriptive social-preview image alternatives | Shared document metadata and root metadata now expose meaningful `og:image:alt` and Twitter image alt text derived from the page title, improving link-preview context for distribution and assistive tooling; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `1206ab1` | Next app scaffold, HLD shell, map fixture, three lenses | `npm run build` passed |
 | `d017257` | README, ignore rules, lockfile and TypeScript config normalization | clean repository after commit |
 | `f6a171e` | Responsive map path for small screens | Playwright: `390px` viewport, `scrollWidth - clientWidth = 0` |
