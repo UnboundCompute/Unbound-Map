@@ -39,6 +39,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `eb33ce3` | Build the trust surface glossary/index | Trust now uses eight explicit domains with meaning, obligation, constructor families, locations, search/filter controls, deep links, and non-finding language; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `e64d057` | Preserve selected context into Lachesis | `/explore` now parses incoming repository/revision/region/label/anchor/flow/domain/bundle context, renders a confirmation summary, and builds a fixed-origin Lachesis URL without dropping context; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `b10f86c` | Resolve the Impeccable detector's mechanical flow warning | Replaced animated `width` with transform-based progress scaling and preserved the intentional map grid advisory; `npm run check`, `npm run build`, and `git diff --check` passed |
+| `99fdce4` | Remove superseded UI vocabulary and align README routes | Deleted unused legacy flow/trust CSS and the obsolete three-entry trust model, removed stale `mode`/tab vocabulary from the tree, and documented canonical routes plus redirects in README; `npm run check`, `npm run build`, `git diff --check`, and stale-pattern search passed |
 
 ## Rebuild brief audit
 
