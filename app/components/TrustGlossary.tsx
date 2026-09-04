@@ -8,9 +8,14 @@ export function TrustGlossary() {
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState('all');
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setQuery(params.get('q') ?? '');
-    setKind(params.get('kind') ?? 'all');
+    const restoreFilters = () => {
+      const params = new URLSearchParams(window.location.search);
+      setQuery(params.get('q') ?? '');
+      setKind(params.get('kind') ?? 'all');
+    };
+    restoreFilters();
+    window.addEventListener('popstate', restoreFilters);
+    return () => window.removeEventListener('popstate', restoreFilters);
   }, []);
   const updateUrl = (nextQuery: string, nextKind: string) => {
     const params = new URLSearchParams(window.location.search);
