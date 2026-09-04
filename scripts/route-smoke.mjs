@@ -30,5 +30,6 @@ await page('/embed?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek archi
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
 await page('/architecture/not-a-region', ['Region context unavailable', 'aria-atomic="true"']);
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
+await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
 await redirect('/flow?step=ipv4', '/flows?step=ipv4');
