@@ -46,6 +46,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `704bf95` | Distinguish coverage-limited snapshots | Added typed coverage state and page/rail language for illustrative, verified graph-backed, and graph-backed coverage-limited snapshots; fixture and projection paths now expose the distinction; `npm run check` and `git diff --check` passed. |
 | `e81c1ff` | Label map external boundaries | Added explicit `wire input` and `consumers` labels outside the repository map region so entry and exit points are readable without inferring them from position; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `fa29124` | Preserve map and flow history | Architecture selection now encodes level 1 and uses browser history with `popstate` restoration; flow step selection likewise uses history and restores the active step on Back/Forward; checks passed. |
+| `a134391` | Make Start here map stages actionable | Replaced decorative macro-stage spans with keyboard-accessible links into each corresponding architecture region at `level=1`, while retaining the compact ordered path and responsive layout; checks passed. |
 
 ## Rebuild brief audit
 
