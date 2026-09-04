@@ -98,6 +98,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `ceacec8` | Make semantic zoom reversible | Focused Architecture links now declare `level=1`, the map exposes a keyboard-operable `Back to system shape` action, and chapter/directory links retain the semantic level and snapshot context; checks passed. |
 | `828dde5` | Guard semantic zoom URL on server | Fixed a server-render regression introduced by the zoom control by guarding `window.location` access, restoring 200 responses for queryful Architecture routes; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `f1da5d1` | Describe Lachesis handoff pages | `/explore` now emits context-aware metadata using the selected repository and anchor, improving previews for shared code-handoff links rather than inheriting the generic product title; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `e91e9a3` | Carry explicit flow steps to Lachesis | Flow handoffs now include both `flow` and `step` query fields, and Explore shows the selected step explicitly alongside repository, revision, region, and anchor; checks passed. |
 
 ## Rebuild brief audit
 
