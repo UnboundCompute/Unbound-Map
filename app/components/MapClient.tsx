@@ -78,9 +78,11 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const activeBundle = renderParams.get('bundle') ?? initialBundle;
   const systemShapeParams = new URLSearchParams(renderParams);
   systemShapeParams.delete('region');
+  systemShapeParams.delete('anchor');
   systemShapeParams.set('level', '0');
   const systemShapeHref = `${route}?${systemShapeParams.toString()}`;
   const regionFocusParams = new URLSearchParams(renderParams);
+  regionFocusParams.delete('anchor');
   regionFocusParams.set('region', current.id);
   regionFocusParams.set('level', '1');
   const regionFocusHref = `${route}?${regionFocusParams.toString()}`;
@@ -97,6 +99,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     const params = new URLSearchParams(window.location.search);
     params.set('region', region.id);
     params.set('level', '1');
+    params.delete('anchor');
     if (window.matchMedia('(max-width: 820px)').matches) {
       window.location.assign(`/architecture/${region.id}?${params.toString()}`);
       return;
