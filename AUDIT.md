@@ -133,6 +133,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `c1289a4` | Add skip navigation to the embed surface | Standalone `/embed` now offers a keyboard skip link targeting a focusable map boundary, so README/social embeds can bypass the header and enter the architecture content directly; `npm run check` and `git diff --check` passed. |
 | `8e9c6ad` | Enforce route landmark invariants | `npm run smoke` now verifies every tested document route renders exactly one `h1` and a `main` landmark, and specifically protects the embed skip target alongside its loading/provenance assertions; smoke, check, and diff validation passed. |
 | `9d1af91` | Connect map selectors to the inspector | Architecture map nodes and the ordered relationship controls now declare `aria-controls="architecture-map-detail"`, matching the live inspector target so selection updates are explicit to assistive-technology users; `npm run check` and `git diff --check` passed. |
+| `8bc652c` | Preserve deep links beyond the placed canvas | Architecture now distinguishes the nine-region spatial canvas cap from the full projected region directory, so valid focused URLs for later projected regions render their actual region instead of silently falling back to the first node; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
