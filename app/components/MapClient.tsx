@@ -74,7 +74,6 @@ export function MapClient({ route = '/architecture' }: { route?: string }) {
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
   const edges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
-  if (!edges.length) regions.slice(0, -1).forEach((region, index) => edges.push({ from: region.id, to: regions[index + 1].id }));
 
   return <>
     <div className="map-workbench">
@@ -83,6 +82,7 @@ export function MapClient({ route = '/architecture' }: { route?: string }) {
         {bundleState === 'loading' && <div className="map-banner" role="status">Loading the hosted graph bundle…</div>}
         {bundleState === 'error' && <div className="map-banner map-banner-error" role="alert">{bundleMessage}</div>}
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
+        {snapshot.provenance === 'graph-backed' && !edges.length && <div className="map-banner map-banner-caution" role="status">Relationship evidence is not present in this bundle, so connections are intentionally not inferred.</div>}
         <div className="map-canvas" aria-label="Suricata architecture map">
           <div className="map-grid" aria-hidden="true" />
           <svg className="map-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="map-arrow" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#637669" /></marker></defs>{edges.map((edge) => { const from = regionPosition.get(edge.from)!; const to = regionPosition.get(edge.to)!; return <line key={`${edge.from}-${edge.to}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} markerEnd="url(#map-arrow)" />; })}</svg>
@@ -92,7 +92,7 @@ export function MapClient({ route = '/architecture' }: { route?: string }) {
       </div>
       <aside className="map-inspector" aria-live="polite" aria-label="Selected region details"><div className="inspector-label">Selected region</div><h2>{current.label}</h2><p>{current.summary}</p><dl className="inspector-facts"><div><dt>footprint</dt><dd>{current.metricLabel}</dd></div><div><dt>path</dt><dd><code>{current.path}</code></dd></div><div><dt>anchor</dt><dd><code>{current.anchor?.label ?? 'No anchor in this projection'}</code></dd></div></dl><Link className="inspector-link" href={`/architecture/${current.id}`}>Read this region <span aria-hidden="true">→</span></Link><Link className="inspector-link" href={handoffHref(snapshot, current, new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search).get('bundle') ?? undefined)}>Open anchor in Lachesis <span aria-hidden="true">↗</span></Link></aside>
     </div>
-    <section className="relationship-summary" aria-labelledby="relationship-title"><div><h2 id="relationship-title">The same map, in words</h2><p>Use this ordered summary if you prefer reading relationships to navigating a diagram.</p></div><ol>{regions.map((region) => <li key={region.id}><button onClick={() => selectRegion(region)} aria-pressed={current.id === region.id}><span>{region.label}</span><small>{region.downstream?.length ? `hands off to ${region.downstream.map((id) => regions.find((item) => item.id === id)?.label ?? id).join(', ')}` : region.role === 'boot' ? 'initializes the runtime' : 'ends the displayed path'}</small></button></li>)}</ol></section>
+    <section className="relationship-summary" aria-labelledby="relationship-title"><div><h2 id="relationship-title">The same map, in words</h2><p>Use this ordered summary if you prefer reading relationships to navigating a diagram.</p></div><ol>{regions.map((region) => <li key={region.id}><button onClick={() => selectRegion(region)} aria-pressed={current.id === region.id}><span>{region.label}</span><small>{region.downstream?.length ? `hands off to ${region.downstream.map((id) => regions.find((item) => item.id === id)?.label ?? id).join(', ')}` : snapshot.provenance === 'graph-backed' && !edges.length ? 'relationship evidence unavailable' : region.role === 'boot' ? 'initializes the runtime' : 'ends the displayed path'}</small></button></li>)}</ol></section>
     <section className="region-directory" aria-label="Region directory"><div><span className="rail-heading">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{snapshot.regions.map((region) => <li key={region.id}><Link href={`/architecture/${region.id}`}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></Link></li>)}</ol></section>
   </>;
 }
