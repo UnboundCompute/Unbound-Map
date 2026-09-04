@@ -35,7 +35,9 @@ export function MapClient({ mode = 'system' }: { mode?: 'system' | 'flow' | 'tru
   }, [mode]);
   const visibleNodes = hostedRegions?.slice(0, 4).map((region, index) => ({ ...mapNodes[index], label: region.label, meta: `${region.path ?? 'top-level region'} · ${region.nodeCount} nodes`, anchor: region.anchor?.label ?? mapNodes[index].anchor })) ?? mapNodes;
   const current = visibleNodes.find((node) => node.id === selected) ?? visibleNodes[1];
+  const directory = hostedRegions ?? mapNodes.map((node) => ({ id: node.id, label: node.label, path: node.meta.split(' · ')[0], nodeCount: Number(node.meta.match(/\d+/)?.[0] ?? 0), rolledUp: false }));
   return (
+    <>
     <div className="map-workbench">
       <div className="map-bezel">
         <div className="map-toolbar"><span className="map-status"><i /> {mode === 'system' ? 'structural view' : mode === 'flow' ? 'request path' : 'boundary view'}</span><span className="map-scale">HLD · {visibleNodes.length} regions</span></div>
@@ -55,5 +57,7 @@ export function MapClient({ mode = 'system' }: { mode?: 'system' | 'flow' | 'tru
         <Link className="inspector-link" href={`/explore?symbol=${encodeURIComponent(current.anchor)}`}>Open this path in Lachesis <span>→</span></Link>
       </aside>
     </div>
+    {mode === 'system' && <section className="region-directory" aria-label="Region directory"><div><span className="sidebar-label">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{directory.map((region) => <li key={region.id}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></li>)}</ol></section>}
+    </>
   );
 }
