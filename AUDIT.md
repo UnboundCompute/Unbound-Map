@@ -75,6 +75,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `6c28dcf` | Align product and design vocabulary | Updated Product to the shipped Architecture/Flows/Trust route names and documented Start/embed as distribution surfaces; updated the design system to record IBM Plex Serif as the implemented display face; no UI behavior changed. |
 | `cbe862f` | Use Architecture map vocabulary | Updated the durable design guidance from retired “System Map” wording to the shipped Architecture map term, reducing naming drift for future work; `npm run check` and `git diff --check` passed. |
 | `ba029a2` | Remove obsolete map state branches | Deleted unreachable loading/error banner branches and the unused error style after the explicit state-panel implementation, leaving one authoritative state presentation; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `e21cdab` | Remove legacy map route styles | Deleted unused decorative route/line CSS now that all map connections are data-driven SVG edges, keeping the stylesheet aligned with the current topology model; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
