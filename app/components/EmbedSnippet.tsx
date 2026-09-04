@@ -8,7 +8,8 @@ export function EmbedSnippet({ context = {} }: { context?: SharedSnapshotContext
   const [state, setState] = useState<'idle' | 'copied' | 'unavailable'>('idle');
   useEffect(() => setOrigin(window.location.origin), []);
   const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
-  const snippet = `<iframe src="${origin}/embed${contextQuery ? `?${contextQuery}` : ''}" title="${context.repository ?? 'Repository'} architecture map" width="100%" height="620" loading="lazy"></iframe>`;
+  const safeRepository = (context.repository ?? 'Repository').replace(/[^\w ./@:-]/g, '').trim().slice(0, 80) || 'Repository';
+  const snippet = `<iframe src="${origin}/embed${contextQuery ? `?${contextQuery}` : ''}" title="${safeRepository} architecture map" width="100%" height="620" loading="lazy"></iframe>`;
   const copy = async () => {
     try {
       if (navigator.clipboard?.writeText) {
