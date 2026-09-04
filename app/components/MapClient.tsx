@@ -18,13 +18,13 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, bun
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
 }
 
-export function MapClient({ route = '/architecture' }: { route?: string }) {
+export function MapClient({ route = '/architecture', initialBundle }: { route?: string; initialBundle?: string }) {
   const [selected, setSelected] = useState('decode');
   const [level, setLevel] = useState('0');
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
-  const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
-  const [requestedBundle, setRequestedBundle] = useState('');
+  const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -37,7 +37,7 @@ export function MapClient({ route = '/architecture' }: { route?: string }) {
       setLevel(next.get('level') ?? '0');
     };
     window.addEventListener('popstate', restoreFocus);
-    const bundleId = params.get('bundle');
+    const bundleId = params.get('bundle') ?? initialBundle;
     if (!bundleId) return () => window.removeEventListener('popstate', restoreFocus);
     setRequestedBundle(bundleId);
     const controller = new AbortController();
