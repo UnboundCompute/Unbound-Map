@@ -99,6 +99,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `828dde5` | Guard semantic zoom URL on server | Fixed a server-render regression introduced by the zoom control by guarding `window.location` access, restoring 200 responses for queryful Architecture routes; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `f1da5d1` | Describe Lachesis handoff pages | `/explore` now emits context-aware metadata using the selected repository and anchor, improving previews for shared code-handoff links rather than inheriting the generic product title; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `e91e9a3` | Carry explicit flow steps to Lachesis | Flow handoffs now include both `flow` and `step` query fields, and Explore shows the selected step explicitly alongside repository, revision, region, and anchor; checks passed. |
+| `e892ff6` | Show complete handoff context | The Lachesis confirmation page now visibly lists selected region and opaque bundle alongside repository, revision, anchor, flow, step, and trust domain when present; checks passed. |
 
 ## Rebuild brief audit
 
@@ -141,6 +142,7 @@ Static and live route checks performed against the local dev server:
 - Contextful `/explore?repository=Zeek&revision=main&bundle=b_demo123&region=decode&anchor=DecodeEthernet%28%29` rendered primary rail and footer links with the same `repository=Zeek`, `revision=main`, and `bundle=b_demo123` query context.
 - Contextful `/?repository=Zeek&revision=main&bundle=b_demo123` rendered `Zeek · Design Map`, `Zeek: see the system before you read it`, and preserved the same context on every Architecture/Flows/Trust entry link and macro-path stage.
 - Contextful `/architecture?repository=Zeek&revision=main&bundle=b_demo123` rendered an iframe snippet with `/embed?repository=Zeek&revision=main&bundle=b_demo123` and `title="Zeek architecture map"`.
+- Queryful `/explore?repository=Zeek&revision=main&bundle=b_demo123&region=decode&flow=packet-decode&step=ipv4&anchor=DecodeIPV4%28%29` rendered visible `region`, `step`, and `bundle` fields plus `DecodeIPV4() · Zeek handoff · Lachesis` metadata.
 - Server-rendered `/embed?repository=Zeek&revision=main&bundle=b_demo123` showed `Preparing the architecture map` and did not include the fixture relationship summary before hydration; its return link retained the Zeek bundle context.
 - Queryful `/architecture?repository=Zeek&revision=main&region=decode&level=1` was re-smoked after the SSR guard and returned 200; the browser-level zoom control remains available without a server-side `window` error.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
