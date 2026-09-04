@@ -42,6 +42,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `99fdce4` | Remove superseded UI vocabulary and align README routes | Deleted unused legacy flow/trust CSS and the obsolete three-entry trust model, removed stale `mode`/tab vocabulary from the tree, and documented canonical routes plus redirects in README; `npm run check`, `npm run build`, `git diff --check`, and stale-pattern search passed |
 | `5e38d55` | Final implementation consistency audit | `DESIGN.md` now names the implemented shell/map/flow/trust components; `npm run check`, `npm run build`, `git diff --check`, canonical route smoke checks, context-query smoke check, and the one-time Impeccable detector pass completed. Browser screenshot inspection was attempted through the required browser surface but was unavailable, so visual screenshot evidence remains an explicit limitation. |
 | `1fa3844` | Make the canonical flow deep-linkable | Added the required `/flows/[flow]` route for `packet-decode`, preserved step state in that route's URL, linked to it from the flow index, and corrected the architecture evidence note to describe the shipped eight-region fixture; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `690ed9f` | Expose hosted snapshot states | Hosted bundle requests now explicitly announce loading, unavailable/error, and valid-empty states; the illustrative fixture is hidden while a requested bundle is unresolved, and failed requests offer recovery instead of silently falling back; checks passed. |
 
 ## Rebuild brief audit
 
