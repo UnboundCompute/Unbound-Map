@@ -52,7 +52,7 @@ await page('/embed?repository=Zeek&revision=main&region=decode&level=2&anchor=De
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
 await page('/architecture/not-a-region', ['Region context unavailable', 'aria-atomic="true"']);
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
-await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state']);
+await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state', 'href="https://lachesis.unboundcompute.com/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;label=Packet+decode&amp;anchor=DecodeEthernet%28%29"']);
 await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123', ['Graph-backed chapter unavailable', 'will not substitute an illustrative chapter', '<meta property="og:title" content="Architecture region · Zeek"']);
 await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123', ['What this region owns', 'Validated payload window']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
