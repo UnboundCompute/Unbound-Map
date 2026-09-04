@@ -39,6 +39,8 @@ async function redirect(path, target) {
 await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek: see the system before you read it', 'Follow a packet', 'Explore architecture', 'full revision', 'Not supplied by snapshot', 'href="https://lachesis.unboundcompute.com/?repository=Zeek&amp;revision=main&amp;bundle=b_demo123"']);
 await image('/opengraph-image?repository=Zeek&revision=main');
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
+await page('/architecture?repository=Zeek&revision=main&bundle=b_demo123', ['A graph-backed bundle was requested', 'Preparing the architecture map']);
+await pageWithout('/architecture?repository=Zeek&revision=main&bundle=b_demo123', ['Illustrative prototype: this eight-region map is editorial fixture content.']);
 await page('/flows?repository=Zeek&revision=main&step=ipv4', ['validated IPv4 payload', 'step=ipv4', '<meta property="og:title" content="Zeek architectural flows · Design Map"', '<meta name="twitter:title" content="Zeek architectural flows · Design Map"']);
 await page('/flows?step=missing-step', ['requested step is not in this flow']);
 await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="memory"', 'value="input"', 'Memory safety', '<meta property="og:title" content="Zeek trust surfaces · Design Map"', '<meta name="twitter:title" content="Zeek trust surfaces · Design Map"']);
