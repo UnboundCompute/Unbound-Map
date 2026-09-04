@@ -106,7 +106,8 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   ].slice(0, 12);
 
   return <>
-    <div className="map-workbench">
+    <section className="map-workbench" aria-labelledby="architecture-map-title">
+      <h2 id="architecture-map-title" className="sr-only">Architecture map</h2>
       <div className="map-bezel">
         <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
@@ -120,7 +121,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
         </div>
       </div>
       <aside className="map-inspector" aria-live="polite" aria-label="Selected region details"><div className="inspector-label">Selected region</div><h2>{current.label}</h2><p>{current.summary}</p><dl className="inspector-facts"><div><dt>footprint</dt><dd>{current.metricLabel}</dd></div><div><dt>path</dt><dd><code>{current.path}</code></dd></div><div><dt>anchor</dt><dd><code>{current.anchor?.label ?? 'No anchor in this projection'}</code></dd></div></dl><Link className="inspector-link" href={`/architecture/${current.id}?${new URLSearchParams({ level: '1', repository: snapshot.repository, revision: snapshot.revision, ...(activeBundle ? { bundle: activeBundle } : {}) }).toString()}`}>Read this region <span aria-hidden="true">→</span></Link><Link className="inspector-link" href={handoffHref(snapshot, current, current.anchor?.label, activeBundle)}>Open anchor in Lachesis <span aria-hidden="true">↗</span></Link></aside>
-    </div>
+    </section>
     <section className="relationship-summary" aria-labelledby="relationship-title"><div><h2 id="relationship-title">The same map, in words</h2><p>Use this ordered summary if you prefer reading relationships to navigating a diagram.</p></div><ol>{regions.map((region) => <li key={region.id}><button type="button" onClick={() => selectRegion(region)} aria-pressed={current.id === region.id}><span>{region.label}</span><small>{region.downstream?.length ? `hands off to ${region.downstream.map((id) => regions.find((item) => item.id === id)?.label ?? id).join(', ')}` : snapshot.provenance === 'graph-backed' && !edges.length ? 'relationship evidence unavailable' : region.role === 'boot' ? 'initializes the runtime' : 'ends the displayed path'}</small></button></li>)}</ol></section>
     <section className="region-directory" aria-label="Region directory"><div><span className="rail-heading">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{snapshot.regions.map((region) => <li key={region.id}><Link href={`/architecture/${region.id}?${new URLSearchParams({ level: '1', repository: snapshot.repository, revision: snapshot.revision, ...(activeBundle ? { bundle: activeBundle } : {}) }).toString()}`}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></Link></li>)}</ol></section>
   </>;
