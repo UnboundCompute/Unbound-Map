@@ -32,6 +32,12 @@ for the same revision-addressed map:
 <iframe src="https://<your-design-map-host>/embed" title="Suricata architecture map" width="100%" height="620" loading="lazy"></iframe>
 ```
 
+For GitHub READMEs (which do not render iframes), use a linked preview image instead:
+
+```markdown
+[![Repository architecture field guide](https://<your-design-map-host>/opengraph-image)](https://<your-design-map-host>/architecture)
+```
+
 Prefer a normal link when the reader needs the explanation, region chapters, flow narrative, or
 accessible text relationship summary; use the embed for a visual orientation inside an existing
 document.
