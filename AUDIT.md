@@ -135,6 +135,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `9d1af91` | Connect map selectors to the inspector | Architecture map nodes and the ordered relationship controls now declare `aria-controls="architecture-map-detail"`, matching the live inspector target so selection updates are explicit to assistive-technology users; `npm run check` and `git diff --check` passed. |
 | `8bc652c` | Preserve deep links beyond the placed canvas | Architecture now distinguishes the nine-region spatial canvas cap from the full projected region directory, so valid focused URLs for later projected regions render their actual region instead of silently falling back to the first node; `npm run check` and `git diff --check` passed. |
 | `6c83864` | Make projection scalability reproducible | Added `npm run projection-smoke`, exercising the real adapter with 0, 1, 8, 30, and 500 top-level modules plus a 20-child roll-up; each case stayed within the documented bounds and emitted explicit remainder regions where required. |
+| `4b975ca` | Protect contextual Flow and Trust previews | Route smoke now asserts repository-specific Open Graph and Twitter titles for the shareable Flows and Trust entry points, alongside their existing deep-link and filter assertions; `npm run smoke` passed. |
 
 ## Rebuild brief audit
 
