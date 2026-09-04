@@ -8,14 +8,16 @@ const flows = { 'packet-decode': { title: 'Packet decode into flow state', intro
 
 export function generateStaticParams() { return Object.keys(flows).map((flow) => ({ flow })); }
 
-export async function generateMetadata({ params }: { params: Promise<{ flow: string }> }): Promise<Metadata> {
-  const { flow } = await params;
-  const entry = flows[flow as keyof typeof flows];
-  return entry ? { title: `${entry.title} · Design Map`, description: `${entry.intro} Read the architectural handoffs before the source.` } : { title: 'Architectural flow · Design Map' };
-}
-
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
+
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }): Promise<Metadata> {
+  const { flow } = await params;
+  const repository = one((await searchParams).repository);
+  const entry = flows[flow as keyof typeof flows];
+  const label = repository ? `${repository} · ` : '';
+  return entry ? { title: `${label}${entry.title} · Design Map`, description: `${entry.intro} Read the architectural handoffs before the source.` } : { title: `${label}Architectural flow · Design Map` };
+}
 
 export default async function FlowPage({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }) {
   const { flow } = await params;
