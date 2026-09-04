@@ -100,6 +100,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `f1da5d1` | Describe Lachesis handoff pages | `/explore` now emits context-aware metadata using the selected repository and anchor, improving previews for shared code-handoff links rather than inheriting the generic product title; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `e91e9a3` | Carry explicit flow steps to Lachesis | Flow handoffs now include both `flow` and `step` query fields, and Explore shows the selected step explicitly alongside repository, revision, region, and anchor; checks passed. |
 | `e892ff6` | Show complete handoff context | The Lachesis confirmation page now visibly lists selected region and opaque bundle alongside repository, revision, anchor, flow, step, and trust domain when present; checks passed. |
+| `558839a` | Preserve context on wordmark navigation | The global Design Map wordmark now retains repository, revision, and bundle query context when returning to Start here, eliminating the final shell-level context reset; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
