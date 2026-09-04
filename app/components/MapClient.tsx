@@ -66,7 +66,7 @@ export function MapClient({ route = '/architecture', initialBundle }: { route?: 
   }
   const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const activeBundle = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search).get('bundle') ?? undefined;
-  const systemShapeParams = new URLSearchParams(window.location.search);
+  const systemShapeParams = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search);
   systemShapeParams.delete('region');
   systemShapeParams.set('level', '0');
   const systemShapeHref = `${route}?${systemShapeParams.toString()}`;
