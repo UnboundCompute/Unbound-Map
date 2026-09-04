@@ -230,6 +230,7 @@ Static and live route checks performed against the local dev server:
 - Playwright keyboard/reduced-motion smoke confirmed Flow step buttons receive a 3px visible focus outline under keyboard Tab navigation, Architecture map nodes do the same, and the flow progress transition resolves to `0.00001s` under `prefers-reduced-motion: reduce`.
 - Clipboard smoke confirmed the focused Architecture share action copies the complete URL, including `repository`, `revision`, `region`, `level`, `anchor`, and opaque `bundle` context; the visible status changed to `Link ready`.
 - Desktop visual pass at 1440px captured and inspected Start here, Flows, and Trust full-page screenshots; the editorial reading hierarchy, bounded map/flow surfaces, and restrained CTA treatment remain coherent with zero horizontal overflow.
+- Latest 375px Flow screenshot inspection confirmed the branch explanation stacks before the step selector, the five-step navigation remains full-width and readable, the mobile linear fallback is open by default, and the route has zero horizontal overflow.
 - Playwright desktop history smoke confirmed Architecture selection semantics: selecting `Application protocols` entered `?region=protocols&level=1`, Back restored level 0 with all eight nodes, and Forward restored the focused region plus inspector content.
 
 ## Known prototype limits
