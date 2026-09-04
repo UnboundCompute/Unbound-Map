@@ -1,0 +1,37 @@
+# Design Map audit log
+
+This prototype is intentionally a fixture-backed HLD surface. Each implementation commit was verified before moving to the next slice.
+
+## Commits
+
+| Commit | Change | Evidence |
+| --- | --- | --- |
+| `1206ab1` | Next app scaffold, HLD shell, map fixture, three lenses | `npm run build` passed |
+| `d017257` | README, ignore rules, lockfile and TypeScript config normalization | clean repository after commit |
+| `f6a171e` | Responsive map path for small screens | Playwright: `390px` viewport, `scrollWidth - clientWidth = 0` |
+| `3e61dd6` | Pin Turbopack to this repository | `npm run build` passed without workspace-root warning |
+| `a93f664` | Context-preserving Lachesis handoff | Playwright verified generated `repo`, `commit`, `focus`, and `anchor` query parameters |
+
+## Current checks
+
+```bash
+npm run check
+npm run build
+```
+
+Browser smoke checks performed against the local dev server:
+
+- Document title: `Design Map — Read this before the source`
+- H1: `See the system before you read it.`
+- Three accessible tabs are rendered.
+- Four map nodes are rendered.
+- Clicking `Detection engine` changes the selected-region inspector.
+- Clicking `Trust surface` changes the lens caption.
+- Mobile viewport has no horizontal overflow.
+- `prefers-reduced-motion` disables long transitions.
+
+## Known prototype limits
+
+- Suricata counts and node facts are fixture data, not yet read from a Lachesis graph endpoint.
+- The Lachesis query string is the agreed handoff shape; the explorer must implement its parser and focused-bundle loading.
+- The system map currently renders four illustrative regions; the scalable community roll-up engine is the next product slice.
