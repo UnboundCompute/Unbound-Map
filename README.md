@@ -32,6 +32,16 @@ for the same revision-addressed map:
 <iframe src="https://<your-design-map-host>/embed" title="Suricata architecture map" width="100%" height="620" loading="lazy"></iframe>
 ```
 
+For a generated snapshot, keep the repository context on the embed URL (the opaque bundle ID is
+what selects the hosted graph):
+
+```html
+<iframe src="https://<your-design-map-host>/embed?repository=OWNER/REPO&revision=COMMIT&bundle=b_…" title="OWNER/REPO architecture map" width="100%" height="620" loading="lazy"></iframe>
+```
+
+The first snippet is the illustrative prototype default; replace its title and URL before sharing
+with maintainers.
+
 For GitHub READMEs (which do not render iframes), use a linked preview image instead:
 
 ```markdown
