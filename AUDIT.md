@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `e0f5b05` | Reject fixture fallback in graph chapter smoke | Route smoke now asserts that an unavailable bundle chapter contains neither fixture headings nor fixture structure facts, making the provenance boundary executable; live `npm run smoke` passed. |
 | `6d68738` | Surface sparse graph projections explicitly | The repository shell now labels a valid graph-backed snapshot with one or zero regions as `Graph-backed · sparse projection` and explains the limited architectural confidence in the reading rail; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `5a3e946` | Clarify current-projection region recovery | Unknown region chapters now describe the active projection rather than incorrectly calling every missing region “illustrative”; hosted chapter projection also normalizes the bundle once instead of repeating the adapter work; `npm run check` and `git diff --check` passed. |
 | `54c7fc2` | Keep graph-backed region chapters provenance-safe | Region chapters now load and project a validated hosted bundle when supplied, derive neighbors from that snapshot, and render a recoverable alert instead of Suricata fixture content when loading fails; live smoke covers the unavailable-bundle chapter path, with `npm run check`, `npm run build`, and `git diff --check` passing. |
