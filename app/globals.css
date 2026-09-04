@@ -143,6 +143,8 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .map-focus-content li { display: grid; grid-template-columns: 30px minmax(120px, .7fr) minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--map-rule); }
 .map-focus-content li > span { color: #90a090; font: 10px var(--mono); }
 .map-focus-content li strong { font-size: 13px; }
+.map-child-link { color: var(--map-ink); font-size: 13px; font-weight: 600; text-decoration: none; }
+.map-child-link:hover { color: var(--signal-light); text-decoration: underline; text-underline-offset: 3px; }
 .map-focus-content li small { color: #b6c2b6; font-size: 12px; line-height: 1.45; }
 .map-focus-content li .map-focus-link { grid-column: 2 / -1; }
 .map-focus-content li small code { display: inline-block; margin-left: 8px; color: #90a090; font: 10px var(--mono); overflow-wrap: anywhere; }
