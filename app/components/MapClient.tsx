@@ -105,6 +105,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       return;
     }
     setSelected(region.id);
+    setLevel('1');
     window.history.pushState(null, '', `${route}?${params.toString()}`);
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
