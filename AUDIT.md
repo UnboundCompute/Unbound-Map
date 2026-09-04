@@ -151,6 +151,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `6c83864` | Make projection scalability reproducible | Added `npm run projection-smoke`, exercising the real adapter with 0, 1, 8, 30, and 500 top-level modules plus a 20-child roll-up; each case stayed within the documented bounds and emitted explicit remainder regions where required. |
 | `4b975ca` | Protect contextual Flow and Trust previews | Route smoke now asserts repository-specific Open Graph and Twitter titles for the shareable Flows and Trust entry points, alongside their existing deep-link and filter assertions; `npm run smoke` passed. |
 | `d2d352a` | Document UX verification gates | README now gives maintainers the exact `check`, `build`, projection, and route-smoke commands and explains the states each gate protects before a map is shared; `git diff --check` passed. |
+| `9d0e50b` | Preserve context in preview snippet | The README’s GitHub image/link example now carries repository, revision, and opaque bundle parameters on both the preview URL and destination, preventing maintainers from publishing a generic handoff by accident; `git diff --check` passed. |
 
 ## Rebuild brief audit
 
