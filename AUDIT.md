@@ -153,6 +153,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `d2d352a` | Document UX verification gates | README now gives maintainers the exact `check`, `build`, projection, and route-smoke commands and explains the states each gate protects before a map is shared; `git diff --check` passed. |
 | `9d0e50b` | Preserve context in preview snippet | The README’s GitHub image/link example now carries repository, revision, and opaque bundle parameters on both the preview URL and destination, preventing maintainers from publishing a generic handoff by accident; `git diff --check` passed. |
 | `419b01a` | Announce unknown region recovery | Unknown `/architecture/[region]` chapters now expose an atomic polite status panel, and route smoke covers the recovery landmark so stale region links remain perceivable and actionable without client hydration; smoke, check, and diff validation passed. |
+| `fbb9249` | Enter region focus on map selection | Desktop level-0 node selection now updates both the URL and React zoom state, immediately switching to the selected region’s focus view instead of requiring a reload to reconcile the semantic zoom; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
