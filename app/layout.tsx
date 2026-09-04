@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   applicationName: 'Design Map',
   authors: [{ name: 'Unbound Compute' }],
   keywords: ['software architecture', 'codebase documentation', 'HLD', 'open source', 'repository map'],
-  openGraph: { title: 'Design Map — Read this before the source', description: 'See a repository’s structure, responsibilities, flows, and trust surfaces before opening the source.', type: 'article', images: ['/opengraph-image'] },
-  twitter: { card: 'summary_large_image', title: 'Design Map — Read this before the source', description: 'A shareable architecture field guide for unfamiliar codebases.', images: ['/opengraph-image'] },
+  openGraph: { title: 'Design Map — Read this before the source', description: 'See a repository’s structure, responsibilities, flows, and trust surfaces before opening the source.', type: 'article', images: [{ url: '/opengraph-image', alt: 'Design Map — read the system before the source' }] },
+  twitter: { card: 'summary_large_image', title: 'Design Map — Read this before the source', description: 'A shareable architecture field guide for unfamiliar codebases.', images: [{ url: '/opengraph-image', alt: 'Design Map — read the system before the source' }] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
