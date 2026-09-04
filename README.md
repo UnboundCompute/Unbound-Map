@@ -11,6 +11,19 @@ npm install
 npm run dev
 ```
 
+Before sharing or opening a pull request, run the static and route gates:
+
+```bash
+npm run check
+npm run build
+npm run projection-smoke
+npm run smoke # with `npm run dev` running on port 3000
+```
+
+`projection-smoke` exercises the bounded adapter with 0, 1, 8, 30, and 500 communities plus a
+child roll-up. `smoke` checks contextual routes, social previews, malformed-link recovery, loading
+states, landmarks, and legacy redirects.
+
 The current UI is a focused Suricata prototype with fixture data and these documentation routes:
 
 - `/` — Start here orientation and the recommended reading order
