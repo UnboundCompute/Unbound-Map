@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `d5cb889` | Personalize share preview images | `/opengraph-image` now accepts repository/revision query context and renders it into the share card, while retaining a safe generic default for direct image requests; the route smoke verifies a contextual PNG response, with `npm run check`, `npm run build`, and `git diff --check` passing. |
 | `04b55dd` | Keep graph-backed region previews out of fixture SEO | Region metadata now uses a generic verified-snapshot description whenever `bundle=…` is present instead of leaking an illustrative region summary; route smoke asserts the generic Zeek preview title and all gates passed. |
 | `e0f5b05` | Reject fixture fallback in graph chapter smoke | Route smoke now asserts that an unavailable bundle chapter contains neither fixture headings nor fixture structure facts, making the provenance boundary executable; live `npm run smoke` passed. |
 | `6d68738` | Surface sparse graph projections explicitly | The repository shell now labels a valid graph-backed snapshot with one or zero regions as `Graph-backed · sparse projection` and explains the limited architectural confidence in the reading rail; `npm run check`, `npm run build`, and `git diff --check` passed. |
