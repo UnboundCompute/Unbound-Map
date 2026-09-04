@@ -254,6 +254,7 @@ Static and live route checks performed against the local dev server:
 - Latest 375px Trust screenshot inspection confirmed the long domain search and kind filter remain operable, the selected domain stays readable as a single document section, query/filter state remains visible in the URL, and zero horizontal overflow persists.
 - Playwright deep-link smoke at 375px confirmed `/trust?domain=memory-safety` selects and scrolls the `#memory-safety` article to the 20px reading offset, with zero horizontal overflow.
 - Playwright desktop history smoke confirmed Architecture selection semantics: selecting `Application protocols` entered `?region=protocols&level=1`, Back restored level 0 with all eight nodes, and Forward restored the focused region plus inspector content.
+- Token contrast audit found no reader-facing paper-surface failure: `--muted`/paper is 4.56:1, `--body`/paper 6.24:1, `--signal`/paper 5.74:1, and map ink/map surface 14.54:1; the 4.23:1 axis annotation is decorative secondary map geometry and has an adjacent text relationship summary.
 
 ## Known prototype limits
 
