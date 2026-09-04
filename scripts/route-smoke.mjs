@@ -28,6 +28,7 @@ await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="
 await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo123', ['Context ready', 'DecodeIPV4()', 'b_demo123', 'aria-label="Open DecodeIPV4() in Lachesis in a new tab"']);
 await page('/embed?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture', 'Graph-backed bundle requested', 'Preparing the architecture map', 'Skip to map', 'id="embed-content"']);
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
+await page('/architecture/not-a-region', ['Region context unavailable', 'aria-atomic="true"']);
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
 await redirect('/flow?step=ipv4', '/flows?step=ipv4');
