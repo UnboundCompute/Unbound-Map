@@ -28,6 +28,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `dc113df` | Audit the current UI/UX and write Luna's replacement implementation goal | `LUNA_UI_UX_REBUILD_GOAL.md` records a 5-dimension 8/20 audit, 14 prioritized findings, a phased commit plan, and measurable acceptance criteria; `npm run check` and `npm run build` passed before the report was committed |
 | `a2d636e` | Establish honest repository view models and isolate illustrative Suricata content | `npm run check` and `npm run build` passed; `RepositorySnapshotView` carries provenance/coverage/limitations, `illustrative-suricata.ts` is explicitly non-live, and hosted map handoff uses the same typed snapshot context |
 | `624f24e` | Replace the competing CSS layers with one warm technical editorial visual system | `DESIGN.md` defines Read-mode layout/type/tokens/interaction gates; legacy CSS was removed, mobile nodes now use a verified single-column flow, focus and touch sizing were added, and detector findings were reduced to the permitted map grid advisory after the font finding was corrected |
+| `1d3b288` | Give Data Flow a distinct ordered reading surface | `FlowDiagram` renders four data nouns, handoffs, guards, region ownership, and symbol-specific Lachesis links; `npm run check` and `npm run build` passed |
 
 ## Current checks
 
