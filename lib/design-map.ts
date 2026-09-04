@@ -58,6 +58,7 @@ export type DesignMapSnapshot = {
   coverageScope: string;
   limitations: string[];
   modules: BundleModule[];
+  nodes: BundleNode[];
 };
 
 export type HLDRegion = {
@@ -66,6 +67,7 @@ export type HLDRegion = {
   path?: string;
   nodeCount: number;
   rolledUp: boolean;
+  anchor?: Pick<BundleNode, 'id' | 'label' | 'file' | 'line'>;
 };
 
 function positiveInteger(value: unknown, fallback: number) {
@@ -92,6 +94,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     coverageScope: bundle.graph.coverage?.scope ?? 'repository',
     limitations,
     modules: bundle.graph.modules ?? [],
+    nodes: bundle.graph.nodes,
   };
 }
 
@@ -112,6 +115,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       path: module.path,
       nodeCount: module.node_ids?.length ?? 0,
       rolledUp: false,
+      anchor: module.node_ids?.map((id) => snapshot.nodes.find((node) => node.id === id)).find(Boolean),
     }))
     .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
 
