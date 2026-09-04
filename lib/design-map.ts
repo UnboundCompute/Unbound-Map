@@ -60,6 +60,14 @@ export type DesignMapSnapshot = {
   modules: BundleModule[];
 };
 
+export type HLDRegion = {
+  id: string;
+  label: string;
+  path?: string;
+  nodeCount: number;
+  rolledUp: boolean;
+};
+
 function positiveInteger(value: unknown, fallback: number) {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : fallback;
 }
@@ -87,3 +95,33 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
   };
 }
 
+/**
+ * Convert the module hierarchy into a bounded HLD table of contents.
+ *
+ * The graph can contain hundreds of communities. At repository altitude we
+ * keep the largest top-level modules and make the remainder an explicit
+ * roll-up, rather than emitting a canvas full of peers.
+ */
+export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12): HLDRegion[] {
+  const safeLimit = Math.max(1, Math.floor(limit));
+  const topLevel = snapshot.modules
+    .filter((module) => !module.parent_id)
+    .map((module) => ({
+      id: module.id,
+      label: module.name,
+      path: module.path,
+      nodeCount: module.node_ids?.length ?? 0,
+      rolledUp: false,
+    }))
+    .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
+
+  if (topLevel.length <= safeLimit) return topLevel;
+  const visible = topLevel.slice(0, safeLimit - 1);
+  const remainder = topLevel.slice(safeLimit - 1);
+  return [...visible, {
+    id: 'region:other',
+    label: `${remainder.length} more regions`,
+    nodeCount: remainder.reduce((total, region) => total + region.nodeCount, 0),
+    rolledUp: true,
+  }];
+}

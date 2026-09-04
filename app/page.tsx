@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { loadHostedBundle } from '../lib/hosted';
-import { toDesignMapSnapshot, type DesignMapSnapshot, type LachesisBundle } from '../lib/design-map';
+import { projectTopLevelRegions, toDesignMapSnapshot, type DesignMapSnapshot, type LachesisBundle } from '../lib/design-map';
 
 type NodeId = 'input' | 'core' | 'detect' | 'output';
 type Tab = 'system' | 'flow' | 'trust';
@@ -27,6 +27,7 @@ export default function Page() {
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [loadMessage, setLoadMessage] = useState('');
   const [hostedSnapshot, setHostedSnapshot] = useState<DesignMapSnapshot | null>(null);
+  const [hostedRegionCount, setHostedRegionCount] = useState(0);
   useEffect(() => {
     const bundleId = new URLSearchParams(window.location.search).get('bundle');
     if (!bundleId) return;
@@ -35,7 +36,9 @@ export default function Page() {
     loadHostedBundle(bundleId, controller.signal).then((raw) => {
       const snapshot = toDesignMapSnapshot(raw as LachesisBundle);
       setHostedSnapshot(snapshot);
-      setLoadMessage(`${snapshot.repository} · ${snapshot.revision.slice(0, 7)} · ${snapshot.includedNodes.toLocaleString()} nodes included`);
+      const regions = projectTopLevelRegions(snapshot);
+      setHostedRegionCount(regions.length);
+      setLoadMessage(`${snapshot.repository} · ${snapshot.revision.slice(0, 7)} · ${snapshot.includedNodes.toLocaleString()} nodes · ${regions.length} HLD regions`);
       setLoadState('ready');
     }).catch((error: unknown) => {
       if (controller.signal.aborted) return;
@@ -69,7 +72,7 @@ export default function Page() {
           </div>
           <aside className="snapshot" aria-label="Repository snapshot">
             <div className="snapshot-meta"><span>commit {revision.slice(0, 7)}</span><span>{hostedSnapshot ? hostedSnapshot.coverageScope : 'fixture snapshot'}</span></div>
-            <strong>{hostedSnapshot ? `${hostedSnapshot.indexedNodes.toLocaleString()} nodes → HLD projection` : '879,085 nodes → 12 regions'}</strong>
+            <strong>{hostedSnapshot ? `${hostedSnapshot.indexedNodes.toLocaleString()} nodes → ${hostedRegionCount} HLD regions` : '879,085 nodes → 12 regions'}</strong>
             <p>{hostedSnapshot ? 'The graph identity and coverage are live. The visible region layout remains a fixture until community roll-up is connected.' : 'The top-level map keeps the shape legible. Every region is anchored to real functions and files in Lachesis.'}</p>
           </aside>
         </div>
