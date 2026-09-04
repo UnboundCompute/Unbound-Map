@@ -81,6 +81,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `1efe59c` | Add README image embed pattern | README now documents a GitHub-compatible linked Open Graph preview image in addition to the iframe, so maintainers can place a clickable HLD visual where iframes are stripped; `npm run check` and `git diff --check` passed. |
 | `ba029a2` | Remove obsolete map state branches | Deleted unreachable loading/error banner branches and the unused error style after the explicit state-panel implementation, leaving one authoritative state presentation; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `e21cdab` | Remove legacy map route styles | Deleted unused decorative route/line CSS now that all map connections are data-driven SVG edges, keeping the stylesheet aligned with the current topology model; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `9f17437` | Make embed identity-aware | `/embed` now derives its title, description, heading, and footer state from incoming repository/bundle context, avoiding a misleading Suricata fixture label when a maintainer shares a graph-backed bundle; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
