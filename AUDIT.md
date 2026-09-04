@@ -91,6 +91,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `4194bf4` | Explain stale graph snapshots | The repository shell now recognizes an explicit stale/outdated/superseded limitation on graph-backed bundles, labels the snapshot as stale, and gives revision-confirmation guidance without guessing freshness; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `ab7aba4` | Make Architecture context-aware | The Architecture index now derives shell identity, page metadata, thesis copy, and the next Flow link from incoming repository/revision/bundle context while keeping fixture provenance explicit; checks passed. |
 | `1a6d41c` | Preserve context in shell navigation | `DocsShell` now carries shared repository/revision/bundle context through the primary rail and footer handoff, and all contextual pages pass that contract into the shell; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `6268130` | Make Start here repository-aware | The canonical `/` distribution entry now derives metadata, title, orientation copy, macro-path links, and recommended routes from incoming repository/revision/bundle context while retaining fixture provenance; checks passed. |
 
 ## Rebuild brief audit
 
@@ -131,6 +132,7 @@ Static and live route checks performed against the local dev server:
 - Contextful `/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123` rendered `Packet decode · Zeek architecture` and preserved context in chapter links; an unknown region rendered `Architecture region · Zeek`, `Region context unavailable`, and a bundle-preserving Lachesis recovery link.
 - Contextful `/architecture?repository=Zeek&revision=main&bundle=b_demo123` rendered `Zeek architecture · Design Map`, a Zeek repository bar, and a context-preserving `/flows` link.
 - Contextful `/explore?repository=Zeek&revision=main&bundle=b_demo123&region=decode&anchor=DecodeEthernet%28%29` rendered primary rail and footer links with the same `repository=Zeek`, `revision=main`, and `bundle=b_demo123` query context.
+- Contextful `/?repository=Zeek&revision=main&bundle=b_demo123` rendered `Zeek · Design Map`, `Zeek: see the system before you read it`, and preserved the same context on every Architecture/Flows/Trust entry link and macro-path stage.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
 - Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
 - `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
