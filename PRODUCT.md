@@ -28,7 +28,8 @@ The artifact is linked from a repository README or shared directly with a contri
 
 ## Capabilities and Constraints
 
-- System Map, Data Flow, and Trust Surface are separate reading surfaces, not three dense panels in one dashboard.
+- Architecture, Flows, and Trust are separate reading surfaces, not three dense panels in one dashboard.
+- Start here and the embeddable map are distribution surfaces: they make a repository’s structural thesis easy to understand and share without requiring product orientation first.
 - Structural facts come from Lachesis bundles and remain tied to a commit, coverage scope, and limitations.
 - The HLD renderer must reduce large graphs into a bounded hierarchy with semantic zoom.
 - The UI must distinguish graph evidence from layout and must not present a map as a security finding.

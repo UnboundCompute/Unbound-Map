@@ -20,7 +20,7 @@ The map should feel like a careful technical drawing printed into the document�
 ## Type
 
 - Body: IBM Plex Sans, 16px base, 1.55–1.7 line-height, 65–75ch measure.
-- Display: a sourced characterful display face selected before implementation; do not default to a platform/system face.
+- Display: IBM Plex Serif, selected for the shipped technical-editorial reading voice.
 - Identifiers: JetBrains Mono, 11–13px, only where the value is a file, symbol, revision, count, or URL.
 - No informational text below 12px.
 - Heading tracking never tighter than `-0.04em`.
