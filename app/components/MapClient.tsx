@@ -80,8 +80,6 @@ export function MapClient({ route = '/architecture' }: { route?: string }) {
     <div className="map-workbench">
       <div className="map-bezel">
         <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : 'region focus'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown</span></div>
-        {bundleState === 'loading' && <div className="map-banner" role="status">Loading the hosted graph bundle…</div>}
-        {bundleState === 'error' && <div className="map-banner map-banner-error" role="alert">{bundleMessage}</div>}
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
         {snapshot.provenance === 'graph-backed' && !edges.length && <div className="map-banner map-banner-caution" role="status">Relationship evidence is not present in this bundle, so connections are intentionally not inferred.</div>}
         <div className="map-canvas" aria-label="Suricata architecture map">
