@@ -28,6 +28,12 @@ function contextualHref(href: string, context?: SharedSnapshotContext) {
   return `${href}${query ? `${href.includes('?') ? '&' : '?'}${query}` : ''}`;
 }
 
+function lachesisHref(context?: SharedSnapshotContext) {
+  if (!context || (!context.repository && !context.revision && !context.bundle)) return 'https://lachesis.unboundcompute.com/';
+  const query = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
+  return `https://lachesis.unboundcompute.com/?${query}`;
+}
+
 export function DocsShell({ children, active, snapshot = illustrativeSnapshot, context }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
   const activeRoute = active ?? '/';
   const isFixture = snapshot.provenance === 'illustrative';
@@ -41,7 +47,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         <span className="bar-repo">{snapshot.repository}</span>
         <details className="revision-detail"><summary aria-label={`Revision ${snapshot.revision}`}><code className="bar-revision">{shortRevision}</code></summary><div className="revision-popover"><span>full revision</span><code>{snapshot.revision}</code></div></details>
         <SnapshotState snapshot={snapshot} />
-        <a className="bar-lachesis" href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>
+        <a className="bar-lachesis" href={lachesisHref(context)} target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>
       </header>
       <div className="docs-layout">
         <aside className="reading-rail" aria-label="Repository guide">
