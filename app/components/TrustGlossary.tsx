@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { illustrativeSnapshot, trustDomains, type SharedSnapshotContext } from '../../lib/view-model';
 
-export function TrustGlossary({ context = {} }: { context?: SharedSnapshotContext }) {
-  const [query, setQuery] = useState('');
-  const [kind, setKind] = useState('all');
+export function TrustGlossary({ context = {}, initialQuery = '', initialKind = 'all' }: { context?: SharedSnapshotContext; initialQuery?: string; initialKind?: string }) {
+  const [query, setQuery] = useState(initialQuery);
+  const [kind, setKind] = useState(initialKind);
   useEffect(() => {
     const restoreFilters = () => {
       const params = new URLSearchParams(window.location.search);
