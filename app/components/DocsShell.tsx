@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { illustrativeSnapshot, type RepositorySnapshotView } from '../../lib/view-model';
+import { ShareButton } from './ShareButton';
 
 export const navItems = [
   { href: '/', label: 'Start here', note: 'Get oriented' },
@@ -51,7 +52,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot }:
 }
 
 export function PageIntro({ eyebrow, title, children, snapshot = illustrativeSnapshot }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView }) {
-  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><SnapshotState snapshot={snapshot} /><span>{snapshot.coverageScope}</span></div></header>;
+  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><SnapshotState snapshot={snapshot} /><span>{snapshot.coverageScope}</span><ShareButton /></div></header>;
 }
 
 export function EvidenceNote({ children }: { children: ReactNode }) { return <aside className="evidence-note"><span className="evidence-label">How to read the evidence</span><p>{children}</p></aside>; }

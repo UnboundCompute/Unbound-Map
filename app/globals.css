@@ -67,6 +67,8 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .page-intro h1 { max-width: 720px; margin: 0; font: 400 clamp(44px, 6vw, 76px)/.98 var(--serif); letter-spacing: -.035em; }
 .page-lede { max-width: 680px; margin: 25px 0 0; color: var(--body); font-size: 18px; line-height: 1.68; }
 .intro-source { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 22px; color: var(--muted); font: 11px var(--mono); }
+.share-button { min-height: 36px; margin-left: auto; padding: 0 10px; border: 1px solid var(--rule); color: var(--signal); background: transparent; font: 600 11px var(--sans); cursor: pointer; }
+.share-button:hover { border-color: var(--signal); background: var(--paper-deep); }
 .thesis-block { max-width: 780px; padding: 27px 0 29px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .thesis-block h2, .flow-intro h2, .trust-intro h2, .architecture-next h2, .flow-next h2, .handoff-boundary h2 { max-width: 680px; margin: 14px 0 12px; font: 400 clamp(28px, 3.4vw, 43px)/1.08 var(--serif); letter-spacing: -.025em; }
 .thesis-block p, .flow-intro p, .trust-intro p, .architecture-next p, .flow-next p { max-width: 640px; margin: 0; color: var(--body); font-size: 16px; line-height: 1.7; }
