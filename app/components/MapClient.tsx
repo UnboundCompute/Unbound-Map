@@ -18,7 +18,7 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, bun
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
 }
 
-export function MapClient() {
+export function MapClient({ route = '/architecture' }: { route?: string }) {
   const [selected, setSelected] = useState('decode');
   const [level, setLevel] = useState('0');
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
@@ -70,7 +70,7 @@ export function MapClient() {
     const params = new URLSearchParams(window.location.search);
     params.set('region', region.id);
     params.set('level', '1');
-    window.history.pushState(null, '', `/architecture?${params.toString()}`);
+    window.history.pushState(null, '', `${route}?${params.toString()}`);
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
   const edges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
