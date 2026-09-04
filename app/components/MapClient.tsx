@@ -114,6 +114,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     ...(current.anchor ? [{ label: current.anchor.label, detail: `${current.anchor.file}:${current.anchor.line}`, summary: 'Primary design anchor for this region.', anchor: current.anchor.label }] : []),
     ...(current.children ?? []).filter((child) => child.anchor).map((child) => ({ label: child.label, detail: child.anchor!, summary: child.summary, anchor: child.anchor! })),
   ].sort((a, b) => Number(b.anchor === requestedAnchor) - Number(a.anchor === requestedAnchor)).slice(0, 12);
+  const anchorIsUnknown = Boolean(level === '2' && requestedAnchor && !focusAnchors.some((anchor) => anchor.anchor === requestedAnchor));
 
   return <>
     <section className="map-workbench" aria-labelledby="architecture-map-title">
@@ -122,6 +123,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
         <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
         {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
+        {anchorIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested anchor is not present in this region projection. Showing the available design anchors instead.</div>}
         {snapshot.provenance === 'graph-backed' && !edges.length && <div className="map-banner map-banner-caution" role="status">Relationship evidence is not present in this bundle, so connections are intentionally not inferred.</div>}
         <div className="map-canvas" aria-label={`${snapshot.repository} architecture map`}>
           <div className="map-grid" aria-hidden="true" />
