@@ -13,12 +13,14 @@ export function FlowDiagram({ route = '/flows', context = {}, initialStep }: { r
   const initialIndex = flowSteps.findIndex((item) => item.id === initialStep);
   const invalidInitialStep = Boolean(initialStep && initialIndex < 0);
   const [active, setActive] = useState(initialIndex >= 0 ? initialIndex : 0);
+  const [invalidStep, setInvalidStep] = useState(invalidInitialStep);
   const [linearOpen, setLinearOpen] = useState(false);
   const step = flowSteps[active];
   useEffect(() => {
     const restoreStep = () => {
       const value = new URLSearchParams(window.location.search).get('step');
       const index = flowSteps.findIndex((item) => item.id === value);
+      setInvalidStep(Boolean(value && index < 0));
       setActive(index >= 0 ? index : (flowSteps.findIndex((item) => item.id === initialStep) >= 0 ? flowSteps.findIndex((item) => item.id === initialStep) : 0));
     };
     restoreStep();
@@ -31,13 +33,14 @@ export function FlowDiagram({ route = '/flows', context = {}, initialStep }: { r
   }, []);
   const choose = (index: number) => {
     setActive(index);
+    setInvalidStep(false);
     const params = new URLSearchParams(window.location.search);
     params.set('step', flowSteps[index].id);
     window.history.pushState(null, '', `${route}?${params.toString()}`);
   };
   return <section className="guided-flow" aria-labelledby="flow-steps-title">
     <div className="flow-progress"><div><span className="flow-label">One flow · {flowSteps.length} handoffs</span><h2 id="flow-steps-title">Read the path one boundary at a time.</h2></div><span className="flow-count">{String(active + 1).padStart(2, '0')} / {String(flowSteps.length).padStart(2, '0')}</span></div>
-    {invalidInitialStep && <p className="flow-banner" role="status" aria-live="polite">The requested step is not in this flow. Showing the first handoff; choose another step below.</p>}
+    {invalidStep && <p className="flow-banner" role="status" aria-live="polite">The requested step is not in this flow. Showing the first handoff; choose another step below.</p>}
     <ol className="flow-step-nav" aria-label="Flow steps">{flowSteps.map((item, index) => <li key={item.id}><button type="button" className={index === active ? 'is-active' : ''} onClick={() => choose(index)} aria-current={index === active ? 'step' : undefined} aria-controls="flow-step-detail"><span>{String(index + 1).padStart(2, '0')}</span><strong>{item.noun}</strong></button></li>)}</ol>
     <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Step {active + 1} of {flowSteps.length}: {step.noun}. {step.description}</p><div className="flow-stage" id="flow-step-detail" role="region" aria-labelledby="flow-step-title"><div className="flow-stage-track" aria-hidden="true"><span className="flow-stage-fill" style={{ transform: `scaleX(${active / Math.max(1, flowSteps.length - 1)})` }} /></div><p className="flow-handoff-label">{step.handoff}</p><h3 id="flow-step-title">{step.noun}</h3><p className="flow-description">{step.description}</p><dl className="flow-fields"><div><dt>input</dt><dd><code>{step.input}</code></dd></div><div><dt>output</dt><dd><code>{step.output}</code></dd></div>{step.decision && <div><dt>decision</dt><dd>{step.decision}</dd></div>}</dl>{step.guard && <p className="flow-guard"><strong>Guard</strong><span>{step.guard}</span></p>}<Link className="quiet-link" href={exploreHref(step.id, context)}>Open {step.anchor} in Lachesis <span aria-hidden="true">↗</span></Link></div>
     <div className="flow-controls"><button type="button" onClick={() => choose(Math.max(0, active - 1))} disabled={active === 0}>← Previous</button><button type="button" onClick={() => choose(Math.min(flowSteps.length - 1, active + 1))} disabled={active === flowSteps.length - 1}>Next →</button></div>
