@@ -6,7 +6,7 @@ import { flowSteps, illustrativeSnapshot, type SharedSnapshotContext } from '../
 
 function exploreHref(stepId: string, context: SharedSnapshotContext) {
   const step = flowSteps.find((item) => item.id === stepId) ?? flowSteps[0];
-  return `/explore?${new URLSearchParams({ repository: context.repository ?? illustrativeSnapshot.repository, revision: context.revision ?? illustrativeSnapshot.revision, region: step.regionId, label: step.noun, flow: step.id, step: step.id, anchor: step.anchor, ...(context.bundle ? { bundle: context.bundle } : {}) }).toString()}`;
+  return `/explore?${new URLSearchParams({ repository: context.repository ?? illustrativeSnapshot.repository, revision: context.revision ?? illustrativeSnapshot.revision, region: step.regionId, label: step.noun, flow: context.flow ?? 'packet-decode', step: step.id, anchor: step.anchor, ...(context.bundle ? { bundle: context.bundle } : {}) }).toString()}`;
 }
 
 export function FlowDiagram({ route = '/flows', context = {}, initialStep }: { route?: string; context?: SharedSnapshotContext; initialStep?: string }) {
