@@ -128,6 +128,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `e97f3f2` | Document verified embed context | README now includes a copyable repository/revision/opaque-bundle iframe example and explicitly labels the bare Suricata snippet as illustrative, reducing maintainer risk when publishing a generated map; `git diff --check` passed. |
 | `558839a` | Preserve context on wordmark navigation | The global Design Map wordmark now retains repository, revision, and bundle query context when returning to Start here, eliminating the final shell-level context reset; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `188dde5` | Connect flow selectors to their detail region | Guided-flow step controls now declare `aria-controls` and the changing narrative panel exposes a matching labelled region, making the selector-to-content relationship explicit for keyboard and assistive-technology users; `npm run check` and `git diff --check` passed. |
+| `731f69e` | Announce share outcomes reliably | Share-link and README-embed controls now expose dedicated polite live statuses for successful and unavailable copy outcomes, keeping the button name stable enough for assistive technology while preserving visible feedback; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
