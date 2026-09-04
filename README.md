@@ -58,7 +58,7 @@ with maintainers.
 For GitHub READMEs (which do not render iframes), use a linked preview image instead:
 
 ```markdown
-[![Repository architecture field guide](https://<your-design-map-host>/opengraph-image)](https://<your-design-map-host>/architecture)
+[![Repository architecture field guide](https://<your-design-map-host>/opengraph-image?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…)](https://<your-design-map-host>/architecture?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…)
 ```
 
 Prefer a normal link when the reader needs the explanation, region chapters, flow narrative, or
