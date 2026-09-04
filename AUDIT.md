@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `1c76f6d` | Keep social previews tied to repository context | `documentMetadata` now passes repository/revision into `/opengraph-image` for Start, Architecture, region, Flows, Trust, Embed, and Lachesis handoff routes; route smoke asserts the contextual image URL, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `02c8b9b` | Run the Impeccable implementation detector | Detector returned one advisory for `.map-grid`'s two-axis line field. Verified as an intentional map-canvas measurement surface (the design system explicitly permits grid only inside the map), not a page-wide generated-UI pattern; no fix warranted. |
 | `ff4c4e1` | Carry snapshot generation provenance | Validated Lachesis metadata now preserves `generated_at` through the HLD projection and exposes it as a semantic `<time>` in the repository rail; malformed non-string timestamps are rejected, while missing timestamps remain explicitly labelled `Not supplied by snapshot`; `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
 | `69f5ae8` | Raise actionable map and handoff labels to the type floor | Toolbar/banner status, flow warnings, inspector links, map handoff links, and Trust handoff links now meet the 12px informational minimum while compact code snippets and decorative indices remain intentionally dense; `npm run check`, `npm run build`, and `git diff --check` passed. |
