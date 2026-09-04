@@ -37,6 +37,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `6da06d1` | Build the bounded, data-driven Architecture surface | Suricata fixture now has eight meaningful regions with roles, relationships, children, anchors, and a separate boot path; the map draws metadata-backed edges, has a visible text relationship summary, supports `/architecture/[region]`, preserves hosted loading, and switches to ordered content on mobile; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `389c404` | Build guided architectural flows | Flow steps now describe the Suricata decode handoffs with data nouns, decisions, guards, anchors, synchronized progress state, URL step deep links, Previous/Next controls, and an accessible all-steps fallback; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `eb33ce3` | Build the trust surface glossary/index | Trust now uses eight explicit domains with meaning, obligation, constructor families, locations, search/filter controls, deep links, and non-finding language; `npm run check`, `npm run build`, and `git diff --check` passed |
+| `e64d057` | Preserve selected context into Lachesis | `/explore` now parses incoming repository/revision/region/label/anchor/flow/domain/bundle context, renders a confirmation summary, and builds a fixed-origin Lachesis URL without dropping context; `npm run check`, `npm run build`, and `git diff --check` passed |
 
 ## Rebuild brief audit
 
