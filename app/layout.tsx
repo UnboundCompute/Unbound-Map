@@ -13,9 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const structuredData = { '@context': 'https://schema.org', '@type': 'TechArticle', headline: 'Design Map — Read this before the source', description: 'A shareable architecture field guide for understanding unfamiliar codebases before reading the source.', author: { '@type': 'Organization', name: 'Unbound Compute' }, about: { '@type': 'Thing', name: 'Software architecture documentation' } };
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>{children}<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body>
     </html>
   );
 }
