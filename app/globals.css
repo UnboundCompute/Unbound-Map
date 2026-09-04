@@ -96,9 +96,13 @@ h1 { font-size: clamp(52px, 7vw, 96px); line-height: .94; letter-spacing: -.075e
   .snapshot { padding-left: 20px; } .workspace { margin-top: 72px; }
   .workspace-top { align-items: start; flex-direction: column; } .tabs { width: 100%; overflow-x: auto; }
   .tab { white-space: nowrap; flex: 1; }
-  .map-layout { grid-template-columns: 1fr; } .map-stage { min-height: 490px; border-radius: 22px 22px 0 0; }
+  .map-layout { grid-template-columns: 1fr; } .map-stage { min-height: 520px; border-radius: 22px 22px 0 0; }
   .inspector { border-left: 0; border-top: 1px solid var(--line-soft); border-radius: 0 0 22px 22px; }
-  .node { min-width: 126px; padding: 13px; } .node-input { left: 6%; } .node-core { left: 33%; } .node-detect { left: 42%; } .node-output { right: 4%; }
+  .route { top: 88px; bottom: 92px; left: 28px; right: auto; width: 1px; height: auto; background: linear-gradient(180deg, transparent, var(--amber), var(--teal), transparent); }
+  .route::before, .route::after { left: -3px; right: auto; }
+  .route::before { top: 18%; } .route::after { top: 78%; }
+  .node { min-width: 0; left: 52px !important; right: 20px !important; width: auto; padding: 13px; }
+  .node-input { top: 62px; } .node-core { top: 164px; } .node-detect { top: 270px; } .node-output { top: 376px; }
   .footer-note { gap: 12px; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
