@@ -66,7 +66,10 @@ export function MapClient({ route = '/architecture', initialBundle }: { route?: 
   }
   const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const activeBundle = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search).get('bundle') ?? undefined;
-  const chapterContext = new URLSearchParams({ repository: snapshot.repository, revision: snapshot.revision, ...(activeBundle ? { bundle: activeBundle } : {}) }).toString();
+  const systemShapeParams = new URLSearchParams(window.location.search);
+  systemShapeParams.delete('region');
+  systemShapeParams.set('level', '0');
+  const systemShapeHref = `${route}?${systemShapeParams.toString()}`;
   const selectRegion = (region: SystemRegion) => {
     setSelected(region.id);
     const params = new URLSearchParams(window.location.search);
@@ -80,7 +83,7 @@ export function MapClient({ route = '/architecture', initialBundle }: { route?: 
   return <>
     <div className="map-workbench">
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : 'region focus'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown</span></div>
+        <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : 'region focus'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown {level !== '0' && <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link>}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
         {snapshot.provenance === 'graph-backed' && !edges.length && <div className="map-banner map-banner-caution" role="status">Relationship evidence is not present in this bundle, so connections are intentionally not inferred.</div>}
         <div className="map-canvas" aria-label={`${snapshot.repository} architecture map`}>
@@ -90,9 +93,9 @@ export function MapClient({ route = '/architecture', initialBundle }: { route?: 
           <div className="map-external external-input" aria-hidden="true">wire input</div><div className="map-external external-output" aria-hidden="true">consumers</div><div className="map-axis axis-x" aria-hidden="true">entry <span /> effect</div><div className="map-axis axis-y" aria-hidden="true">runtime spine</div>
         </div>
       </div>
-      <aside className="map-inspector" aria-live="polite" aria-label="Selected region details"><div className="inspector-label">Selected region</div><h2>{current.label}</h2><p>{current.summary}</p><dl className="inspector-facts"><div><dt>footprint</dt><dd>{current.metricLabel}</dd></div><div><dt>path</dt><dd><code>{current.path}</code></dd></div><div><dt>anchor</dt><dd><code>{current.anchor?.label ?? 'No anchor in this projection'}</code></dd></div></dl><Link className="inspector-link" href={`/architecture/${current.id}?${chapterContext}`}>Read this region <span aria-hidden="true">→</span></Link><Link className="inspector-link" href={handoffHref(snapshot, current, activeBundle)}>Open anchor in Lachesis <span aria-hidden="true">↗</span></Link></aside>
+      <aside className="map-inspector" aria-live="polite" aria-label="Selected region details"><div className="inspector-label">Selected region</div><h2>{current.label}</h2><p>{current.summary}</p><dl className="inspector-facts"><div><dt>footprint</dt><dd>{current.metricLabel}</dd></div><div><dt>path</dt><dd><code>{current.path}</code></dd></div><div><dt>anchor</dt><dd><code>{current.anchor?.label ?? 'No anchor in this projection'}</code></dd></div></dl><Link className="inspector-link" href={`/architecture/${current.id}?${new URLSearchParams({ level: '1', repository: snapshot.repository, revision: snapshot.revision, ...(activeBundle ? { bundle: activeBundle } : {}) }).toString()}`}>Read this region <span aria-hidden="true">→</span></Link><Link className="inspector-link" href={handoffHref(snapshot, current, activeBundle)}>Open anchor in Lachesis <span aria-hidden="true">↗</span></Link></aside>
     </div>
     <section className="relationship-summary" aria-labelledby="relationship-title"><div><h2 id="relationship-title">The same map, in words</h2><p>Use this ordered summary if you prefer reading relationships to navigating a diagram.</p></div><ol>{regions.map((region) => <li key={region.id}><button onClick={() => selectRegion(region)} aria-pressed={current.id === region.id}><span>{region.label}</span><small>{region.downstream?.length ? `hands off to ${region.downstream.map((id) => regions.find((item) => item.id === id)?.label ?? id).join(', ')}` : snapshot.provenance === 'graph-backed' && !edges.length ? 'relationship evidence unavailable' : region.role === 'boot' ? 'initializes the runtime' : 'ends the displayed path'}</small></button></li>)}</ol></section>
-    <section className="region-directory" aria-label="Region directory"><div><span className="rail-heading">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{snapshot.regions.map((region) => <li key={region.id}><Link href={`/architecture/${region.id}?${chapterContext}`}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></Link></li>)}</ol></section>
+    <section className="region-directory" aria-label="Region directory"><div><span className="rail-heading">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{snapshot.regions.map((region) => <li key={region.id}><Link href={`/architecture/${region.id}?${new URLSearchParams({ level: '1', repository: snapshot.repository, revision: snapshot.revision, ...(activeBundle ? { bundle: activeBundle } : {}) }).toString()}`}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></Link></li>)}</ol></section>
   </>;
 }
