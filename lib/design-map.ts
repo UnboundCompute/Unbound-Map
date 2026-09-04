@@ -57,11 +57,13 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   return candidate.format === 'lachesis-explorer-bundle'
     && candidate.schema_version === '2.0'
     && !!meta && typeof meta === 'object'
-    && typeof meta.repository === 'string' && typeof meta.revision === 'string'
+    && typeof meta.repository === 'string' && typeof meta.language === 'string' && typeof meta.revision === 'string'
+    && typeof meta.lines === 'number' && Number.isInteger(meta.lines) && meta.lines >= 0
+    && typeof meta.indexed_nodes === 'number' && Number.isInteger(meta.indexed_nodes) && meta.indexed_nodes >= 0
     && (!meta.generated_at || typeof meta.generated_at === 'string')
     && !!graph && typeof graph === 'object'
     && Array.isArray(graph.nodes)
-    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number')
+    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number' && Number.isInteger(node.line) && node.line >= 0)
     && (!graph.modules || Array.isArray(graph.modules))
     && (!graph.modules || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (!module.node_ids || Array.isArray(module.node_ids))));
 }

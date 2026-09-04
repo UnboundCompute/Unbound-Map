@@ -1,4 +1,4 @@
-import { projectTopLevelRegions } from '../lib/design-map.ts';
+import { isLachesisBundle, projectTopLevelRegions } from '../lib/design-map.ts';
 
 function snapshot(count, childCount = 0) {
   const modules = Array.from({ length: count }, (_, index) => ({
@@ -33,3 +33,14 @@ const children = projectTopLevelRegions(snapshot(1, 20));
 if (children[0]?.children?.length !== 12) throw new Error(`20 child modules projected to ${children[0]?.children?.length ?? 0}; expected 12 including remainder`);
 if (!children[0]?.children?.at(-1)?.label.startsWith('Other ')) throw new Error('child projection is missing its explicit remainder roll-up');
 console.log('ok 20 child modules → 12 bounded children');
+
+const validBundle = {
+  format: 'lachesis-explorer-bundle',
+  schema_version: '2.0',
+  meta: { repository: 'fixture', language: 'C', revision: 'test', lines: 1, indexed_nodes: 1 },
+  graph: { nodes: [{ id: 'node-0', label: 'Anchor', kind: 'function', file: 'src/main.c', line: 1 }] },
+};
+if (!isLachesisBundle(validBundle)) throw new Error('valid bundle rejected by the schema guard');
+if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: { invalid: true } } })) throw new Error('non-string generated_at accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, indexed_nodes: 1.5 } })) throw new Error('non-integer indexed_nodes accepted by the schema guard');
+console.log('ok malformed metadata rejected by bundle guard');
