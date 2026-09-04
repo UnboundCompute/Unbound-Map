@@ -9,7 +9,7 @@ function exploreHref(stepId: string) {
   return `/explore?${new URLSearchParams({ repository: illustrativeSnapshot.repository, revision: illustrativeSnapshot.revision, region: step.regionId, label: step.noun, flow: step.id, anchor: step.anchor }).toString()}`;
 }
 
-export function FlowDiagram() {
+export function FlowDiagram({ route = '/flows' }: { route?: string }) {
   const [active, setActive] = useState(0);
   const step = flowSteps[active];
   useEffect(() => {
@@ -19,7 +19,7 @@ export function FlowDiagram() {
   }, []);
   const choose = (index: number) => {
     setActive(index);
-    window.history.replaceState(null, '', `/flows?step=${flowSteps[index].id}`);
+    window.history.replaceState(null, '', `${route}?step=${flowSteps[index].id}`);
   };
   return <section className="guided-flow" aria-labelledby="flow-steps-title">
     <div className="flow-progress"><div><span className="flow-label">One flow · {flowSteps.length} handoffs</span><h2 id="flow-steps-title">Read the path one boundary at a time.</h2></div><span className="flow-count">{String(active + 1).padStart(2, '0')} / {String(flowSteps.length).padStart(2, '0')}</span></div>
