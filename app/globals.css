@@ -39,6 +39,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .snapshot-state { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
 .snapshot-state i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
 .snapshot-graph-backed i { background: #547966; }
+.snapshot-stale i { background: #a8752b; }
 .bar-lachesis { margin-left: auto; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: var(--signal); font-size: 13px; font-weight: 600; text-decoration: none; }
 .bar-lachesis:hover { text-decoration: underline; text-underline-offset: 4px; }
 
