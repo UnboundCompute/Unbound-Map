@@ -57,6 +57,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `57e2058` | Audit stale vocabulary and crawler access | Stale UI terms are confined to historical/reference documentation or product vocabulary; no deprecated component/mode implementation remains. Added an explicit allow-all `robots.txt` route so public guide pages and embeds remain crawler-discoverable without inventing a deployment hostname. |
 | `d761c1e` | Add social preview image | Added a generated Open Graph image with the product thesis and repository architecture vocabulary; configured `metadataBase` from `NEXT_PUBLIC_SITE_URL`/`VERCEL_URL` with a local fallback, and verified `/opengraph-image` prerenders during `npm run build`. |
 | `98eb9ed` | Add index route metadata | Architecture, Flows, and Trust indexes now emit repository-specific titles and descriptions for search and social sharing rather than inheriting the generic root title; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `22f9b99` | Fix mobile map boundary labels | The mobile ordered relationship composition now hides spatial-only external boundary labels along with the diagram axes, preventing overlap and preserving a clean linear reading order; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
