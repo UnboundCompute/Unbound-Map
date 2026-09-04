@@ -39,6 +39,7 @@ export default function Page() {
             <div className="eyebrow">Architecture / Suricata</div>
             <h1 id="page-title">See the system before you read it.</h1>
             <p className="hero-copy">A living design map generated from the code graph. Start with the system shape, choose one question, then follow the answer into the exact source.</p>
+            <a className="hero-cta" href="#map-title">Start with the system map <span aria-hidden="true">↘</span></a>
           </div>
           <aside className="snapshot" aria-label="Repository snapshot">
             <div className="snapshot-meta"><span>commit 4e8b2d</span><span>just now</span></div>
@@ -46,6 +47,14 @@ export default function Page() {
             <p>The top-level map keeps the shape legible. Every region is anchored to real functions and files in Lachesis.</p>
           </aside>
         </div>
+      </section>
+
+      <section className="reading-rail" aria-label="How to read this map">
+        <div className="rail-step rail-step-active"><span>01</span><div><b>Orient</b><small>See the major regions</small></div></div>
+        <div className="rail-connector" aria-hidden="true" />
+        <div className="rail-step"><span>02</span><div><b>Choose</b><small>Select a path or boundary</small></div></div>
+        <div className="rail-connector" aria-hidden="true" />
+        <div className="rail-step"><span>03</span><div><b>Verify</b><small>Open the exact source</small></div></div>
       </section>
 
       <section className="workspace" aria-labelledby="map-title">
