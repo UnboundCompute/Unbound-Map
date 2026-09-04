@@ -102,6 +102,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `e892ff6` | Show complete handoff context | The Lachesis confirmation page now visibly lists selected region and opaque bundle alongside repository, revision, anchor, flow, step, and trust domain when present; checks passed. |
 | `8c5a16e` | Hydrate shared flow step | Flow pages now initialize the stepper from the server URL, so a shared `?step=ipv4` link renders the IPv4 narrative before hydration instead of briefly showing Ethernet; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `6a13b98` | Hydrate shared trust filters | Trust now seeds its search/category controls from the server URL and validates the requested category, so shared filtered links render the matching glossary state before hydration; checks passed. |
+| `cdf3217` | Raise share control hit areas | Copy link, Copy embed code, and Trust inspect links now use a 44px minimum target, aligning the compact distribution controls with the brief’s touch/accessibility floor; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `558839a` | Preserve context on wordmark navigation | The global Design Map wordmark now retains repository, revision, and bundle query context when returning to Start here, eliminating the final shell-level context reset; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
