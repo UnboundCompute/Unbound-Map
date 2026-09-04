@@ -18,9 +18,9 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, bun
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
 }
 
-export function MapClient({ route = '/architecture', initialBundle }: { route?: string; initialBundle?: string }) {
-  const [selected, setSelected] = useState('decode');
-  const [level, setLevel] = useState('0');
+export function MapClient({ route = '/architecture', initialBundle, initialLevel = '0', initialRegion = 'decode', initialQuery = '' }: { route?: string; initialBundle?: string; initialLevel?: string; initialRegion?: string; initialQuery?: string }) {
+  const [selected, setSelected] = useState(initialRegion);
+  const [level, setLevel] = useState(initialLevel);
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
@@ -65,8 +65,9 @@ export function MapClient({ route = '/architecture', initialBundle }: { route?: 
     return <section className="map-state-panel" role="status"><span className="map-state-label">No regions in snapshot</span><h2>There is no architecture to draw yet.</h2><p>This snapshot is valid but contains no displayable top-level regions. Return to the repository start page or open the source explorer for coverage details.</p><Link className="quiet-link" href="/">Return to Start here <span aria-hidden="true">→</span></Link></section>;
   }
   const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
-  const activeBundle = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search).get('bundle') ?? undefined;
-  const systemShapeParams = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search);
+  const renderParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
+  const activeBundle = renderParams.get('bundle') ?? initialBundle;
+  const systemShapeParams = new URLSearchParams(renderParams);
   systemShapeParams.delete('region');
   systemShapeParams.set('level', '0');
   const systemShapeHref = `${route}?${systemShapeParams.toString()}`;
