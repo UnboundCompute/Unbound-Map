@@ -4,12 +4,13 @@ import { useState } from 'react';
 
 type NodeId = 'input' | 'core' | 'detect' | 'output';
 type Tab = 'system' | 'flow' | 'trust';
+type NodeView = { label: string; description: string; eyebrow: string };
 
-const nodes: Record<NodeId, { label: string; eyebrow: string; description: string; files: string; anchor: string }> = {
-  input: { label: 'Input & protocol', eyebrow: '01 · entry', description: 'Accepts packets, normalizes framing, and hands validated data to the engine.', files: 'src/decode · 46 files', anchor: 'DecodePacket()' },
-  core: { label: 'Runtime core', eyebrow: '02 · spine', description: 'Owns the event loop and routes normalized traffic through the processing stages.', files: 'src/runmodes · 118 files', anchor: 'RunModeDispatch()' },
-  detect: { label: 'Detection engine', eyebrow: '03 · fan-out', description: 'Applies protocol-aware rules through a resolved operations table.', files: 'src/detect · 227 files', anchor: 'SigMatchSignatures()' },
-  output: { label: 'Outputs & telemetry', eyebrow: '04 · effects', description: 'Serializes alerts and metrics for the configured output consumers.', files: 'src/output · 74 files', anchor: 'OutputRegisterModules()' },
+const nodes: Record<NodeId, { system: NodeView; flow: NodeView; trust: NodeView; files: string; anchor: string }> = {
+  input: { system: { label: 'Input & protocol', eyebrow: '01 · entry', description: 'Accepts packets, normalizes framing, and hands validated data to the engine.' }, flow: { label: 'Packet bytes', eyebrow: '01 · source', description: 'Raw bytes enter through the capture adapter and become a normalized event.' }, trust: { label: 'External packet', eyebrow: '01 · untrusted', description: 'The trust boundary begins here. Length and framing must be established before use.' }, files: 'src/decode · 46 files', anchor: 'DecodePacket()' },
+  core: { system: { label: 'Runtime core', eyebrow: '02 · spine', description: 'Owns the event loop and routes normalized traffic through the processing stages.' }, flow: { label: 'Normalized event', eyebrow: '02 · handoff', description: 'A validated event moves through the run mode and into protocol-aware inspection.' }, trust: { label: 'Validation gate', eyebrow: '02 · guard', description: 'Guards and normalization establish the invariants downstream stages rely on.' }, files: 'src/runmodes · 118 files', anchor: 'RunModeDispatch()' },
+  detect: { system: { label: 'Detection engine', eyebrow: '03 · fan-out', description: 'Applies protocol-aware rules through a resolved operations table.' }, flow: { label: 'Signature cursor', eyebrow: '03 · fan-out', description: 'The event fans out through the resolved operations table and matching pipeline.' }, trust: { label: 'Rule interpreter', eyebrow: '03 · obligation', description: 'Rule evaluation consumes normalized state and must preserve parser assumptions.' }, files: 'src/detect · 227 files', anchor: 'SigMatchSignatures()' },
+  output: { system: { label: 'Outputs & telemetry', eyebrow: '04 · effects', description: 'Serializes alerts and metrics for the configured output consumers.' }, flow: { label: 'Alert record', eyebrow: '04 · effect', description: 'The resulting record is serialized for the configured output consumers.' }, trust: { label: 'Alert sink', eyebrow: '04 · effect', description: 'Data leaves the processing boundary through configured alert and telemetry sinks.' }, files: 'src/output · 74 files', anchor: 'OutputRegisterModules()' },
 };
 
 const tabCopy: Record<Tab, { label: string; title: string; caption: string }> = {
@@ -22,7 +23,8 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<Tab>('system');
   const [selected, setSelected] = useState<NodeId>('core');
   const node = nodes[selected];
-  const lachesisHref = `https://lachesis.unboundcompute.com/?repo=suricata&commit=4e8b2d&focus=${selected}&anchor=${encodeURIComponent(node.anchor)}`;
+  const view = node[activeTab];
+  const lachesisHref = `https://lachesis.unboundcompute.com/?repo=suricata&commit=4e8b2d&lens=${activeTab}&focus=${selected}&anchor=${encodeURIComponent(node.anchor)}`;
 
   return (
     <main className="shell">
@@ -58,10 +60,10 @@ export default function Page() {
           <div className="map-stage" aria-label="Interactive system map">
             <div className="map-caption"><span>●</span> {tabCopy[activeTab].caption}</div>
             <div className="route" aria-hidden="true" />
-            {(Object.keys(nodes) as NodeId[]).map((id) => <button key={id} className={`node node-${id}`} data-selected={selected === id} onClick={() => setSelected(id)} aria-pressed={selected === id}><small>{nodes[id].eyebrow}</small><b>{nodes[id].label}</b><p>{activeTab === 'trust' && id === 'input' ? 'untrusted boundary' : nodes[id].description}</p></button>)}
+            {(Object.keys(nodes) as NodeId[]).map((id) => <button key={id} className={`node node-${id}`} data-selected={selected === id} onClick={() => setSelected(id)} aria-pressed={selected === id}><small>{nodes[id][activeTab].eyebrow}</small><b>{nodes[id][activeTab].label}</b><p>{nodes[id][activeTab].description}</p></button>)}
             <div className="stage-footer"><span><i /> entry / handoff</span><span><i className="teal" /> verified edge</span></div>
           </div>
-          <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected region</div><h2>{node.label}</h2><p>{node.description}</p><dl><dt>Anchored by</dt><dd>{node.anchor}</dd><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : 'What happens next?'}</dd></dl><a className="inspector-link" href={lachesisHref} target="_blank" rel="noreferrer">Explore in Lachesis <span aria-hidden="true">↗</span></a></aside>
+          <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected {activeTab === 'system' ? 'region' : activeTab === 'flow' ? 'handoff' : 'boundary'}</div><h2>{view.label}</h2><p>{view.description}</p><dl><dt>Anchored by</dt><dd>{node.anchor}</dd><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : activeTab === 'flow' ? 'Where does this value go next?' : 'What happens next?'}</dd></dl><a className="inspector-link" href={lachesisHref} target="_blank" rel="noreferrer">Explore in Lachesis <span aria-hidden="true">↗</span></a></aside>
         </div></div>
         <div className="footer-note"><span>Map generated from commit 4e8b2d · 96% graph coverage</span><a href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">How the evidence works ↗</a></div>
       </section>
