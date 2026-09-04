@@ -96,10 +96,10 @@ npm run build
 
 Static and live route checks performed against the local dev server:
 
-- `/`, `/architecture`, `/architecture/decode`, `/flows`, `/flows?step=ipv4`, `/flows/packet-decode`, `/trust`, and `/explore` returned 200.
-- Legacy `/map` and `/flow` returned redirects to `/architecture` and `/flows`.
+- `/`, `/architecture`, `/architecture/decode`, `/flows`, `/flows?step=ipv4`, `/flows/packet-decode`, `/trust`, `/explore`, `/embed`, `/opengraph-image`, `/robots.txt`, and `/sitemap.xml` returned 200 in the latest route smoke run.
+- Legacy `/map` and `/flow` returned redirects to `/architecture` and `/flows`, preserving incoming query context.
 - Contextful `/explore?repository=Suricata&revision=8f4c1b2&region=decode&anchor=DecodeEthernet%28%29` rendered `Context ready`, the repository/revision, region, anchor, and Lachesis handoff.
-- `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation.
+- `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
 - Live browser screenshot inspection was attempted through the required browser surface, but no browser was available; visual screenshot evidence remains an explicit limitation.
 
 ## Known prototype limits
