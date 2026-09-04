@@ -155,6 +155,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `419b01a` | Announce unknown region recovery | Unknown `/architecture/[region]` chapters now expose an atomic polite status panel, and route smoke covers the recovery landmark so stale region links remain perceivable and actionable without client hydration; smoke, check, and diff validation passed. |
 | `fbb9249` | Enter region focus on map selection | Desktop level-0 node selection now updates both the URL and React zoom state, immediately switching to the selected region’s focus view instead of requiring a reload to reconcile the semantic zoom; `npm run check` and `git diff --check` passed. |
 | `75ced8b` | Reconcile map state with client navigation | MapClient now observes Next search-parameter changes in addition to `popstate`, so child-anchor links and zoom-reset links update the mounted map’s level/selection immediately instead of leaving stale visual state after client navigation; `npm run check` and `git diff --check` passed. |
+| `2d3c104` | Clear anchor state for anchorless children | Child level-2 URLs now remove any inherited anchor when the selected child has no anchor of its own, preventing direct or stale level-1 URLs from falsely highlighting an unrelated design anchor; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
