@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { loadHostedBundle } from '../lib/hosted';
+import { toDesignMapSnapshot, type DesignMapSnapshot, type LachesisBundle } from '../lib/design-map';
 
 type NodeId = 'input' | 'core' | 'detect' | 'output';
 type Tab = 'system' | 'flow' | 'trust';
@@ -22,9 +24,31 @@ const tabCopy: Record<Tab, { label: string; title: string; helper: string; capti
 export default function Page() {
   const [activeTab, setActiveTab] = useState<Tab>('system');
   const [selected, setSelected] = useState<NodeId>('core');
+  const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [loadMessage, setLoadMessage] = useState('');
+  const [hostedSnapshot, setHostedSnapshot] = useState<DesignMapSnapshot | null>(null);
+  useEffect(() => {
+    const bundleId = new URLSearchParams(window.location.search).get('bundle');
+    if (!bundleId) return;
+    const controller = new AbortController();
+    setLoadState('loading');
+    loadHostedBundle(bundleId, controller.signal).then((raw) => {
+      const snapshot = toDesignMapSnapshot(raw as LachesisBundle);
+      setHostedSnapshot(snapshot);
+      setLoadMessage(`${snapshot.repository} · ${snapshot.revision.slice(0, 7)} · ${snapshot.includedNodes.toLocaleString()} nodes included`);
+      setLoadState('ready');
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) return;
+      setLoadMessage(error instanceof Error ? error.message : 'The hosted map could not be loaded.');
+      setLoadState('error');
+    });
+    return () => controller.abort();
+  }, []);
   const node = nodes[selected];
   const view = node[activeTab];
-  const lachesisHref = `https://lachesis.unboundcompute.com/?repo=suricata&commit=4e8b2d&lens=${activeTab}&focus=${selected}&anchor=${encodeURIComponent(node.anchor)}`;
+  const repository = hostedSnapshot?.repository ?? 'suricata';
+  const revision = hostedSnapshot?.revision ?? '4e8b2d';
+  const lachesisHref = `https://lachesis.unboundcompute.com/?repo=${encodeURIComponent(repository)}&commit=${encodeURIComponent(revision)}&lens=${activeTab}&focus=${selected}&anchor=${encodeURIComponent(node.anchor)}`;
 
   return (
     <main className="shell">
@@ -32,6 +56,8 @@ export default function Page() {
         <div className="brand"><span className="brand-mark" aria-hidden="true" /><div><div className="brand-name">Design Map</div><div className="brand-kicker">read before the source</div></div></div>
         <div className="nav-meta"><span className="live-dot" /> generated from commit <span>·</span> suricata</div>
       </nav>
+
+      {loadState !== 'idle' && <div className={`load-banner load-${loadState}`} role={loadState === 'error' ? 'alert' : 'status'} aria-live="polite"><span className="load-pip" aria-hidden="true" />{loadState === 'loading' ? 'Loading hosted design map…' : loadState === 'ready' ? `Hosted graph connected · ${loadMessage}` : loadMessage}</div>}
 
       <section className="hero" aria-labelledby="page-title">
         <div className="hero-grid">
@@ -42,9 +68,9 @@ export default function Page() {
             <a className="hero-cta" href="#map-title">Start with the system map <span aria-hidden="true">↘</span></a>
           </div>
           <aside className="snapshot" aria-label="Repository snapshot">
-            <div className="snapshot-meta"><span>commit 4e8b2d</span><span>just now</span></div>
-            <strong>879,085 nodes → 12 regions</strong>
-            <p>The top-level map keeps the shape legible. Every region is anchored to real functions and files in Lachesis.</p>
+            <div className="snapshot-meta"><span>commit {revision.slice(0, 7)}</span><span>{hostedSnapshot ? hostedSnapshot.coverageScope : 'fixture snapshot'}</span></div>
+            <strong>{hostedSnapshot ? `${hostedSnapshot.indexedNodes.toLocaleString()} nodes → HLD projection` : '879,085 nodes → 12 regions'}</strong>
+            <p>{hostedSnapshot ? 'The graph identity and coverage are live. The visible region layout remains a fixture until community roll-up is connected.' : 'The top-level map keeps the shape legible. Every region is anchored to real functions and files in Lachesis.'}</p>
           </aside>
         </div>
       </section>
@@ -74,7 +100,7 @@ export default function Page() {
           </div>
           <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected {activeTab === 'system' ? 'region' : activeTab === 'flow' ? 'handoff' : 'boundary'}</div><h2>{view.label}</h2><p>{view.description}</p><div className="evidence-status"><span className="evidence-check" aria-hidden="true">✓</span><div><b>Graph-backed</b><small>Anchored to {node.anchor} in the analyzed commit.</small></div></div><dl><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : activeTab === 'flow' ? 'Where does this value go next?' : 'What happens next?'}</dd></dl><a className="inspector-link" href={lachesisHref} target="_blank" rel="noreferrer">Open this in Lachesis <span aria-hidden="true">↗</span></a><small className="inspector-handoff">Code-level path · commit 4e8b2d</small></aside>
         </div></div>
-        <div className="footer-note"><span>Map generated from commit 4e8b2d · 96% graph coverage</span><a href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">Open Lachesis ↗</a></div>
+        <div className="footer-note"><span>Map generated from commit {revision.slice(0, 7)} · {hostedSnapshot ? `${hostedSnapshot.includedNodes.toLocaleString()} of ${hostedSnapshot.indexedNodes.toLocaleString()} nodes` : '96% graph coverage'}</span><a href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">Open Lachesis ↗</a></div>
         <details className="evidence-details"><summary>How this map was made <span aria-hidden="true">+</span></summary><p>Regions are rolled up from tightly connected graph communities. The selected anchor and source footprint are evidence from the analyzed commit; the layout is a reading aid, not a finding.</p></details>
       </section>
     </main>
