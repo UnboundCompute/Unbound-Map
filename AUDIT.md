@@ -52,6 +52,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `3c44c7e` | Add shareable page metadata and links | Added a reusable Copy link control to every page intro and search-friendly title/description, Open Graph, Twitter, author, application, and keyword metadata at the root; `npm run check`, `npm run build`, and `git diff --check` passed. Clipboard behavior remains progressively optional when browser permissions deny access. |
 | `2f1a50b` | Add embeddable architecture map | Added a lightweight `/embed` route for README, issue, and social embeds, reusing the bounded map and hosted snapshot states with a clear link back to the full guide; map history now respects the embed route; checks passed. |
 | `1b56ee9` | Document shareable embed usage | README now lists the canonical flow and embed routes, explains when to use a normal link versus an iframe, and includes a ready-to-paste iframe snippet; route smoke testing confirmed `/embed` and social metadata (`og:title`, `twitter:card`, `Copy link`). |
+| `1fd5446` | Harden share fallback | Copy link now uses the native share sheet when available, falls back to the clipboard, handles user cancellation quietly, and clearly explains when browser permissions make copying unavailable; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
