@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { illustrativeSnapshot, type RepositorySnapshotView } from '../../lib/view-model';
+import { illustrativeSnapshot, type RepositorySnapshotView, type SharedSnapshotContext } from '../../lib/view-model';
 import { ShareButton } from './ShareButton';
 
 export const navItems = [
@@ -20,7 +20,13 @@ export function SnapshotState({ snapshot }: { snapshot: RepositorySnapshotView }
   return <span className={`snapshot-state snapshot-${snapshot.provenance}${stale ? ' snapshot-stale' : ''}`}><i aria-hidden="true" />{label}</span>;
 }
 
-export function DocsShell({ children, active, snapshot = illustrativeSnapshot }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView }) {
+function contextualHref(href: string, context?: SharedSnapshotContext) {
+  if (!context || (!context.repository && !context.revision && !context.bundle)) return href;
+  const query = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
+  return `${href}${query ? `${href.includes('?') ? '&' : '?'}${query}` : ''}`;
+}
+
+export function DocsShell({ children, active, snapshot = illustrativeSnapshot, context }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
   const activeRoute = active ?? '/';
   const isFixture = snapshot.provenance === 'illustrative';
   return (
@@ -38,7 +44,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot }:
         <aside className="reading-rail" aria-label="Repository guide">
           <div className="rail-heading">Read this map</div>
           <nav className="primary-nav" aria-label="Primary navigation">
-            {navItems.map((item) => { const current = isActive(item.href, activeRoute); return <Link key={item.href} href={item.href} className={`primary-nav-link ${current ? 'is-current' : ''}`} aria-current={current ? 'page' : undefined}><span>{item.label}</span><small>{item.note}</small></Link>; })}
+            {navItems.map((item) => { const current = isActive(item.href, activeRoute); return <Link key={item.href} href={contextualHref(item.href, context)} className={`primary-nav-link ${current ? 'is-current' : ''}`} aria-current={current ? 'page' : undefined}><span>{item.label}</span><small>{item.note}</small></Link>; })}
           </nav>
           <div className="rail-rule" />
           <div className="rail-heading">Snapshot</div>
@@ -47,7 +53,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot }:
         </aside>
         <main id="main-content" className="docs-main">{children}</main>
       </div>
-      <footer className="docs-footer"><span>Design Map · read this before the source</span><Link href="/explore">Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
+      <footer className="docs-footer"><span>Design Map · read this before the source</span><Link href={contextualHref('/explore', context)}>Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
     </div>
   );
 }
