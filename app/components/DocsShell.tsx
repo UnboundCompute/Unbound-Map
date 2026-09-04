@@ -2,52 +2,55 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { illustrativeSnapshot, type RepositorySnapshotView } from '../../lib/view-model';
 
-const sections = [
-  { href: '/map', label: 'System Map', note: 'What owns what' },
-  { href: '/flow', label: 'Data Flow', note: 'How a packet moves' },
-  { href: '/trust', label: 'Trust Surface', note: 'Where obligations begin' },
-  { href: '/explore', label: 'Read in Lachesis', note: 'Open the code path' },
+export const navItems = [
+  { href: '/', label: 'Start here', note: 'Get oriented' },
+  { href: '/architecture', label: 'Architecture', note: 'See the system' },
+  { href: '/flows', label: 'Flows', note: 'Follow a journey' },
+  { href: '/trust', label: 'Trust', note: 'Name obligations' },
 ];
 
+function isActive(href: string, active?: string) {
+  return href === '/' ? active === '/' || !active : active === href || Boolean(active?.startsWith(`${href}/`));
+}
+
+export function SnapshotState({ snapshot }: { snapshot: RepositorySnapshotView }) {
+  const label = snapshot.provenance === 'illustrative' ? 'Illustrative prototype' : 'Graph-backed snapshot';
+  return <span className={`snapshot-state snapshot-${snapshot.provenance}`}><i aria-hidden="true" />{label}</span>;
+}
+
 export function DocsShell({ children, active, snapshot = illustrativeSnapshot }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView }) {
+  const activeRoute = active ?? '/';
   const isFixture = snapshot.provenance === 'illustrative';
   return (
     <div className="docs-shell">
-      <header className="docs-header">
-        <Link href="/" className="docs-brand" aria-label="Design Map home">
-          <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
-          <span>Design Map</span>
-        </Link>
-        <span className="docs-header-note">Read this before the source</span>
-        <span className="docs-header-repo">{snapshot.repository} · {snapshot.revision}{isFixture ? ' · illustrative' : ''}</span>
+      <a className="skip-link" href="#main-content">Skip to content</a>
+      <header className="repo-bar" role="banner">
+        <Link href="/" className="wordmark" aria-label="Design Map start here"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Design Map</span></Link>
+        <span className="bar-divider" aria-hidden="true" />
+        <span className="bar-repo">{snapshot.repository}</span>
+        <code className="bar-revision">{snapshot.revision}</code>
+        <SnapshotState snapshot={snapshot} />
+        <a className="bar-lachesis" href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">Lachesis <span aria-hidden="true">↗</span></a>
       </header>
-      <div className="docs-body">
-        <aside className="docs-sidebar" aria-label="Map navigation">
-          <div className="sidebar-label">This map</div>
-          <nav className="docs-nav">
-            {sections.map((section) => (
-              <Link key={section.href} href={section.href} aria-current={active === section.href ? 'page' : undefined} className={`docs-nav-link ${active === section.href ? 'is-active' : ''}`}>
-                <span>{section.label}</span><small>{section.note}</small>
-              </Link>
-            ))}
+      <div className="docs-layout">
+        <aside className="reading-rail" aria-label="Repository guide">
+          <div className="rail-heading">Read this map</div>
+          <nav className="primary-nav" aria-label="Primary navigation">
+            {navItems.map((item) => { const current = isActive(item.href, activeRoute); return <Link key={item.href} href={item.href} className={`primary-nav-link ${current ? 'is-current' : ''}`} aria-current={current ? 'page' : undefined}><span>{item.label}</span><small>{item.note}</small></Link>; })}
           </nav>
-          <div className="sidebar-divider" />
-          <div className="sidebar-label">Snapshot</div>
-          <dl className="sidebar-facts">
-            <div><dt>revision</dt><dd>{snapshot.revision}</dd></div>
-            <div><dt>coverage</dt><dd>{snapshot.coverageScope}</dd></div>
-            <div><dt>indexed</dt><dd>{snapshot.indexedNodes.toLocaleString()} nodes</dd></div>
-          </dl>
-          <p className="sidebar-footnote">{isFixture ? 'Illustrative prototype. Replace this snapshot with a graph-backed bundle before sharing.' : 'Generated from a Lachesis graph bundle. Layout is editorial; counts are evidence.'}</p>
+          <div className="rail-rule" />
+          <div className="rail-heading">Snapshot</div>
+          <dl className="snapshot-list"><div><dt>revision</dt><dd><code>{snapshot.revision}</code></dd></div><div><dt>coverage</dt><dd>{snapshot.coverageScope}</dd></div><div><dt>indexed</dt><dd>{snapshot.indexedNodes.toLocaleString()} nodes</dd></div></dl>
+          <p className="rail-note">{isFixture ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p>
         </aside>
-        <main className="docs-main">{children}</main>
+        <main id="main-content" className="docs-main">{children}</main>
       </div>
     </div>
   );
 }
 
-export const DocTabs = ({ active }: { active: string }) => (
-  <nav className="doc-tabs" aria-label="Map sections">
-    {sections.slice(0, 3).map((section) => <Link key={section.href} href={section.href} className={active === section.href ? 'is-active' : ''}>{section.label}</Link>)}
-  </nav>
-);
+export function PageIntro({ eyebrow, title, children, snapshot = illustrativeSnapshot }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView }) {
+  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><SnapshotState snapshot={snapshot} /><span>{snapshot.coverageScope}</span></div></header>;
+}
+
+export function EvidenceNote({ children }: { children: ReactNode }) { return <aside className="evidence-note"><span className="evidence-label">How to read the evidence</span><p>{children}</p></aside>; }
