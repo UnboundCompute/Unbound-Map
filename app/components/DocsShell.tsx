@@ -28,6 +28,12 @@ function contextualHref(href: string, context?: SharedSnapshotContext) {
   return `${href}${query ? `${href.includes('?') ? '&' : '?'}${query}` : ''}`;
 }
 
+function contextualHandoffHref(context?: SharedSnapshotContext) {
+  if (!context) return '/explore';
+  const query = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.region ? { region: context.region } : {}), ...(context.label ? { label: context.label } : {}), ...(context.anchor ? { anchor: context.anchor } : {}), ...(context.flow ? { flow: context.flow } : {}), ...(context.step ? { step: context.step } : {}), ...(context.domain ? { domain: context.domain } : {}) }).toString();
+  return `/explore${query ? `?${query}` : ''}`;
+}
+
 function lachesisHref(context: SharedSnapshotContext | undefined, snapshot: RepositorySnapshotView) {
   const hasSelection = Boolean(context && (context.region || context.label || context.anchor || context.flow || context.step || context.domain));
   if (!context || (!context.repository && !context.revision && !context.bundle && !hasSelection)) return 'https://lachesis.unboundcompute.com/';
@@ -63,7 +69,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         </aside>
         <main id="main-content" className="docs-main" tabIndex={-1}>{children}</main>
       </div>
-      <footer className="docs-footer"><span>Design Map · read this before the source</span><Link href={contextualHref('/explore', context)}>Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
+      <footer className="docs-footer"><span>Design Map · read this before the source</span><Link href={contextualHandoffHref(context)}>Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
     </div>
   );
 }
