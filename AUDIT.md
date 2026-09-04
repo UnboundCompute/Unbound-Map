@@ -97,6 +97,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `1f8944c` | Sanitize embed title labels | Copied iframe markup now normalizes repository labels before placing them in the HTML `title` attribute, keeping unusual query-supplied names from producing malformed share snippets; checks passed. |
 | `ceacec8` | Make semantic zoom reversible | Focused Architecture links now declare `level=1`, the map exposes a keyboard-operable `Back to system shape` action, and chapter/directory links retain the semantic level and snapshot context; checks passed. |
 | `828dde5` | Guard semantic zoom URL on server | Fixed a server-render regression introduced by the zoom control by guarding `window.location` access, restoring 200 responses for queryful Architecture routes; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `f1da5d1` | Describe Lachesis handoff pages | `/explore` now emits context-aware metadata using the selected repository and anchor, improving previews for shared code-handoff links rather than inheriting the generic product title; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
