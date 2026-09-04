@@ -150,6 +150,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `8bc652c` | Preserve deep links beyond the placed canvas | Architecture now distinguishes the nine-region spatial canvas cap from the full projected region directory, so valid focused URLs for later projected regions render their actual region instead of silently falling back to the first node; `npm run check` and `git diff --check` passed. |
 | `6c83864` | Make projection scalability reproducible | Added `npm run projection-smoke`, exercising the real adapter with 0, 1, 8, 30, and 500 top-level modules plus a 20-child roll-up; each case stayed within the documented bounds and emitted explicit remainder regions where required. |
 | `4b975ca` | Protect contextual Flow and Trust previews | Route smoke now asserts repository-specific Open Graph and Twitter titles for the shareable Flows and Trust entry points, alongside their existing deep-link and filter assertions; `npm run smoke` passed. |
+| `d2d352a` | Document UX verification gates | README now gives maintainers the exact `check`, `build`, projection, and route-smoke commands and explains the states each gate protects before a map is shared; `git diff --check` passed. |
 
 ## Rebuild brief audit
 
