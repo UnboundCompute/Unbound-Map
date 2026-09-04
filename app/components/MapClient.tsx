@@ -118,7 +118,8 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     window.history.pushState(null, '', `${route}?${params.toString()}`);
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
-  const edges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
+  const allEdges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
+  const edges = allEdges.slice(0, 12);
   const requestedAnchor = renderParams.get('anchor');
   const focusAnchors = [
     ...(current.anchor ? [{ label: current.anchor.label, detail: `${current.anchor.file}:${current.anchor.line}`, summary: 'Primary design anchor for this region.', anchor: current.anchor.label }] : []),
@@ -134,6 +135,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
         {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
         {anchorIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested anchor is not present in this region projection. Showing the available design anchors instead.</div>}
+        {allEdges.length > edges.length && <div className="map-banner map-banner-caution" role="status">This canvas shows the first 12 deterministic connections. The ordered text summary below retains the full relationship list.</div>}
         {snapshot.provenance === 'graph-backed' && !edges.length && <div className="map-banner map-banner-caution" role="status">Relationship evidence is not present in this bundle, so connections are intentionally not inferred.</div>}
         <div className="map-canvas" aria-label={`${snapshot.repository} architecture map`}>
           <div className="map-grid" aria-hidden="true" />
