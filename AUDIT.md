@@ -83,6 +83,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `e21cdab` | Remove legacy map route styles | Deleted unused decorative route/line CSS now that all map connections are data-driven SVG edges, keeping the stylesheet aligned with the current topology model; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `9f17437` | Make embed identity-aware | `/embed` now derives its title, description, heading, and footer state from incoming repository/bundle context, avoiding a misleading Suricata fixture label when a maintainer shares a graph-backed bundle; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `382f836` | Make map identity repository-aware | The accessible map canvas label now derives from the loaded snapshot repository instead of hardcoding Suricata, so hosted bundles do not expose a misleading screen-reader name; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `2bf1b23` | Keep embed surface focused | Moved the README iframe authoring snippet from `/embed` into the full Architecture guide, so an embedded map contains only its repository header, map, accessible relationship summary, and recovery links; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
