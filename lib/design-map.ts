@@ -63,9 +63,9 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && (!meta.generated_at || typeof meta.generated_at === 'string')
     && !!graph && typeof graph === 'object'
     && Array.isArray(graph.nodes)
-    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number' && Number.isInteger(node.line) && node.line >= 0)
+    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.kind === 'string' && typeof node.file === 'string' && typeof node.line === 'number' && Number.isInteger(node.line) && node.line >= 0 && (!node.module || typeof node.module === 'string') && (!node.documentation || typeof node.documentation === 'string'))
     && (!graph.modules || Array.isArray(graph.modules))
-    && (!graph.modules || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (!module.node_ids || Array.isArray(module.node_ids))));
+    && (!graph.modules || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (!module.path || typeof module.path === 'string') && (!module.parent_id || typeof module.parent_id === 'string') && (!module.node_ids || (Array.isArray(module.node_ids) && module.node_ids.every((id) => typeof id === 'string')))));
 }
 
 export type DesignMapSnapshot = {
