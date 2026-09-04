@@ -15,6 +15,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `1564feb` | First-viewport reading rail and explicit “Start with the system map” CTA | Playwright verified CTA anchor navigation, three rail steps, and zero mobile overflow |
 | `f8207d5` | Point-of-reading provenance status and expandable evidence explanation | Playwright verified `Graph-backed` status, disclosure expansion, evidence copy, and zero mobile overflow |
 | `a053424` | Typed Lachesis graph-first bundle adapter | `npm run check` and `npm run build`; adapter preserves indexed-vs-included counts and projected-subset limitations |
+| `5da2f52` | Safe opaque hosted-bundle loader | `npm run check` and `npm run build`; loader validates IDs, rejects redirects, caps body size, and handles expiry/malformed JSON |
 
 ## Current checks
 
