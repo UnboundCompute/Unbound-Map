@@ -17,7 +17,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
 export default async function TrustPage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
-  const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle) };
+  const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle), domain: one(query.domain) };
   const snapshot = snapshotWithContext(illustrativeSnapshot, context);
   const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
   const requestedKind = one(query.kind);

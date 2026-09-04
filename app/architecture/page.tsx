@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 
 export default async function ArchitecturePage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
-  const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle) };
+  const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle), region: one(query.region), anchor: one(query.anchor) };
   const snapshot = snapshotWithContext(illustrativeSnapshot, context);
   const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
   const initialQuery = new URLSearchParams({ ...(contextQuery ? Object.fromEntries(new URLSearchParams(contextQuery).entries()) : {}), ...(one(query.region) ? { region: one(query.region)! } : {}), ...(one(query.level) ? { level: one(query.level)! } : {}), ...(one(query.anchor) ? { anchor: one(query.anchor)! } : {}) }).toString();

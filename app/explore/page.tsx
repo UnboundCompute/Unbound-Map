@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
 export default async function ExplorePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
   const query = searchParams ? await searchParams : {};
   const context = { repository: one(query.repository), revision: one(query.revision), region: one(query.region), label: one(query.label), anchor: one(query.anchor), flow: one(query.flow), step: one(query.step), domain: one(query.domain), bundle: one(query.bundle) };
-  const sharedContext: SharedSnapshotContext = { repository: context.repository, revision: context.revision, bundle: context.bundle };
+  const sharedContext: SharedSnapshotContext = { repository: context.repository, revision: context.revision, bundle: context.bundle, region: context.region, label: context.label, anchor: context.anchor, flow: context.flow, step: context.step, domain: context.domain };
   const snapshot = snapshotWithContext(illustrativeSnapshot, sharedContext);
   const hasContext = Boolean(context.region || context.anchor || context.flow || context.step || context.domain);
   const repository = context.repository ?? illustrativeSnapshot.repository;

@@ -30,7 +30,7 @@ function contextualHref(href: string, context?: SharedSnapshotContext) {
 
 function lachesisHref(context?: SharedSnapshotContext) {
   if (!context || (!context.repository && !context.revision && !context.bundle)) return 'https://lachesis.unboundcompute.com/';
-  const query = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
+  const query = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.region ? { region: context.region } : {}), ...(context.label ? { label: context.label } : {}), ...(context.anchor ? { anchor: context.anchor } : {}), ...(context.flow ? { flow: context.flow } : {}), ...(context.step ? { step: context.step } : {}), ...(context.domain ? { domain: context.domain } : {}) }).toString();
   return `https://lachesis.unboundcompute.com/?${query}`;
 }
 

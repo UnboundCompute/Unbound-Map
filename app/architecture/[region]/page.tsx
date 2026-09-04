@@ -26,7 +26,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
 export default async function RegionPage({ params, searchParams }: { params: Promise<{ region: string }>; searchParams: SearchParams }) {
   const { region: regionId } = await params;
   const query = await searchParams;
-  const context: SharedSnapshotContext = { bundle: one(query.bundle), repository: one(query.repository), revision: one(query.revision) };
+  const context: SharedSnapshotContext = { bundle: one(query.bundle), repository: one(query.repository), revision: one(query.revision), region: regionId, anchor: one(query.anchor) };
   let snapshot = snapshotWithContext(illustrativeSnapshot, context);
   let bundleError = '';
   if (context.bundle) {
