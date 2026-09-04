@@ -22,12 +22,13 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<Tab>('system');
   const [selected, setSelected] = useState<NodeId>('core');
   const node = nodes[selected];
+  const lachesisHref = `https://lachesis.unboundcompute.com/?repo=suricata&commit=4e8b2d&focus=${selected}&anchor=${encodeURIComponent(node.anchor)}`;
 
   return (
     <main className="shell">
       <nav className="nav" aria-label="Design Map navigation">
         <div className="brand"><span className="brand-mark" aria-hidden="true" /><div><div className="brand-name">Design Map</div><div className="brand-kicker">read before the source</div></div></div>
-        <div className="nav-meta"><span className="live-dot" /> generated from HEAD <span>·</span> suricata</div>
+        <div className="nav-meta"><span className="live-dot" /> generated from commit <span>·</span> suricata</div>
       </nav>
 
       <section className="hero" aria-labelledby="page-title">
@@ -60,7 +61,7 @@ export default function Page() {
             {(Object.keys(nodes) as NodeId[]).map((id) => <button key={id} className={`node node-${id}`} data-selected={selected === id} onClick={() => setSelected(id)} aria-pressed={selected === id}><small>{nodes[id].eyebrow}</small><b>{nodes[id].label}</b><p>{activeTab === 'trust' && id === 'input' ? 'untrusted boundary' : nodes[id].description}</p></button>)}
             <div className="stage-footer"><span><i /> entry / handoff</span><span><i className="teal" /> verified edge</span></div>
           </div>
-          <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected region</div><h2>{node.label}</h2><p>{node.description}</p><dl><dt>Anchored by</dt><dd>{node.anchor}</dd><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : 'What happens next?'}</dd></dl><button className="inspector-link" onClick={() => window.open('https://lachesis.unboundcompute.com/', '_blank', 'noopener,noreferrer')}>Explore in Lachesis <span aria-hidden="true">↗</span></button></aside>
+          <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected region</div><h2>{node.label}</h2><p>{node.description}</p><dl><dt>Anchored by</dt><dd>{node.anchor}</dd><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : 'What happens next?'}</dd></dl><a className="inspector-link" href={lachesisHref} target="_blank" rel="noreferrer">Explore in Lachesis <span aria-hidden="true">↗</span></a></aside>
         </div></div>
         <div className="footer-note"><span>Map generated from commit 4e8b2d · 96% graph coverage</span><a href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">How the evidence works ↗</a></div>
       </section>
