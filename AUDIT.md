@@ -106,6 +106,7 @@ Static and live route checks performed against the local dev server:
 - `/`, `/architecture`, `/architecture/decode`, `/flows`, `/flows?step=ipv4`, `/flows/packet-decode`, `/trust`, `/explore`, `/embed`, `/opengraph-image`, `/robots.txt`, and `/sitemap.xml` returned 200 in the latest route smoke run.
 - Legacy `/map` and `/flow` returned redirects to `/architecture` and `/flows`, preserving incoming query context.
 - Contextful `/explore?repository=Suricata&revision=8f4c1b2&region=decode&anchor=DecodeEthernet%28%29` rendered `Context ready`, the repository/revision, region, anchor, and Lachesis handoff.
+- Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
 - `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
 - Live browser screenshot inspection was attempted through the required browser surface, but no browser was available; visual screenshot evidence remains an explicit limitation.
 
