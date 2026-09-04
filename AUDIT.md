@@ -30,6 +30,29 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `624f24e` | Replace the competing CSS layers with one warm technical editorial visual system | `DESIGN.md` defines Read-mode layout/type/tokens/interaction gates; legacy CSS was removed, mobile nodes now use a verified single-column flow, focus and touch sizing were added, and detector findings were reduced to the permitted map grid advisory after the font finding was corrected |
 | `1d3b288` | Give Data Flow a distinct ordered reading surface | `FlowDiagram` renders four data nouns, handoffs, guards, region ownership, and symbol-specific Lachesis links; `npm run check` and `npm run build` passed |
 | `3a96cbb` | Give Trust Surface its own glossary/index | `TrustGlossary` renders source/guard/sink kinds, plain-language obligations, repository locations, and anchor-specific Lachesis links; `npm run check` and `npm run build` passed |
+| `111943b` | Replace Luna's incremental UI plan with a researched, from-scratch implementation specification | The brief defines product boundaries, authoritative inputs, 12 official online references, canonical routes, page-level interaction contracts, semantic zoom limits, responsive and accessible alternatives, Suricata proof content, staged commits, end-to-end tasks, acceptance criteria, and automatic rejection conditions; `git diff --check` passed before commit |
+
+## Rebuild brief audit
+
+The Luna brief was reviewed as a specification rather than as shipped UI.
+
+- **Ambiguity:** Pass. Each route names its reader question, required content, interaction model,
+  responsive behavior, and exclusions.
+- **Research traceability:** Pass. Official sources are linked inline and every reference says what
+  to borrow and what not to copy. Luna must create a dated visual research record before coding.
+- **Product boundary:** Pass. Design-level canonical flows remain in Design Map; function bodies,
+  symbol neighborhoods, runtime taint tracing, and findings remain in Lachesis/Trace.
+- **Scalability:** Pass. The specification bounds initial regions, focused children, and
+  connections; requires stable roll-ups and fixtures spanning zero to 500 communities; and rejects
+  a force-directed hairball.
+- **Content sufficiency:** Pass. The useful Suricata thesis, macro path, subsystem inventory, boot
+  path, decode flow, dispatch distinction, key structures, and trust taxonomy are retained without
+  copying either Claude mockup's layout.
+- **Implementation authority:** Pass. The current frontend is explicitly disposable while safe
+  bundle loading and validated graph adapters are preserved when suitable.
+- **Verification:** Pass for documentation. `git diff --check` completed without whitespace errors;
+  the document includes build, interaction, accessibility, screenshot, and clean-worktree gates for
+  implementation.
 
 ## Current checks
 
