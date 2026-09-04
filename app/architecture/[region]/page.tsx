@@ -1,9 +1,16 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
 import { illustrativeSnapshot } from '../../../lib/view-model';
 
 export function generateStaticParams() { return illustrativeSnapshot.regions.map((region) => ({ region: region.id })); }
+
+export async function generateMetadata({ params }: { params: Promise<{ region: string }> }): Promise<Metadata> {
+  const { region: regionId } = await params;
+  const region = illustrativeSnapshot.regions.find((item) => item.id === regionId);
+  return region ? { title: `${region.label} · ${illustrativeSnapshot.repository} architecture`, description: `${region.summary} Read the ${region.label} chapter in Design Map before opening the source.` } : { title: 'Architecture region · Design Map' };
+}
 
 export default async function RegionPage({ params }: { params: Promise<{ region: string }> }) {
   const { region: regionId } = await params;

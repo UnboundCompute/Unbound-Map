@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
 import { FlowDiagram } from '../../components/FlowDiagram';
 import { illustrativeSnapshot } from '../../../lib/view-model';
@@ -6,6 +7,12 @@ import { illustrativeSnapshot } from '../../../lib/view-model';
 const flows = { 'packet-decode': { title: 'Packet decode into flow state', intro: 'Follow one architectural journey from bytes on the wire into the stateful unit used by downstream parsers.' } };
 
 export function generateStaticParams() { return Object.keys(flows).map((flow) => ({ flow })); }
+
+export async function generateMetadata({ params }: { params: Promise<{ flow: string }> }): Promise<Metadata> {
+  const { flow } = await params;
+  const entry = flows[flow as keyof typeof flows];
+  return entry ? { title: `${entry.title} · Design Map`, description: `${entry.intro} Read the architectural handoffs before the source.` } : { title: 'Architectural flow · Design Map' };
+}
 
 export default async function FlowPage({ params }: { params: Promise<{ flow: string }> }) {
   const { flow } = await params;
