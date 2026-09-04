@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { SharedSnapshotContext } from '../../lib/view-model';
 
-export function EmbedSnippet() {
+export function EmbedSnippet({ context = {} }: { context?: SharedSnapshotContext }) {
   const [origin, setOrigin] = useState('https://<your-design-map-host>');
   const [state, setState] = useState<'idle' | 'copied' | 'unavailable'>('idle');
   useEffect(() => setOrigin(window.location.origin), []);
-  const snippet = `<iframe src="${origin}/embed" title="Repository architecture map" width="100%" height="620" loading="lazy"></iframe>`;
+  const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
+  const snippet = `<iframe src="${origin}/embed${contextQuery ? `?${contextQuery}` : ''}" title="${context.repository ?? 'Repository'} architecture map" width="100%" height="620" loading="lazy"></iframe>`;
   const copy = async () => {
     try {
       if (navigator.clipboard?.writeText) {
