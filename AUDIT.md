@@ -70,6 +70,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `f3af308` | Make social preview repository-neutral | Global Open Graph artwork no longer hardcodes the Suricata fixture name, avoiding misleading previews when Design Map serves another repository; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `11623d1` | Document public metadata host | README now explains that production deployments should set `NEXT_PUBLIC_SITE_URL` (with automatic `VERCEL_URL` support) so sitemap and social metadata never point maintainers at localhost; `npm run check` and `git diff --check` passed. |
 | `6c28dcf` | Align product and design vocabulary | Updated Product to the shipped Architecture/Flows/Trust route names and documented Start/embed as distribution surfaces; updated the design system to record IBM Plex Serif as the implemented display face; no UI behavior changed. |
+| `ba029a2` | Remove obsolete map state branches | Deleted unreachable loading/error banner branches and the unused error style after the explicit state-panel implementation, leaving one authoritative state presentation; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
