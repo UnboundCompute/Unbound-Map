@@ -23,6 +23,10 @@ export type SystemRegion = {
   nodeCount: number;
   metricLabel: string;
   rolledUp?: boolean;
+  role?: 'entry' | 'runtime' | 'fanout' | 'output' | 'boot';
+  upstream?: string[];
+  downstream?: string[];
+  children?: { label: string; summary: string; anchor?: string }[];
   anchor?: { id: string; label: string; file: string; line: number };
 };
 

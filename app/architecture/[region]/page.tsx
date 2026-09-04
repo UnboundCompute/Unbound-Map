@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
+import { illustrativeSnapshot } from '../../../lib/view-model';
+
+export function generateStaticParams() { return illustrativeSnapshot.regions.map((region) => ({ region: region.id })); }
+
+export default async function RegionPage({ params }: { params: Promise<{ region: string }> }) {
+  const { region: regionId } = await params;
+  const region = illustrativeSnapshot.regions.find((item) => item.id === regionId);
+  if (!region) notFound();
+  const neighbors = [...(region.upstream ?? []), ...(region.downstream ?? [])].map((id) => illustrativeSnapshot.regions.find((item) => item.id === id)).filter(Boolean);
+  return <DocsShell active="/architecture"><div className="doc-page region-page"><Link className="back-link" href="/architecture">← Architecture</Link><PageIntro title={region.label} snapshot={illustrativeSnapshot}>{region.summary} This chapter keeps the design-level responsibility in view before you open the implementation.</PageIntro><div className="region-meta"><div><span>Footprint</span><strong>{region.metricLabel}</strong></div><div><span>Repository path</span><code>{region.path}</code></div><div><span>Role</span><strong>{region.role ?? 'runtime region'}</strong></div></div><section className="region-section"><h2>What this region owns</h2><p>{region.summary}</p>{region.children && <ul className="region-children">{region.children.map((child) => <li key={child.label}><strong>{child.label}</strong><span>{child.summary}</span>{child.anchor && <code>{child.anchor}</code>}</li>)}</ul>}</section><section className="region-section"><h2>How it connects</h2>{neighbors.length ? <ul className="neighbor-list">{neighbors.map((neighbor) => <li key={neighbor!.id}><Link href={`/architecture/${neighbor!.id}`}><span>{neighbor!.label}</span><small>{region.downstream?.includes(neighbor!.id) ? 'downstream' : 'upstream'} →</small></Link></li>)}</ul> : <p>This projection has no neighboring region metadata at this level.</p>}</section><section className="region-section"><h2>Open the anchor</h2><p>{region.anchor ? <><code>{region.anchor.label}</code> lives at <code>{region.anchor.file}:{region.anchor.line}</code>. Lachesis can show its callers, callees, and exact source context.</> : 'This region has no anchor in the current projection.'}</p><Link className="primary-button" href={`/explore?${new URLSearchParams({ repository: illustrativeSnapshot.repository, revision: illustrativeSnapshot.revision, region: region.id, label: region.label, anchor: region.anchor?.label ?? region.label }).toString()}`}>Prepare Lachesis handoff <span aria-hidden="true">↗</span></Link></section><EvidenceNote>This region chapter is illustrative prototype content. Placement and descriptions should be regenerated from the selected graph-backed snapshot.</EvidenceNote></div></DocsShell>;
+}

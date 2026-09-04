@@ -1,65 +1,81 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { loadHostedBundle } from '../../lib/hosted';
 import { projectTopLevelRegions, toDesignMapSnapshot, type LachesisBundle } from '../../lib/design-map';
-import { illustrativeSnapshot, snapshotFromProjection, toHandoff, type RepositorySnapshotView } from '../../lib/view-model';
+import { illustrativeSnapshot, snapshotFromProjection, toHandoff, type RepositorySnapshotView, type SystemRegion } from '../../lib/view-model';
 
-type MapNode = { id: string; label: string; meta: string; detail: string; anchor: string; x: number; y: number; tone: string; regionId: string };
+type Position = { x: number; y: number; tone: 'gold' | 'blue' | 'violet' | 'green' };
+const positions: Position[] = [
+  { x: 9, y: 52, tone: 'gold' }, { x: 23, y: 52, tone: 'gold' }, { x: 38, y: 52, tone: 'blue' },
+  { x: 53, y: 52, tone: 'violet' }, { x: 68, y: 38, tone: 'gold' }, { x: 68, y: 67, tone: 'blue' },
+  { x: 88, y: 52, tone: 'green' }, { x: 38, y: 16, tone: 'violet' }, { x: 82, y: 24, tone: 'green' },
+];
 
-const positions = [{ x: 8, tone: 'gold' }, { x: 34, tone: 'blue' }, { x: 61, tone: 'violet' }, { x: 84, tone: 'green' }];
-const mapNodes: MapNode[] = illustrativeSnapshot.regions.map((region, index) => ({ id: region.id, regionId: region.id, label: region.label, meta: region.metricLabel, detail: region.summary, anchor: region.anchor?.label ?? region.label, y: 44, ...positions[index] }));
+function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, bundleId?: string) {
+  const handoff = toHandoff(snapshot, region, region.anchor?.label ?? region.label, bundleId);
+  return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
+}
 
-export function MapClient({ mode = 'system' }: { mode?: 'system' | 'flow' | 'trust' }) {
-  const [selected, setSelected] = useState('core');
+export function MapClient() {
+  const [selected, setSelected] = useState('decode');
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [bundleMessage, setBundleMessage] = useState('');
+
   useEffect(() => {
-    const bundleId = new URLSearchParams(window.location.search).get('bundle');
-    if (!bundleId || mode !== 'system') return;
+    const params = new URLSearchParams(window.location.search);
+    const requestedRegion = params.get('region');
+    if (requestedRegion) setSelected(requestedRegion);
+    const bundleId = params.get('bundle');
+    if (!bundleId) return;
     const controller = new AbortController();
     setBundleState('loading');
     loadHostedBundle(bundleId, controller.signal).then((bundle) => {
-      const rawSnapshot = toDesignMapSnapshot(bundle as LachesisBundle);
-      setSnapshot(snapshotFromProjection(rawSnapshot, projectTopLevelRegions(rawSnapshot)));
+      const raw = toDesignMapSnapshot(bundle as LachesisBundle);
+      const next = snapshotFromProjection(raw, projectTopLevelRegions(raw));
+      setSnapshot(next);
+      setSelected((current) => next.regions.some((region) => region.id === current) ? current : next.regions[0]?.id ?? '');
       setBundleState('ready');
     }).catch((error) => {
       if (error instanceof DOMException && error.name === 'AbortError') return;
-      setBundleState('error'); setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
+      setBundleState('error');
+      setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
     });
     return () => controller.abort();
-  }, [mode]);
-  const projectedNodes = snapshot.regions.slice(0, 4).map((region, index) => ({ ...mapNodes[index], id: region.id, regionId: region.id, label: region.label, meta: region.metricLabel, detail: region.summary, anchor: region.anchor?.label ?? mapNodes[index].anchor }));
-  const visibleNodes = projectedNodes.length >= 2 ? projectedNodes : mapNodes;
-  const renderedNodes = visibleNodes;
-  const current = renderedNodes.find((node) => node.id === selected) ?? renderedNodes[1];
-  const directory = snapshot.regions;
-  const handoff = toHandoff(snapshot, snapshot.regions.find((region) => region.id === current.regionId) ?? illustrativeSnapshot.regions[1], current.anchor, new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search).get('bundle') ?? undefined);
-  const handoffHref = `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
-  return (
-    <>
+  }, []);
+
+  const regions = useMemo(() => snapshot.regions.slice(0, 9), [snapshot.regions]);
+  const current = regions.find((region) => region.id === selected) ?? regions[0] ?? illustrativeSnapshot.regions[1];
+  const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
+  const selectRegion = (region: SystemRegion) => {
+    setSelected(region.id);
+    const params = new URLSearchParams(window.location.search);
+    params.set('region', region.id);
+    window.history.replaceState(null, '', `/architecture?${params.toString()}`);
+  };
+  const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
+  const edges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
+  if (!edges.length) regions.slice(0, -1).forEach((region, index) => edges.push({ from: region.id, to: regions[index + 1].id }));
+
+  return <>
     <div className="map-workbench">
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status"><i /> {mode === 'system' ? 'structural view' : mode === 'flow' ? 'request path' : 'boundary view'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {visibleNodes.length} regions</span></div>
+        <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level 0 · system shape</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown</span></div>
         {bundleState === 'loading' && <div className="map-banner" role="status">Loading the hosted graph bundle…</div>}
         {bundleState === 'error' && <div className="map-banner map-banner-error" role="alert">{bundleMessage}</div>}
-        {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Layout remains a bounded reading projection.</div>}
-        <div className="map-canvas" aria-label={`${mode} architecture map`}>
-          <div className="map-grid" />
-          <div className="map-route route-a" /><div className="map-route route-b" /><div className="map-route route-c" />
-          {visibleNodes.map((node) => <button key={node.id} className={`map-node node-${node.tone} ${selected === node.id ? 'is-selected' : ''}`} style={{ left: `${node.x}%`, top: `${node.y}%` }} onClick={() => setSelected(node.id)} aria-pressed={selected === node.id}><span className="node-dot" /><strong>{node.label}</strong><small>{node.meta}</small></button>)}
-          <div className="map-axis axis-x">entry <span /> effect</div><div className="map-axis axis-y">runtime spine</div>
+        {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
+        <div className="map-canvas" aria-label="Suricata architecture map">
+          <div className="map-grid" aria-hidden="true" />
+          <svg className="map-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="map-arrow" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#637669" /></marker></defs>{edges.map((edge) => { const from = regionPosition.get(edge.from)!; const to = regionPosition.get(edge.to)!; return <line key={`${edge.from}-${edge.to}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} markerEnd="url(#map-arrow)" />; })}</svg>
+          {regions.map((region, index) => { const position = positionFor(index); return <button key={region.id} className={`map-node node-${position.tone} ${current.id === region.id ? 'is-selected' : ''}`} style={{ left: `${position.x}%`, top: `${position.y}%` }} onClick={() => selectRegion(region)} aria-pressed={current.id === region.id}><span className="node-dot" /><strong>{region.label}</strong><small>{region.metricLabel}</small></button>; })}
+          <div className="map-axis axis-x" aria-hidden="true">entry <span /> effect</div><div className="map-axis axis-y" aria-hidden="true">runtime spine</div>
         </div>
       </div>
-      <aside className="map-inspector" aria-live="polite">
-        <div className="inspector-label">Selected region</div><h2>{current.label}</h2><p>{current.detail}</p>
-        <dl className="inspector-facts"><div><dt>footprint</dt><dd>{current.meta}</dd></div><div><dt>anchor</dt><dd><code>{current.anchor}</code></dd></div></dl>
-        <Link className="inspector-link" href={handoffHref}>Open this path in Lachesis <span>→</span></Link>
-      </aside>
+      <aside className="map-inspector" aria-live="polite" aria-label="Selected region details"><div className="inspector-label">Selected region</div><h2>{current.label}</h2><p>{current.summary}</p><dl className="inspector-facts"><div><dt>footprint</dt><dd>{current.metricLabel}</dd></div><div><dt>path</dt><dd><code>{current.path}</code></dd></div><div><dt>anchor</dt><dd><code>{current.anchor?.label ?? 'No anchor in this projection'}</code></dd></div></dl><Link className="inspector-link" href={`/architecture/${current.id}`}>Read this region <span aria-hidden="true">→</span></Link><Link className="inspector-link" href={handoffHref(snapshot, current, new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search).get('bundle') ?? undefined)}>Open anchor in Lachesis <span aria-hidden="true">↗</span></Link></aside>
     </div>
-    {mode === 'system' && <section className="region-directory" aria-label="Region directory"><div><span className="sidebar-label">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{directory.map((region) => <li key={region.id}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></li>)}</ol></section>}
-    </>
-  );
+    <section className="relationship-summary" aria-labelledby="relationship-title"><div><h2 id="relationship-title">The same map, in words</h2><p>Use this ordered summary if you prefer reading relationships to navigating a diagram.</p></div><ol>{regions.map((region) => <li key={region.id}><button onClick={() => selectRegion(region)} aria-pressed={current.id === region.id}><span>{region.label}</span><small>{region.downstream?.length ? `hands off to ${region.downstream.map((id) => regions.find((item) => item.id === id)?.label ?? id).join(', ')}` : region.role === 'boot' ? 'initializes the runtime' : 'ends the displayed path'}</small></button></li>)}</ol></section>
+    <section className="region-directory" aria-label="Region directory"><div><span className="rail-heading">Region directory</span><p>Placed regions stay legible on the map. The full projection remains available here as the repository grows.</p></div><ol>{snapshot.regions.map((region) => <li key={region.id}><Link href={`/architecture/${region.id}`}><span>{region.label}</span><small>{region.rolledUp ? 'remainder' : `${region.nodeCount} nodes`}</small></Link></li>)}</ol></section>
+  </>;
 }
