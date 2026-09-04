@@ -101,6 +101,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `e91e9a3` | Carry explicit flow steps to Lachesis | Flow handoffs now include both `flow` and `step` query fields, and Explore shows the selected step explicitly alongside repository, revision, region, and anchor; checks passed. |
 | `e892ff6` | Show complete handoff context | The Lachesis confirmation page now visibly lists selected region and opaque bundle alongside repository, revision, anchor, flow, step, and trust domain when present; checks passed. |
 | `8c5a16e` | Hydrate shared flow step | Flow pages now initialize the stepper from the server URL, so a shared `?step=ipv4` link renders the IPv4 narrative before hydration instead of briefly showing Ethernet; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `6a13b98` | Hydrate shared trust filters | Trust now seeds its search/category controls from the server URL and validates the requested category, so shared filtered links render the matching glossary state before hydration; checks passed. |
 | `558839a` | Preserve context on wordmark navigation | The global Design Map wordmark now retains repository, revision, and bundle query context when returning to Start here, eliminating the final shell-level context reset; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
@@ -146,6 +147,7 @@ Static and live route checks performed against the local dev server:
 - Contextful `/architecture?repository=Zeek&revision=main&bundle=b_demo123` rendered an iframe snippet with `/embed?repository=Zeek&revision=main&bundle=b_demo123` and `title="Zeek architecture map"`.
 - Queryful `/explore?repository=Zeek&revision=main&bundle=b_demo123&region=decode&flow=packet-decode&step=ipv4&anchor=DecodeIPV4%28%29` rendered visible `region`, `step`, and `bundle` fields plus `DecodeIPV4() · Zeek handoff · Lachesis` metadata.
 - Server-rendered `/flows?step=ipv4` included the `validated IPv4 payload` narrative and `step=ipv4` state before hydration, while retaining the full ordered step list.
+- Server-rendered `/trust?q=memory&kind=input` included `value="memory"`, `value="input"`, and only the matching `Memory safety` domain in the initial HTML.
 - Server-rendered `/embed?repository=Zeek&revision=main&bundle=b_demo123` showed `Preparing the architecture map` and did not include the fixture relationship summary before hydration; its return link retained the Zeek bundle context.
 - Queryful `/architecture?repository=Zeek&revision=main&region=decode&level=1` was re-smoked after the SSR guard and returned 200; the browser-level zoom control remains available without a server-side `window` error.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
