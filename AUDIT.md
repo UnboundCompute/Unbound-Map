@@ -223,6 +223,7 @@ Static and live route checks performed against the local dev server:
 - Earlier browser-surface inspection was unavailable in this environment; a local Playwright runner is now installed and provides the viewport evidence recorded below.
 - Playwright headless viewport audit is now available locally: `/`, `/architecture`, `/flows`, `/trust`, and `/embed` each had zero horizontal overflow, exactly one `h1`, and one `main` at 375×812, 768×1024, 1024×768, and 1440×1000; a 375px Architecture full-page screenshot was captured and inspected.
 - Playwright interaction smoke at 375px also confirmed mobile Architecture selection navigates to the selected region chapter (`/architecture/input?region=input&level=1`), Flow step selection updates both `step=ipv4` and the “validated IPv4 payload” narrative, and Trust filtering updates `q=memory` while narrowing the visible domains.
+- Desktop visual pass at 1440px captured and inspected Start here, Flows, and Trust full-page screenshots; the editorial reading hierarchy, bounded map/flow surfaces, and restrained CTA treatment remain coherent with zero horizontal overflow.
 
 ## Known prototype limits
 
