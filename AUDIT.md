@@ -220,7 +220,8 @@ Static and live route checks performed against the local dev server:
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
 - Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
 - `npm run check`, `npm run build`, `npm run projection-smoke`, `npm run smoke`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
-- Live browser screenshot inspection was attempted through the required browser surface, but no browser was available; visual screenshot evidence remains an explicit limitation.
+- Earlier browser-surface inspection was unavailable in this environment; a local Playwright runner is now installed and provides the viewport evidence recorded below.
+- Playwright headless viewport audit is now available locally: `/`, `/architecture`, `/flows`, `/trust`, and `/embed` each had zero horizontal overflow, exactly one `h1`, and one `main` at 375×812, 768×1024, 1024×768, and 1440×1000; a 375px Architecture full-page screenshot was captured and inspected.
 
 ## Known prototype limits
 
