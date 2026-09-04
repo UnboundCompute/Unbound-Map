@@ -37,6 +37,13 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .bar-divider { width: 1px; height: 24px; background: var(--rule); }
 .bar-repo { font-size: 14px; font-weight: 600; }
 .bar-revision { color: var(--muted); font: 12px var(--mono); }
+.revision-detail { position: relative; }
+.revision-detail summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; list-style: none; }
+.revision-detail summary::-webkit-details-marker { display: none; }
+.revision-detail summary::after { margin-left: 5px; color: var(--signal); content: '⌄'; font: 12px var(--mono); }
+.revision-popover { position: absolute; z-index: 5; top: 40px; left: 0; display: grid; gap: 7px; min-width: 220px; padding: 12px; border: 1px solid var(--rule); background: var(--paper); box-shadow: 0 8px 22px rgba(31, 35, 32, .12); }
+.revision-popover span { color: var(--muted); font: 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.revision-popover code { color: var(--ink); font: 11px var(--mono); overflow-wrap: anywhere; }
 .snapshot-state { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; }
 .snapshot-state i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
 .snapshot-graph-backed i { background: #547966; }

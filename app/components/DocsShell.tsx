@@ -31,6 +31,7 @@ function contextualHref(href: string, context?: SharedSnapshotContext) {
 export function DocsShell({ children, active, snapshot = illustrativeSnapshot, context }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
   const activeRoute = active ?? '/';
   const isFixture = snapshot.provenance === 'illustrative';
+  const shortRevision = snapshot.revision.length > 14 ? `${snapshot.revision.slice(0, 8)}…${snapshot.revision.slice(-5)}` : snapshot.revision;
   return (
     <div className="docs-shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
@@ -38,7 +39,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         <Link href={contextualHref('/', context)} className="wordmark" aria-label="Design Map start here"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Design Map</span></Link>
         <span className="bar-divider" aria-hidden="true" />
         <span className="bar-repo">{snapshot.repository}</span>
-        <code className="bar-revision">{snapshot.revision}</code>
+        <details className="revision-detail"><summary aria-label={`Revision ${snapshot.revision}`}><code className="bar-revision">{shortRevision}</code></summary><div className="revision-popover"><span>full revision</span><code>{snapshot.revision}</code></div></details>
         <SnapshotState snapshot={snapshot} />
         <a className="bar-lachesis" href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>
       </header>
