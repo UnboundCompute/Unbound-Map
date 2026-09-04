@@ -36,6 +36,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `bed786a` | Replace the documentation visual system | Replaced the global stylesheet and route composition with a single light technical-editorial world, one repository shell, no duplicated tabs, map/list mobile reflow, semantic landmarks/focus styles, and route-specific document sections; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `6da06d1` | Build the bounded, data-driven Architecture surface | Suricata fixture now has eight meaningful regions with roles, relationships, children, anchors, and a separate boot path; the map draws metadata-backed edges, has a visible text relationship summary, supports `/architecture/[region]`, preserves hosted loading, and switches to ordered content on mobile; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `389c404` | Build guided architectural flows | Flow steps now describe the Suricata decode handoffs with data nouns, decisions, guards, anchors, synchronized progress state, URL step deep links, Previous/Next controls, and an accessible all-steps fallback; `npm run check`, `npm run build`, and `git diff --check` passed |
+| `eb33ce3` | Build the trust surface glossary/index | Trust now uses eight explicit domains with meaning, obligation, constructor families, locations, search/filter controls, deep links, and non-finding language; `npm run check`, `npm run build`, and `git diff --check` passed |
 
 ## Rebuild brief audit
 
