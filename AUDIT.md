@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `3eed1e6` | Explain flow branching without a path tangle | The guided flow now names the static EtherType dispatch alternatives and the later runtime flow/parser dispatch separately, preserving the readable canonical path while documenting supported branches; responsive styles stack the explanation on small screens; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `80bb199` | Complete region chapter evidence sections | Region chapters now show explicit inputs, outputs, key structures/state, and honest projection fallbacks; illustrative Suricata regions carry substantive Packet/Flow/parser/detection/output evidence while graph projections preserve optional fields; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `68b2f46` | Clarify internal start navigation | The homepage’s Architecture action now uses the same directional cue as other internal links, reserving the external-tab cue for Lachesis handoffs; `npm run check` and `git diff --check` passed. |
 | `dfb5c53` | Make the recommended first read explicit | Start here now places a labelled `Start with` decision immediately after the repository path, with context-preserving `Follow a packet` and `Explore architecture` actions; the homepage route smoke asserts both actions and `npm run check`, `npm run build`, and `git diff --check` passed. |
