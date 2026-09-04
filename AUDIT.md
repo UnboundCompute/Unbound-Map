@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `69f5ae8` | Raise actionable map and handoff labels to the type floor | Toolbar/banner status, flow warnings, inspector links, map handoff links, and Trust handoff links now meet the 12px informational minimum while compact code snippets and decorative indices remain intentionally dense; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `2420124` | Unify focus rings for native disclosures | Revision and Flow `<summary>` controls now receive the same 3px visible focus treatment as links/buttons; Playwright confirmed both disclosure summaries report a 3px outline, with `npm run check`, `npm run build`, and `git diff --check` passing. |
 | `084aa22` | Contain long repository context on mobile | Long `repository`/`revision` URLs now keep the mobile repository bar and open revision disclosure within the viewport; Playwright confirmed zero overflow at 375px in both states, with `npm run check`, `npm run build`, and `git diff --check` passing. |
 | `204256f` | Raise visible section labels to the type floor | Repository rail headings, page labels, evidence labels, flow labels, and handoff labels now inherit the 12px informational minimum alongside metadata; `npm run check`, `npm run build`, and `git diff --check` passed. |
