@@ -24,6 +24,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `06047cf` | Preserve hosted-bundle loading, error, and graph-backed status in the new map surface | `npm run check` and `npm run build` passed; map client still validates the hosted transport through the existing adapter and announces loading/error/ready states |
 | `795c946` | Add a scalable region directory beneath the bounded spatial projection | `npm run check` and `npm run build` passed; hosted projections can expose all bounded regions in a readable list while the canvas stays limited to four placed regions |
 | `1a7f60e` | Keep the spatial canvas on its newcomer-safe fixture when a hosted projection is too sparse to place | `npm run check` and `npm run build` passed; empty or single-region projections no longer leave the inspector without a selected region |
+| `0351079` | Document the multipage route model in the repository handoff | README now names all five routes and the map/explorer boundary |
 
 ## Current checks
 
