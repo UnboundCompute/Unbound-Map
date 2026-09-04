@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { illustrativeSnapshot, type RepositorySnapshotView } from '../../lib/view-model';
 
 const sections = [
   { href: '/map', label: 'System Map', note: 'What owns what' },
@@ -8,7 +9,8 @@ const sections = [
   { href: '/explore', label: 'Read in Lachesis', note: 'Open the code path' },
 ];
 
-export function DocsShell({ children, active }: { children: ReactNode; active?: string }) {
+export function DocsShell({ children, active, snapshot = illustrativeSnapshot }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView }) {
+  const isFixture = snapshot.provenance === 'illustrative';
   return (
     <div className="docs-shell">
       <header className="docs-header">
@@ -17,14 +19,14 @@ export function DocsShell({ children, active }: { children: ReactNode; active?: 
           <span>Design Map</span>
         </Link>
         <span className="docs-header-note">Read this before the source</span>
-        <span className="docs-header-repo">suricata · main</span>
+        <span className="docs-header-repo">{snapshot.repository} · {snapshot.revision}{isFixture ? ' · illustrative' : ''}</span>
       </header>
       <div className="docs-body">
         <aside className="docs-sidebar" aria-label="Map navigation">
           <div className="sidebar-label">This map</div>
           <nav className="docs-nav">
             {sections.map((section) => (
-              <Link key={section.href} href={section.href} className={`docs-nav-link ${active === section.href ? 'is-active' : ''}`}>
+              <Link key={section.href} href={section.href} aria-current={active === section.href ? 'page' : undefined} className={`docs-nav-link ${active === section.href ? 'is-active' : ''}`}>
                 <span>{section.label}</span><small>{section.note}</small>
               </Link>
             ))}
@@ -32,11 +34,11 @@ export function DocsShell({ children, active }: { children: ReactNode; active?: 
           <div className="sidebar-divider" />
           <div className="sidebar-label">Snapshot</div>
           <dl className="sidebar-facts">
-            <div><dt>revision</dt><dd>8f4c1b2</dd></div>
-            <div><dt>coverage</dt><dd>repository</dd></div>
-            <div><dt>indexed</dt><dd>12,486 nodes</dd></div>
+            <div><dt>revision</dt><dd>{snapshot.revision}</dd></div>
+            <div><dt>coverage</dt><dd>{snapshot.coverageScope}</dd></div>
+            <div><dt>indexed</dt><dd>{snapshot.indexedNodes.toLocaleString()} nodes</dd></div>
           </dl>
-          <p className="sidebar-footnote">Generated from a Lachesis graph bundle. Layout is editorial; counts are evidence.</p>
+          <p className="sidebar-footnote">{isFixture ? 'Illustrative prototype. Replace this snapshot with a graph-backed bundle before sharing.' : 'Generated from a Lachesis graph bundle. Layout is editorial; counts are evidence.'}</p>
         </aside>
         <main className="docs-main">{children}</main>
       </div>
