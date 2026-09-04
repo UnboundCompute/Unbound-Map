@@ -206,6 +206,15 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 
 .handoff-card { display: flex; align-items: center; justify-content: space-between; gap: 34px; max-width: 790px; margin-top: 12px; padding: 30px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); } .handoff-card h2 { margin: 12px 0 9px; font: 400 34px/1.05 var(--serif); } .handoff-card p:not(.card-label) { max-width: 510px; margin: 0; color: var(--body); font-size: 15px; line-height: 1.6; } .primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 18px; color: var(--paper); background: var(--ink); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; } .primary-button:hover { background: var(--signal); }
 .handoff-card.has-context { border-top-color: var(--signal); } .handoff-context { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 790px; margin: 0; padding: 20px 0; border-bottom: 1px solid var(--rule); } .handoff-context div { display: grid; gap: 7px; } .handoff-context dt { color: var(--muted); font: 10px var(--mono); letter-spacing: .07em; text-transform: uppercase; } .handoff-context dd { margin: 0; color: var(--body); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; } .handoff-context code { color: var(--ink); font: 11px var(--mono); }
+
+/* Keep visible reader-facing metadata above the 12px informational floor. */
+.revision-popover span, .snapshot-list dt, .embed-kicker, .embed-footer, .bar-revision, .snapshot-state, .intro-source,
+.map-axis, .map-external, .map-focus-content li > span, .map-focus-content li small code,
+.map-node small, .inspector-label, .inspector-facts dt, .region-directory li::before,
+.region-directory li small, .relationship-summary button::before, .flow-step-nav button span,
+.flow-fields dt, .flow-linear li small, .trust-key, .trust-kind, .trust-tools label,
+.trust-result-count, .trust-domain-index small, .trust-obligation strong, .trust-meta > code,
+.handoff-context dt { font-size: 12px; }
 .handoff-boundary { max-width: 790px; margin-top: 68px; } .boundary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; padding-top: 19px; border-top: 1px solid var(--rule); } .boundary-grid strong { font: 600 13px var(--mono); } .boundary-grid p { margin: 10px 0 0; color: var(--body); font-size: 14px; line-height: 1.6; }
 .trust-meta .quiet-link { min-height: 44px; }
 
