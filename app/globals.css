@@ -109,6 +109,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .route-b { left: 28%; top: 50%; width: 38%; transform: rotate(-29deg); }
 .route-c { left: 60%; top: 50%; width: 27%; transform: rotate(23deg); }
 .map-axis { position: absolute; color: #6d806f; font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.map-external { position: absolute; z-index: 1; color: #c4d7c5; font: 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.external-input { left: 14px; top: 48%; writing-mode: vertical-rl; transform: rotate(180deg); }
+.external-output { right: 14px; top: 48%; writing-mode: vertical-rl; }
 .axis-x { right: 18px; bottom: 14px; } .axis-x span { display: inline-block; width: 36px; margin: 0 7px 3px; border-top: 1px solid #6d806f; } .axis-y { left: 15px; top: 15px; writing-mode: vertical-rl; }
 .map-node { position: absolute; z-index: 1; display: grid; grid-template-columns: 12px minmax(0, 1fr); align-items: center; column-gap: 8px; width: 150px; min-height: 58px; padding: 10px 12px; border: 1px solid #506453; border-radius: 2px; color: var(--map-ink); background: #19261d; text-align: left; cursor: pointer; transform: translate(-50%, -50%); transition: border-color 180ms ease, background 180ms ease, transform 180ms ease; }
 .map-node:hover, .map-node.is-selected { border-color: var(--signal-light); background: #26382b; transform: translate(-50%, -50%) translateY(-3px); }
