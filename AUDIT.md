@@ -44,6 +44,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `1fa3844` | Make the canonical flow deep-linkable | Added the required `/flows/[flow]` route for `packet-decode`, preserved step state in that route's URL, linked to it from the flow index, and corrected the architecture evidence note to describe the shipped eight-region fixture; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `690ed9f` | Expose hosted snapshot states | Hosted bundle requests now explicitly announce loading, unavailable/error, and valid-empty states; the illustrative fixture is hidden while a requested bundle is unresolved, and failed requests offer recovery instead of silently falling back; checks passed. |
 | `704bf95` | Distinguish coverage-limited snapshots | Added typed coverage state and page/rail language for illustrative, verified graph-backed, and graph-backed coverage-limited snapshots; fixture and projection paths now expose the distinction; `npm run check` and `git diff --check` passed. |
+| `e81c1ff` | Label map external boundaries | Added explicit `wire input` and `consumers` labels outside the repository map region so entry and exit points are readable without inferring them from position; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
