@@ -58,8 +58,9 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     return () => { controller.abort(); window.removeEventListener('popstate', restoreFocus); };
   }, []);
 
-  const regions = useMemo(() => snapshot.regions.slice(0, 9), [snapshot.regions]);
-  const current = regions.find((region) => region.id === selected) ?? regions[0];
+  const allRegions = snapshot.regions;
+  const regions = useMemo(() => allRegions.slice(0, 9), [allRegions]);
+  const current = allRegions.find((region) => region.id === selected) ?? regions[0];
   const startParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
   const startContext = new URLSearchParams();
   ['repository', 'revision', 'bundle'].forEach((key) => { const value = startParams.get(key); if (value) startContext.set(key, value); });
@@ -73,7 +74,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const renderParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
   const requestedRegion = renderParams.get('region');
-  const regionIsUnknown = Boolean(requestedRegion && !snapshot.regions.some((region) => region.id === requestedRegion));
+  const regionIsUnknown = Boolean(requestedRegion && !allRegions.some((region) => region.id === requestedRegion));
   const activeBundle = renderParams.get('bundle') ?? initialBundle;
   const systemShapeParams = new URLSearchParams(renderParams);
   systemShapeParams.delete('region');
