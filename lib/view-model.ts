@@ -67,10 +67,14 @@ export type LachesisHandoff = {
 };
 
 export function snapshotWithContext(snapshot: RepositorySnapshotView, context: SharedSnapshotContext): RepositorySnapshotView {
+  const limitations = context.bundle && snapshot.provenance === 'illustrative' && !snapshot.limitations.some((item) => /bundle requested/i.test(item))
+    ? [...snapshot.limitations, 'A graph-backed bundle was requested; this page is awaiting its validated projection.']
+    : snapshot.limitations;
   return {
     ...snapshot,
     repository: context.repository || snapshot.repository,
     revision: context.revision || snapshot.revision,
+    limitations,
   };
 }
 
