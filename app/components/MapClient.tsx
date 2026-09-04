@@ -100,6 +100,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const childDesignAnchorHref = (anchor?: string) => {
     const params = new URLSearchParams(designAnchorParams);
     if (anchor) params.set('anchor', anchor);
+    else params.delete('anchor');
     return `${route}?${params.toString()}`;
   };
   const selectRegion = (region: SystemRegion) => {
