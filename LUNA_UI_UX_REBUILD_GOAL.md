@@ -1,267 +1,638 @@
-# Luna Goal: Rebuild Design Map as a Trustworthy Reading Tool
+# Luna Implementation Brief: Rebuild Design Map from Scratch
 
-## Goal
+## Status and authority
 
-Replace the current interface and content system with a clear, credible documentation experience for a newcomer entering an unfamiliar repository.
+This is the single implementation brief for the next Design Map frontend. It supersedes the
+current frontend composition and the earlier incremental rebuild plan.
 
-The result must make this sequence obvious without explanation:
+The user explicitly approved a from-scratch rebuild. Treat every current route, component,
+stylesheet, and visual decision as disposable. Preserve existing code only when it demonstrably
+supports the product contract below. Do not polish the current pages; rebuild the information
+architecture and reading experience.
 
-1. Understand what the repository does and the revision being described.
-2. Learn the few major regions and what each owns.
-3. Follow one concrete design-level path through those regions.
-4. Understand where trust obligations begin or end.
-5. Continue into Lachesis with repository, revision, region, and symbol context intact.
+## Mission
 
-This is a **replacement**, not a polish pass. Preserve the product boundary, typed bundle adapter, hosted-bundle safety, and route separation. Replace the current content hierarchy, visual system, map presentation, and handoff UX.
+Build a public, shareable repository field guide that lets a newcomer understand the shape of an
+unfamiliar codebase before reading its source.
 
-## Product truth
+The experience must make this sequence self-evident:
 
-Design Map is a generated table of contents and glossary at HLD/LLD altitude. It is not a graph explorer, source viewer, or findings dashboard.
+1. Identify the repository, revision, coverage, and provenance.
+2. Learn the repository's dominant structural idea in one sentence.
+3. See its major regions and relationships without facing the full graph.
+4. Focus one region and understand its responsibility, neighbors, anchors, and important data.
+5. Follow one canonical design-level flow through the system.
+6. Learn where security and correctness obligations exist.
+7. Continue into Lachesis with the exact repository and selected context preserved.
 
-- Design Map answers: “What are the major parts, how do they relate, and where should I begin?”
-- Lachesis answers: “What does this symbol do, who calls it, and what exact path does this value take?”
-- Trace answers: “Which reviewed findings are real?”
+The finished experience must be credible enough to send to an OSS maintainer without an
+explanatory email.
 
-Do not invent repository facts. Fixture content must say it is illustrative. Graph-backed claims must expose repository, revision, coverage, and limitations at the point of reading.
+## Product contract
 
-## Current audit
+Design Map is the generated **table of contents and glossary** for a repository at HLD/LLD
+altitude.
 
-### Audit health score
-
-| Dimension | Score | Key finding |
-| --- | ---: | --- |
-| Accessibility | 2/4 | Multiple 9–11px labels fail contrast; several links are below a 44px touch target. |
-| Performance | 3/4 | The app is small and statically rendered, but dead legacy CSS and unnecessary client map instances remain. |
-| Responsive design | 1/4 | Mobile node-position selectors do not match the rendered buttons, causing the four map nodes to overlap. |
-| Theming | 1/4 | Two unrelated visual systems and dozens of raw colors coexist in one stylesheet. |
-| Implementation integrity | 1/4 | Fixture metadata reads as real, three lenses reuse one map, and the Lachesis handoff drops its context. |
-| **Total** | **8/20** | **Poor — major overhaul required** |
-
-Implementation integrity verdict: **Fail.** The current implementation does not yet express a coherent product-specific reading system. The multipage routes are useful scaffolding, but the content and map semantics remain interchangeable with a generic architecture template.
-
-Issue count: **0 P0, 6 P1, 6 P2, 2 P3**.
-
-### P1 — fix before showing maintainers
-
-#### 1. Fixture data is presented as verified repository evidence
-
-- **Locations:** `app/components/DocsShell.tsx:20`, `:35-39`; `app/components/MapClient.tsx:10-14`; `app/page.tsx:5`.
-- **Impact:** A maintainer cannot tell whether `suricata · main`, revision `8f4c1b2`, `12,486 nodes`, file counts, and responsibilities came from a real graph. This damages the core promise of determinism.
-- **Fix:** Introduce a single snapshot state with `fixture | graph-backed` provenance. Label fixture screens “Illustrative prototype.” Render repository identity, commit, counts, coverage, and limitations only from the loaded snapshot.
-- **Suggested command:** `$impeccable clarify`
-
-#### 2. System Map, Data Flow, and Trust Surface are the same visualization
-
-- **Locations:** `app/flow/page.tsx:6`, `app/trust/page.tsx:6`, `app/components/MapClient.tsx:45-53`.
-- **Impact:** Changing routes mostly changes headings and one toolbar label. Readers do not learn a flow or a trust boundary; the product promise feels fake.
-- **Fix:** Give each route its own content model and visual grammar:
-  - System Map: regions, ownership, boot/entry anchors, rolled-up interactions.
-  - Data Flow: ordered handoffs, data noun at each step, guard/dispatch annotations, start/end.
-  - Trust Surface: sources, guards, sinks, obligation text, taxonomy/filtering.
-- **Suggested command:** `$impeccable shape`
-
-#### 3. Map nodes overlap on mobile
-
-- **Location:** `app/globals.css:183`.
-- **Evidence:** The CSS targets `.map-node:nth-of-type(5..8)`, but there are only four button elements of that type. Inline `top: 44%` values therefore remain for all nodes after `left` is forced to `58px`.
-- **Impact:** The primary product surface becomes unreadable on phones.
-- **Fix:** Do not repair this with positional selector tricks. Render mobile as an ordered semantic path/list, or calculate positions through data-backed CSS custom properties with verified non-overlap.
-- **Suggested command:** `$impeccable adapt`
-
-#### 4. The Lachesis handoff loses the selected context
-
-- **Locations:** `app/components/MapClient.tsx:59`; `app/explore/page.tsx:5`.
-- **Impact:** The map links to `/explore?symbol=…`, but the explore page ignores the symbol and opens the Lachesis homepage without repository, revision, region, or anchor. The user has to start over.
-- **Fix:** Define and test one handoff URL contract. Echo the selected context on `/explore`, then pass it into Lachesis. Preserve opaque hosted bundle ID where available.
-- **Suggested command:** `$impeccable harden`
-
-#### 5. Small low-contrast text fails basic readability
-
-- **Locations:** `app/globals.css:156-172`, `:178-180`, `:189-191`.
-- **Evidence:** Measured contrast on the paper surface: `#898c84` = 3.03:1, `#7d8279` = 3.49:1, `#85887f` = 3.20:1, `#a7a79e` = 2.15:1. These colors are used at 9–11px.
-- **Impact:** Navigation notes, tabs, snapshot metadata, node metadata, and directory counts are difficult to read and fail WCAG 1.4.3 for normal text.
-- **Fix:** Set a 12px floor for auxiliary text, 14–16px for explanatory text, and use token pairs with at least 4.5:1 contrast.
-- **Suggested command:** `$impeccable typeset`
-
-#### 6. Competing legacy and documentation styles create visual corruption
-
-- **Locations:** `app/globals.css:1-144` and `:146-192`.
-- **Evidence:** The obsolete dark prototype and the newer paper documentation world are both global. `.brand-mark::before/::after` from the old system still applies to the new bar-mark component.
-- **Impact:** The interface looks assembled from iterations rather than designed as one system; selectors can alter unrelated current components.
-- **Fix:** Remove unused legacy rules, scope the surviving map surface, and rebuild tokens/components from one documented design system.
-- **Suggested command:** `$impeccable document`
-
-### P2 — fix in the rebuild
-
-#### 7. Navigation is duplicated without a clear hierarchy
-
-- **Locations:** `DocsShell.tsx:23-31`, `:47-50`.
-- **Impact:** Sidebar navigation and top tabs repeat the same three destinations, consuming space while still omitting overview as an explicit item.
-- **Fix:** Use one primary docs navigation. Add a compact next/previous reading control inside documents if sequence support is needed.
-- **Suggested command:** `$impeccable distill`
-
-#### 8. Current-route semantics are missing
-
-- **Locations:** `DocsShell.tsx:27`, `:49`.
-- **Impact:** Visual active state exists, but assistive technology is not told which page is current.
-- **Fix:** Add `aria-current="page"` to the active route and retain a visible focus ring independent of hover styling.
-- **Suggested command:** `$impeccable harden`
-
-#### 9. Primary navigation and CTAs have undersized touch targets
-
-- **Locations:** `app/globals.css:158`, `:168`, `:174`, `:177`, `:179`.
-- **Impact:** Tabs and text links can be roughly 24–40px tall, making them error-prone on touch devices.
-- **Fix:** Give every standalone interactive target a minimum 44×44px hit area without inflating all visible typography.
-- **Suggested command:** `$impeccable adapt`
-
-#### 10. Map semantics are incomplete
-
-- **Locations:** `MapClient.tsx:49-53`.
-- **Impact:** The canvas has an `aria-label` but no semantic role or textual relationship model. Decorative grid/routes/axes remain in the accessibility tree, and color dots have no declared meaning.
-- **Fix:** Provide a visible ordered relationship summary and hide decorative geometry. Ensure map comprehension never depends on color or absolute position alone.
-- **Suggested command:** `$impeccable harden`
-
-#### 11. Reduced-motion handling removes all useful feedback
-
-- **Location:** `app/globals.css:144`.
-- **Impact:** A global `0.01ms` kill eliminates state-change continuity rather than providing an intentional low-motion alternative.
-- **Fix:** Disable decorative entrance/translation only. Preserve immediate color, outline, and content-state feedback.
-- **Suggested command:** `$impeccable animate`
-
-#### 12. Hosted projection vocabulary is inconsistent
-
-- **Locations:** `MapClient.tsx:36`, `:40`, `:62`.
-- **Impact:** Fixture rows call footprints “files,” hosted rows call them “nodes,” and the UI uses both as if they are comparable. The inspector description remains fixture copy after hosted labels replace the region name.
-- **Fix:** Define explicit metrics (`files`, `symbols`, `included nodes`) and never reuse fixture descriptions for hosted regions.
-- **Suggested command:** `$impeccable clarify`
-
-### P3 — finish after the core experience works
-
-#### 13. Source files are difficult to review
-
-- **Locations:** all route `page.tsx` files and `MapClient.tsx:45-62`.
-- **Impact:** Entire pages and complex branches are compressed onto single lines, making content review and regressions harder to spot.
-- **Fix:** Format components around semantic sections and extract data definitions from rendering.
-- **Suggested command:** `$impeccable polish`
-
-#### 14. The decorative map grid is a familiar generated-UI signature
-
-- **Locations:** `app/globals.css:86`, `:178`.
-- **Detector result:** Advisory only. A grid is defensible on a real spatial map, so this is not automatically a defect.
-- **Impact:** Combined with generic node cards and glowing dots, it contributes to the “AI-generated” impression.
-- **Fix:** Keep a measurement grid only if the final map layout uses it functionally; otherwise prefer restrained topology lines and whitespace.
-- **Suggested command:** `$impeccable quieter`
-
-## What is worth preserving
-
-- The routes `/`, `/map`, `/flow`, `/trust`, and `/explore` correctly separate reading tasks.
-- Native links and buttons provide a reasonable semantic foundation.
-- Hosted loading uses text status/error states and an abort signal.
-- The graph adapter bounds large community sets and exposes an explicit remainder roll-up.
-- The app has no image payload, no animation library, and builds as static pages.
-- The map inspector uses `aria-live`, selected buttons expose `aria-pressed`, and reduced motion was considered even though the current implementation is too blunt.
-
-## Required replacement direction
-
-### Experience model
-
-The surface is a **repository field guide**, not a dashboard and not a marketing landing page.
-
-- Use a single calm reading column with a compact repository rail.
-- Let the system map be the one genuinely spatial surface.
-- Render flow as an ordered narrative diagram.
-- Render trust as a glossary/index with precise obligation language.
-- Make “generated fact,” “editorial arrangement,” and “illustrative fixture” visibly different states.
-- Prefer authored hierarchy, whitespace, typography, and topology over cards, badges, glows, and ornamental grids.
-
-### Content model
-
-Each page must answer a concrete newcomer question.
-
-| Route | Question | Required content |
+| Product | Altitude | Question it answers |
 | --- | --- | --- |
-| `/` | What is this repository and how should I read this map? | One sourced overview, snapshot provenance, three-entry reading sequence, limitations. |
-| `/map` | What are the major responsibilities and how do they interact? | Regions, responsibilities, footprint metric, anchors, entry/boot points, rolled-up edges. |
-| `/flow` | What happens to one meaningful value/request? | Named path, ordered data nouns, handoffs, guards, resolved dispatch, start/end anchors. |
-| `/trust` | Where do security or correctness obligations start? | Source/guard/sink taxonomy, plain-language obligation, repo locations, counts with provenance. |
-| `/explore` | What should I open in Lachesis? | Selected repo/revision/region/symbol, why it was selected, context-preserving external link. |
+| Design Map | Architecture and design | What are the major parts, how do they relate, and where should I begin? |
+| Lachesis | Source and symbols | What does this symbol do, who calls it, and what exact path does a value take? |
+| Trace | Reviewed findings | Which suspected issues have been adjudicated as real? |
 
-### Visual direction
+Design Map may show a canonical architectural flow such as packet decode. It must not present a
+runtime trace, claim that taint reaches a sink, render function bodies, or become a source-code
+browser. Those interactions belong in Lachesis.
 
-Choose one visual world and document it in `DESIGN.md` before implementation. Recommended direction:
+The guiding line is **“Read this before the source.”** It may appear once, quietly. It is not a
+marketing hero.
 
-- Warm technical editorial surface: off-white paper, dense near-black type, one restrained signal color.
-- A distinctive humanist body face with a precise mono only for identifiers and metadata.
-- No generic card grid, no gratuitous pills, no glow-as-status, no decorative statistics.
-- Hairlines must express real document structure; do not surround every section.
-- Use a compact, unmistakable wordmark rather than a generic analytics glyph.
-- Motion should clarify navigation and selection only, using transform/opacity and a reduced-motion alternative.
+## Definition of user success
 
-The high-end design rules are a quality bar, not a mandate to add glass, cinematic animation, or nested cards. This is a reading product; comprehension outranks spectacle.
+- After 5 seconds: “Which repository and revision am I looking at, and is this real or a demo?”
+- After 30 seconds: “What does this repository do, and what is its dominant architectural shape?”
+- After 2 minutes: “Which subsystem should I open for my task, and what does it connect to?”
+- After a flow: “Where does this data enter, change form, cross a boundary, and leave?”
+- At handoff: “What will Lachesis open, and why am I going there?”
 
-## Luna implementation plan
+If a reader must understand the product before understanding the repository, the experience has
+failed.
 
-### Phase 1 — establish truth and content
+## Audience and visitor mode
 
-1. Create typed `RepositorySnapshot`, `SystemRegion`, `DesignFlow`, `TrustSurface`, and `LachesisHandoff` view models.
-2. Move fixture data into a clearly named `illustrative-suricata.ts` source with a permanent fixture banner.
-3. Remove hard-coded snapshot facts from `DocsShell`.
-4. Write concrete page copy from view-model facts; do not write unsourced architecture claims.
-5. Commit as `content: establish honest repository view models`.
-6. Add the commit and evidence to `AUDIT.md` in a separate commit.
+The primary reader is a developer approaching a large OSS repository for the first time. They may
+arrive from a README badge, a maintainer's link, an issue, or a pull request. They are impatient,
+uncertain where to start, and unfamiliar with project vocabulary.
 
-### Phase 2 — replace the visual system
+Maintainers are the secondary audience. They need the artifact to be accurate, revision-addressed,
+honest about limitations, and easy to share. They should not have to defend invented prose or an
+opaque AI conclusion.
 
-1. Write `DESIGN.md` with tokens, typography, layout, interaction, and responsive rules.
-2. Delete the unused legacy CSS layer rather than overriding it.
-3. Build one responsive docs shell with one primary navigation.
-4. Rebuild the overview as a short field-guide entry, not a hero plus feature cards.
-5. Commit as `ux: replace the documentation visual system`.
-6. Audit and commit the evidence separately.
+The visitor mode is **Read**, with a small amount of **Operate** on the spatial map. Comprehension
+outranks spectacle.
 
-### Phase 3 — build three genuinely distinct reading surfaces
+## Sources of truth
 
-1. System Map: bounded spatial topology plus accessible relationship summary.
-2. Data Flow: ordered, data-backed handoff diagram with guards and dispatch.
-3. Trust Surface: glossary/index organized by source, guard, and sink.
-4. Do not pass a `mode` prop to one generic map component.
-5. Commit each surface independently and audit each independently.
+Use sources in this order:
 
-### Phase 4 — repair the Lachesis handoff
+1. This brief and direct user instructions.
+2. `../design-map-concept.md` for purpose, boundaries, generation model, and scale.
+3. Existing typed snapshot/bundle adapters for facts actually represented in data.
+4. `/Users/riyandhiman/.claude/jobs/8d8d2701/tmp/designdoc.html` for the richer Suricata content.
+5. `/Users/riyandhiman/.claude/jobs/8d8d2701/tmp/understanding.html` for the useful reading order.
+6. The current frontend only as evidence of problems to avoid.
 
-1. Parse selected context on `/explore`.
-2. Display what will be opened and why.
-3. Build the external URL from repository, revision, bundle, region, and anchor.
-4. Verify round-trip context with a deterministic unit or browser test.
-5. Commit implementation and audit separately.
+The two Claude HTML files are **content references, not design references**. Do not copy their
+single-page layouts, card grids, badges, tiny type, or visual density.
 
-### Phase 5 — bounded verification
+## Mandatory online reference research
 
-1. Run `npm run check` and `npm run build`.
-2. Test loading, ready, malformed, expired, empty, sparse, and coverage-limited bundles.
-3. Test keyboard order and visible focus across every route.
-4. Verify text contrast at 4.5:1 or better.
-5. Verify minimum 44×44px touch targets.
-6. Capture and inspect 375×812, 768×1024, and 1440×1000 screenshots for all five routes.
-7. Confirm zero viewport-level horizontal overflow and zero map-node collisions.
-8. Run the Impeccable detector once after the UI is complete; fix verified findings in one bounded batch.
-9. Record evidence in `AUDIT.md` and leave the worktree clean.
+The interface must be grounded in observed, current products rather than an invented “developer
+tool” aesthetic. Before implementation, view these official references and record the page,
+pattern borrowed, screenshot or precise observation, and date in `UI_REFERENCE_NOTES.md`.
+
+| Reference | Borrow | Do not copy |
+| --- | --- | --- |
+| [IcePanel diagramming](https://docs.icepanel.io/core-features/diagramming) | A shared model shown through bounded levels; drill into a selected object; incoming/outgoing details | Its editing UI, enterprise controls, or authoring chrome |
+| [IcePanel flows](https://docs.icepanel.io/visual-storytelling/flows) | Step-by-step playback over the same diagram; highlight the active path; introduce before playback | Presentation controls, excessive tags, or animation-dependent meaning |
+| [C4 model](https://c4model.com/) | Explicit abstraction levels and a clear promise about what each diagram includes | Generic C4 boxes as the final identity or one fixed shape for every repository |
+| [EventCatalog](https://www.eventcatalog.dev/) | Start broad, then move from domains to systems, services, and messages; several views over one model | Catalog-card density, ownership dashboards, or event vocabulary forced on all repos |
+| [CodeSee map exploration](https://docs.codesee.io/docs/explore-your-map) | Begin collapsed; reveal detail on demand; selection, filtering, and a visible path to code | A file/folder hairball, freeform dragging as the main task, or file-level ownership here |
+| [Diátaxis](https://diataxis.fr/) | Separate explanation, reference, and guided learning needs | Its four labels as product navigation when repository terms are clearer |
+| [GitHub newcomer journey](https://docs.github.com/en/get-started/start-your-journey) | A clear starting point, an ordered journey, and an obvious next step | A large article directory or generic docs homepage |
+| [Stripe documentation](https://docs.stripe.com/) | Strong reading hierarchy, persistent context, restrained technical typography, task-led entry | A three-column API-reference shell or irrelevant code samples |
+| [GitHub code navigation](https://docs.github.com/en/repositories/working-with-files/using-files/navigating-code-on-github) | Familiar transition from symbols to definitions and references | Rebuilding symbol navigation inside Design Map |
+| [Sourcegraph code navigation](https://sourcegraph.com/docs/code-navigation) | Exact source-level continuation and contextual actions | Search-heavy code-intelligence controls on architecture pages |
+| [W3C page structure](https://www.w3.org/WAI/tutorials/page-structure/) | Semantic landmarks, logical headings, efficient navigation, document fallback | `application` semantics for the entire page |
+| [WCAG 2.2](https://www.w3.org/TR/WCAG22/) | Visible/non-obscured focus, contrast, reflow, and operable targets | Treating conformance as a substitute for usability |
+
+Research synthesis:
+
+- IcePanel supplies the **map and flow interaction model**.
+- C4 supplies the **bounded abstraction principle**.
+- Diátaxis and GitHub Docs supply the **multipage reading model**.
+- Stripe supplies the **quality bar for technical reading**, not a visual clone.
+- GitHub and Sourcegraph define the **handoff boundary to Lachesis**.
+- W3C supplies the **semantic and accessibility floor**.
+
+Reject the generic dark SaaS/dashboard direction previously returned by the local UI design-system
+search. Dark cards, green accents, and pervasive monospace reproduce the AI-generated visual
+language the user rejected.
+
+## Core experience thesis
+
+The product opens as a repository, not as a product landing page.
+
+The first screen contains only:
+
+1. Repository identity and honest snapshot status.
+2. A repository-specific one-sentence structural thesis.
+3. A simplified interactive architecture map with an obvious place to begin.
+
+The map is the visual anchor. Prose explains it without competing with it. Detail is progressively
+disclosed through routes and focused chapters.
+
+## Information architecture
+
+| Route | Visible label | Reader question |
+| --- | --- | --- |
+| `/` | Start here | What is this repository, and how should I approach it? |
+| `/architecture` | Architecture | What are the major responsibilities and relationships? |
+| `/architecture/[region]` | Region name | What does this region own, and where does it connect? |
+| `/flows` | Flows | Which canonical journeys explain this system? |
+| `/flows/[flow]` | Flow name | How does one meaningful datum or request move through the design? |
+| `/trust` | Trust | Where do security or correctness obligations begin and end? |
+| `/explore` | Open in Lachesis | What exact context am I carrying into the code explorer? |
+
+Redirect legacy `/map` to `/architecture` and `/flow` to `/flows`. Do not maintain two route
+families.
+
+Use one primary navigation with four items: Start here, Architecture, Flows, Trust. On desktop it
+may be a compact left rail. On small screens it becomes a conventional menu or short horizontal
+route row. Do not duplicate navigation in a sidebar and header. “Open in Lachesis” is contextual,
+not a fifth permanent section.
+
+## Global shell
+
+### Repository bar
+
+Show repository owner/name, short revision with access to the full revision, and snapshot state:
+illustrative, graph-backed, coverage-limited, stale, or unavailable. Add repository search/switch
+only if the data supports it.
+
+Do not show decorative statistics here. Counts belong near the content they qualify. Never claim
+“always current” merely because regeneration is intended; show actual revision and generation
+time.
+
+### Reading rail
+
+The rail contains the four routes, current-location semantics, and at most one concise snapshot
+note. It contains no repeated descriptions, marketing, or second tab set.
+
+### Main document
+
+Each page begins with one direct question or descriptive title, a two-sentence explanation, and a
+provenance/coverage note only when it affects interpretation. Do not stack an eyebrow, numbered
+badge, category, and title above every heading.
+
+## Page: Start here
+
+This is guided orientation, not a landing page.
+
+```text
+┌ repository / revision / snapshot state ───────────────────────────────┐
+│ nav rail │ Suricata                                                   │
+│          │ Network traffic becomes structured protocol state, then    │
+│ Start    │ passes through a wide detection stage before fan-out.      │
+│ Arch     │                                                            │
+│ Flows    │ [ simplified architecture map — dominant visual ]          │
+│ Trust    │                                                            │
+│          │ Start with: [Follow a packet]  [Explore architecture]       │
+│          │ Coverage and limitation note                               │
+└──────────┴────────────────────────────────────────────────────────────┘
+```
+
+Required content:
+
+- Repository-specific title; do not headline “Design Map.”
+- One structural thesis.
+- A simplified map of five to nine macro regions.
+- One graph-justified recommended flow.
+- One secondary action to open the complete architecture.
+- A short provenance note.
+
+Exclude feature cards, “why Design Map,” metric walls, testimonials, and product explanations.
+Put methodology behind an unobtrusive About/Method link if needed.
+
+## Page: Architecture
+
+This is the only intentionally spatial page.
+
+### Semantic zoom
+
+- **Level 0 — system shape:** five to nine macro regions and external entry/exit points.
+- **Level 1 — region focus:** selected region, four to twelve important children, and its direct
+  incoming/outgoing relationships.
+- **Level 2 — design anchors:** important entry/boot functions, structures, dispatch sites, and
+  representative paths. No function body or raw caller/callee list.
+
+State the visible level in text and encode it in the URL. Browser Back/Forward restores focus.
+Every region and flow is deep-linkable.
+
+Selecting a region does not open a small tooltip. On desktop, open a stable adjacent inspector or
+navigate to a region chapter while retaining the map. On mobile, navigate to the chapter. Hover
+may preview but is never required.
+
+### Diagram rules
+
+- Express the actual shape: pipeline, fan-out, fan-in, mesh, layers, or hubs. Do not force a
+  left-to-right pipeline.
+- Region size may encode footprint only with a visible metric legend.
+- Connection width may encode rolled-up weight only with a bounded, labeled range.
+- Never depend on size, width, position, or color alone.
+- Keep labels horizontal and readable.
+- Place external inputs/outputs outside the repository boundary.
+- Distinguish boot/initialization from runtime paths.
+- Show at most nine primary regions and twelve primary connections initially.
+- At any level, show at most twelve selectable children. Roll up the rest as, for example,
+  “Other protocol parsers · 37.”
+- Keep layout deterministic for the same snapshot.
+- Pan/zoom may assist desktop use but cannot be necessary for comprehension.
+
+### Region chapter order
+
+1. Responsibility in plain language.
+2. Why it exists in the system.
+3. Inputs and outputs described as data/responsibility.
+4. Direct upstream and downstream regions.
+5. Important entry/boot anchors.
+6. Key structures or state it owns.
+7. Representative paths/files.
+8. Provenance and coverage.
+9. One contextual Lachesis handoff.
+
+Use document sections and a compact relationship list, not generic cards.
+
+### Accessible alternative
+
+Render a visible ordered/nested relationship summary from the same data. Hide decorative routes
+from assistive technology. Selecting a summary item and its node performs the same action. The
+document remains complete if the diagram fails.
+
+## Page: Flows
+
+The index contains a short list of canonical design journeys, not every possible path. Examples:
+“Packet to alert,” “Configuration to initialized engine,” or “Request to response.”
+
+Each flow reuses the architecture model and presents one step at a time.
+
+```text
+Flow: How a packet becomes an alert                    Step 2 of 6
+
+[ architecture map with only current and adjacent path emphasized ]
+
+← Previous   Decode network layer                     Next →
+             Input: Ethernet payload + EtherType
+             Decision: choose an L3 decoder
+             Guard: reject a truncated header
+             Output: validated IPv4 payload
+
+[ All steps — visible ordered text version ]
+```
+
+Requirements:
+
+- Introduce the flow with the complete route at low emphasis.
+- Synchronize controls, highlighted objects/connections, narrative, and URL.
+- Support Previous/Next and direct keyboard-operable step selection.
+- Show the data noun passed between steps.
+- Annotate guards, boundaries, and resolved dispatch only when supported.
+- Name alternate/parallel paths and let readers select them without rendering a tangle.
+- Provide an “All steps” linear mode; default to it on mobile when needed.
+- “Open this step in Lachesis” carries step, region, anchor, repository, and revision.
+
+Do not create a vertical stack of equal cards with arrows. Do not represent confidence as a swarm
+of pills; state provenance at the relevant fact.
+
+## Page: Trust
+
+Trust is an educational glossary and repository index, not a vulnerability dashboard. Presence of
+a source or sink is not a finding.
+
+Structure:
+
+- Short explanation of a trust surface.
+- Searchable/filterable index organized by domain.
+- Domain detail with meaning, obligation, families, relevant regions, and graph-backed counts.
+- Optional selected-domain architecture overlay, secondary to the glossary.
+
+Start with a readable index/list or table, not eight cards. Filters use labels and counts, not
+color alone. Selected domains are deep-linkable.
+
+Illustrative taxonomy:
+
+1. Resource lifecycle.
+2. Memory safety.
+3. Injection.
+4. Request forgery and redirection.
+5. Object integrity.
+6. Filesystem.
+7. Cryptography and transport configuration.
+8. Resource exhaustion.
+
+For each domain, distinguish meaning, obligation, constructor families, repository presence, and
+the explicit non-claim that presence alone does not establish a bug.
+
+## Page: Lachesis handoff
+
+This is a confirmation step, not an advertisement. Show repository/full revision, selected
+region/flow step/trust domain, anchor symbol/file, why Lachesis is next, context preserved, one
+primary action, and a way back.
+
+Define and test a deterministic URL contract containing the opaque bundle ID where one exists.
+Never drop selection context and send the reader to the Lachesis homepage.
+
+## Illustrative Suricata content
+
+Use `designdoc.html` to prove the interface carries substantive repository knowledge. Label it
+**Illustrative prototype** until loaded from a verified snapshot.
+
+### Structural thesis and macro path
+
+Suricata is a network intrusion-detection and prevention engine. Raw packets are decoded, grouped
+into flows, reassembled, parsed as application protocols, inspected by a wide detection stage, and
+emitted as alerts/logs. Its memorable shape is a long pipeline with a broad detection stage in the
+middle.
+
+```text
+wire → packet decode → flow/stream state → application protocols
+     → prefilter/matcher/detection → alerts and output
+```
+
+### Regions
+
+- Packet decode.
+- TCP stream engine.
+- Flow manager.
+- Protocol detection.
+- Protocol parsers, initially grouped; DNP3, TLS/SSL, and SMTP/FTP appear after focus.
+- Detection engine.
+- Prefilter.
+- Multi-pattern matcher.
+- Datasets.
+- Output and logging.
+
+This proves progressive grouping: never render all twelve as equal cards on the first view.
+
+### Boot path
+
+Keep initialization separate from packet processing. `SigTableSetup` builds the signature
+language through rule-keyword registration. `PostConfLoadedSetup` wires the engine after config
+loading.
+
+### First canonical flow: How a packet enters flow state
+
+1. `DecodeEthernet` validates the frame and reads EtherType.
+2. `DecodeNetworkLayer` dispatches to the correct layer-three decoder.
+3. `DecodeIPV4` / `DecodeIPV4Packet` validates and exposes transport data.
+4. `DecodeTCP` validates the transport header.
+5. `FlowSetupPacket` attaches the decoded packet to its flow.
+
+Include data passed forward, header/length guards, the untrusted-network boundary, fail-closed
+behavior, and the difference between static EtherType dispatch and runtime `StateAlloc` dispatch.
+Exact source reading belongs in Lachesis.
+
+### Key structures
+
+- `Packet`: transport protocol, owning flow, and current payload window.
+- `Flow`: detected application protocol and per-flow parser state.
+
+Explain why these connect stages; do not render raw structure definitions.
+
+## Data and provenance model
+
+Use or evolve typed models for `RepositorySnapshot`, region hierarchy/relationships, architecture
+anchors, flows/steps/branches, trust domains/families/presence, evidence and coverage, and
+`LachesisHandoff`.
+
+Every fact must be attributable to graph-derived, repository-text-derived, editorial arrangement,
+or illustrative fixture. Do not badge every sentence; provide calm page-level sourcing and
+fact-level detail where provenance differs or confidence is limited.
+
+Keep files, symbols, graph nodes, included nodes, communities, and displayed regions distinct.
+Never show an undefined number.
+
+Required states:
+
+- Loading.
+- Verified graph-backed.
+- Illustrative fixture.
+- Empty.
+- Sparse/one-region.
+- Coverage-limited.
+- Malformed.
+- Expired/unavailable.
+
+Each state needs plain-language interpretation or recovery. Never silently replace failed live
+data with a realistic fixture.
+
+## Scalability rules
+
+- Maximum nine macro regions initially and twelve children per focused region.
+- Stable “Other …” roll-ups include count and combined footprint.
+- Rank by architectural importance from graph facts, not alphabetically or file order.
+- Preserve relationships during merging and expose what was summarized.
+- Choose a suitable layout for pipeline, hub, layers, fan-in/out, or bounded clusters.
+- If spatial confidence is low, prefer a textual hierarchy and conservative diagram rather than
+  claiming a meaningful layout.
+- Never default to a force-directed hairball.
+- The same snapshot produces stable ordering and positions.
+
+Test 0, 1, 8, 30, and 500 regions; a pipeline; fan-out/fan-in; and a flat mesh without a defensible
+spine.
+
+## Visual direction
+
+The world is a **carefully edited technical field guide**, not a SaaS dashboard, AI chat surface,
+graph-analysis console, or marketing site.
+
+- Calm, exact, and recognizably human-edited.
+- Light neutral reading surface by default, not generic navy.
+- Near-black text and one restrained signal color for selection/current path.
+- Readable humanist sans for interface/prose; mono only for revisions, identifiers, files, symbols.
+- Typography and whitespace establish hierarchy before borders.
+- A darker technical-drawing map surface is optional only if it improves topology and contrast.
+- Sparse consistent SVG icons; accessible names for interactive icons.
+- Motion communicates focus/path progression, not decoration.
+
+Human character comes from repository-specific editorial judgment: a truthful structural thesis,
+project vocabulary paired with plain language, graph-justified “Start with…” recommendations,
+labeled relationships/captions, and honest unknown states. Do not simulate humanity with scribbles,
+random rotation, paper texture, jokes, decorative illustration, or chatty AI copy.
+
+### Prohibited patterns
+
+- Equal card or bento grids as primary organization.
+- Decorative metrics.
+- Excessive pills, badges, tags, colored side borders, gradients, or glows.
+- Grid backgrounds without a diagram-reading function.
+- Tiny uppercase mono labels as the main hierarchy device.
+- More than one competing CTA per section.
+- Hover-only disclosure.
+- Large sticky header plus sticky sidebar plus sticky inspector.
+- Marketing copy inside repository routes.
+- Symbol deep-dive inside Design Map.
+- Raw force graph.
+- Generic copy such as “Unlock insights,” “Explore your codebase,” or “AI-powered understanding.”
+
+## Responsive behavior
+
+Mobile is a different composition, not a squeezed canvas.
+
+- At 375px, show repository identity, structural thesis, and ordered macro path first.
+- Architecture becomes a vertical/nested relationship view with optional simplified topology.
+- Region selection navigates to a full-width chapter instead of an overlay.
+- Flow defaults to linear “All steps” mode with Previous/Next.
+- Trust becomes a searchable disclosure list/table with no page-level horizontal scroll.
+- Preserve selection and step across viewport changes.
+
+Verify 375×812, 768×1024, 1024×768, and 1440×1000.
+
+## Accessibility requirements
+
+- Semantic header, nav, main, article/section, aside, and footer landmarks.
+- One logical `h1`, nested headings, skip link, and `aria-current="page"`.
+- Keyboard operation in meaningful focus order.
+- Visible focus equivalent to a 2px perimeter, 3:1 state contrast, never obscured.
+- Normal text contrast 4.5:1; meaningful non-text diagram elements 3:1.
+- Never rely on color, position, line width, or motion alone.
+- Standalone controls target 44×44 CSS pixels where practical and never miss WCAG 2.2 AA.
+- Body starts at 16px; informational text never below 12px.
+- Diagram has an equivalent visible text representation.
+- Loading/error updates are announced without stealing focus.
+- Reduced motion removes travel/decorative animation but preserves state.
+- At 200% zoom, content reflows and remains operable.
+
+## Implementation boundaries
+
+Next.js/React remains suitable. Stay static-first and server-light. Do not add canvas, animation,
+state, or component libraries unless a requirement cannot be met cleanly with the platform and the
+dependency is justified in the commit.
+
+Prefer semantic HTML and SVG. Keep layout data-driven/deterministic. Server-render reading content;
+hydrate only necessary map/flow interactions.
+
+Preserve safe opaque hosted-bundle loading and validated graph adapters if they fit. Rewrite only
+with equivalent tests. Preserve unrelated user changes.
+
+Required responsibilities, though names may change:
+
+- Repository shell and snapshot status.
+- Primary reading navigation.
+- Start-here orientation.
+- Bounded architecture projection and deterministic layout.
+- Region inspector/chapter and accessible relationship summary.
+- Flow selector, stepper, and linear fallback.
+- Trust index and domain detail.
+- Evidence/provenance note.
+- Lachesis handoff builder/confirmation.
+- Loading/error/empty/coverage states.
+
+Do not implement System, Flow, and Trust with a `mode` prop on one generic graph. They share data,
+not presentation semantics.
+
+## Delivery phases and commits
+
+Every phase ends with a working build and focused commit. Commit audit evidence separately.
+
+### Phase 0 — research and teardown
+
+1. Create `UI_REFERENCE_NOTES.md` from the official references.
+2. Record desktop/mobile screenshots or precise observations where available.
+3. List current modules to retain, replace, or delete and why.
+4. Commit `docs: establish researched rebuild direction`; audit in a separate commit.
+
+### Phase 1 — truth model and routes
+
+1. Finalize typed data/provenance models and fixture boundaries.
+2. Establish canonical routes and redirects.
+3. Build semantic shell, repository bar, one navigation, and material states without flourishes.
+4. Commit `ux: establish repository reading architecture`; audit separately.
+
+### Phase 2 — Start here and Architecture
+
+1. Implement first-run orientation.
+2. Implement bounded semantic zoom and deterministic layout.
+3. Implement region chapters and accessible relationship view.
+4. Validate 0, 1, 8, 30, and 500-community fixtures.
+5. Commit Start here and Architecture separately; audit each separately.
+
+### Phase 3 — Flows
+
+Implement flow index, introduction, step playback, alternatives, linear mode, and Suricata decode
+flow. Verify deep links/history. Commit `ux: build guided architectural flows`; audit separately.
+
+### Phase 4 — Trust
+
+Implement glossary/index, filtering, domain detail, optional overlay, and eight illustrative domains
+with non-finding language. Commit `ux: build trust surface index`; audit separately.
+
+### Phase 5 — Lachesis handoff
+
+Define/render/test the full context contract for regions, flow steps, and trust domains. Commit
+`ux: preserve context into Lachesis`; audit separately.
+
+### Phase 6 — visual system and bounded QA
+
+1. Apply the researched direction consistently and remove superseded CSS/components.
+2. Run `npm run check` and `npm run build`.
+3. Test keyboard, zoom, contrast, reduced motion, focus, errors, and deep links.
+4. Capture every route at required viewports; inspect desktop and mobile together.
+5. Run once after UI completion:
+   `node /Users/riyandhiman/.codex/skills/impeccable/scripts/detect.mjs --json <changed targets>`
+6. Fix verified findings in one bounded pass, confirm once, stop polishing.
+7. Commit implementation and final audit separately; leave the worktree clean.
+
+## Required end-to-end scenarios
+
+### Newcomer
+
+“Understand how a network packet becomes an alert and find the code transitioning from decode into
+flow state.” The reader starts at `/`, follows the suggested flow, focuses `FlowSetupPacket`, and
+reaches Lachesis with repository/revision/flow/step/anchor intact.
+
+### Maintainer trust
+
+“Is this current, and which claims are generated versus illustrative?” The answer is visible
+without developer tools or an About essay.
+
+### Architecture exploration
+
+“Which parts feed detection, and where does its output go?” Both the selected map and textual
+relationship summary answer it.
+
+### Trust education
+
+“What does memory-safety surface mean here, and does presence prove a vulnerability?” The glossary
+explains obligation, locations/counts with provenance, and explicitly says no.
 
 ## Acceptance criteria
 
-- A first-time visitor can state what Design Map is, what it is not, and where to start after the first viewport.
-- No fixture value can be mistaken for a live graph-derived fact.
-- System, Flow, and Trust pages differ in data, semantics, and visual representation—not only labels.
-- Selecting a region changes useful evidence and produces a valid context-preserving Lachesis handoff.
-- The interface remains readable with 8 regions, 500 regions summarized into a bounded projection, zero modules, and one module.
-- Mobile map content never overlaps and does not require precision tapping.
-- All normal text meets WCAG AA contrast and no informational text is below 12px.
-- Every interactive target is keyboard accessible, visibly focused, and at least 44×44px on touch layouts.
-- The final stylesheet contains one coherent token system and no dead predecessor UI.
-- `npm run check`, `npm run build`, route smoke tests, interaction tests, and screenshot review all pass.
+- First viewport is about the repository, not Design Map.
+- A recommended starting action is obvious without scanning the page.
+- Start, Architecture, Flows, and Trust have different information structures.
+- Initial architecture has at most nine regions and remains useful for 500 communities.
+- Selection updates meaningful content/URL/history and offers a complete Lachesis handoff.
+- Flow controls synchronize map, narrative, URL, and accessible ordered content.
+- Trust is educational/indexed and never resembles a vulnerability scorecard.
+- No fixture fact can be mistaken for verified evidence.
+- No function body, symbol neighborhood, or taint-result UI appears here.
+- Mobile has no overlap, precision-only interaction, or viewport overflow.
+- Meaning survives without color, hover, animation, or diagram rendering.
+- All snapshot/error states are intentionally designed.
+- Accessibility and responsive requirements pass.
+- `npm run check`, `npm run build`, smoke/interaction tests, and screenshot review pass.
+- Superseded components/CSS are deleted rather than buried under overrides.
+- Every material change and audit is committed separately.
+
+## Automatic rejection conditions
+
+Reject and return to the relevant phase if:
+
+- It is the current UI with new colors.
+- It copies either Claude HTML file as one long page.
+- The system map is a card grid, node cloud, or raw force graph.
+- The first screen leads with marketing or decorative statistics.
+- System, Flow, and Trust are one renamed visualization.
+- Mobile shrinks or horizontally scrolls the desktop diagram.
+- Selection context is lost on Lachesis handoff.
+- It uses dark cards, green accents, tiny mono text, badges, and glows as developer-tool costume.
+- Any currency, security, coverage, or confidence claim exceeds available evidence.
 
 ## Definition of done
 
-This goal is done only when the experience is credible enough to send to an OSS maintainer without an explanatory email. The interface must feel authored for repository comprehension, the content must be trustworthy, and the transition into Lachesis must preserve the reader’s place.
+Design Map must feel like a deliberately edited, graph-backed field guide. A newcomer forms a
+correct mental model and chooses where to go next; a maintainer trusts the revision and provenance;
+and Lachesis preserves the reader's place.
 
-After implementation, re-run `$impeccable audit`, then finish with `$impeccable polish`.
+The goal is not “a beautiful architecture page.” The goal is **faster, more trustworthy repository
+comprehension than either stale prose or starting from raw source**.
