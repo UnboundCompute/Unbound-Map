@@ -13,6 +13,16 @@ async function page(path, expected) {
   console.log(`ok ${path}`);
 }
 
+async function pageWithout(path, forbidden) {
+  const response = await fetch(`${origin}${path}`);
+  if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`);
+  const body = await response.text();
+  for (const marker of forbidden) {
+    if (body.includes(marker)) throw new Error(`${path} unexpectedly contains ${JSON.stringify(marker)}`);
+  }
+  console.log(`ok ${path} (without fixture fallback)`);
+}
+
 async function redirect(path, target) {
   const response = await fetch(`${origin}${path}`, { redirect: 'manual' });
   if (![301, 302, 307, 308].includes(response.status)) throw new Error(`${path} returned HTTP ${response.status}, expected redirect`);
@@ -32,5 +42,6 @@ await page('/architecture/not-a-region', ['Region context unavailable', 'aria-at
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
 await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state']);
 await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123', ['Graph-backed chapter unavailable', 'will not substitute an illustrative chapter']);
+await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123', ['What this region owns', 'Validated payload window']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
 await redirect('/flow?step=ipv4', '/flows?step=ipv4');
