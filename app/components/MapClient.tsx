@@ -72,10 +72,14 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   systemShapeParams.set('level', '0');
   const systemShapeHref = `${route}?${systemShapeParams.toString()}`;
   const selectRegion = (region: SystemRegion) => {
-    setSelected(region.id);
     const params = new URLSearchParams(window.location.search);
     params.set('region', region.id);
     params.set('level', '1');
+    if (window.matchMedia('(max-width: 820px)').matches) {
+      window.location.assign(`/architecture/${region.id}?${params.toString()}`);
+      return;
+    }
+    setSelected(region.id);
     window.history.pushState(null, '', `${route}?${params.toString()}`);
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
