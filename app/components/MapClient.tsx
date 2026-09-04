@@ -30,11 +30,11 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     const params = new URLSearchParams(window.location.search);
     const requestedRegion = params.get('region');
     if (requestedRegion) setSelected(requestedRegion);
-    if (params.get('level')) setLevel(params.get('level')!);
+    setLevel(params.get('level') === '1' ? '1' : '0');
     const restoreFocus = () => {
       const next = new URLSearchParams(window.location.search);
       setSelected(next.get('region') ?? 'decode');
-      setLevel(next.get('level') ?? '0');
+      setLevel(next.get('level') === '1' ? '1' : '0');
     };
     window.addEventListener('popstate', restoreFocus);
     const bundleId = params.get('bundle') ?? initialBundle;
