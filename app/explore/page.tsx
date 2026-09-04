@@ -20,7 +20,7 @@ export default async function ExplorePage({ searchParams }: { searchParams?: Pro
   const context = { repository: one(query.repository), revision: one(query.revision), region: one(query.region), label: one(query.label), anchor: one(query.anchor), flow: one(query.flow), step: one(query.step), domain: one(query.domain), bundle: one(query.bundle) };
   const sharedContext: SharedSnapshotContext = { repository: context.repository, revision: context.revision, bundle: context.bundle };
   const snapshot = snapshotWithContext(illustrativeSnapshot, sharedContext);
-  const hasContext = Boolean(context.repository || context.revision || context.region || context.anchor || context.flow || context.step || context.domain);
+  const hasContext = Boolean(context.repository || context.revision || context.region || context.anchor || context.flow || context.step || context.domain || context.bundle);
   const repository = context.repository ?? illustrativeSnapshot.repository;
   const revision = context.revision ?? illustrativeSnapshot.revision;
   const label = context.label ?? context.region ?? 'No region selected';
