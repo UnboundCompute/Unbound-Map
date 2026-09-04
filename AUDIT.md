@@ -34,6 +34,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `158a661` | Record the researched UI references and frontend teardown/retain decision | `UI_REFERENCE_NOTES.md` links the official references, names the observed interaction pattern, records the Design Map decision, and separates replaceable presentation from retained adapters; `git diff --check` passed |
 | `1ed525c` | Establish the canonical repository reading architecture | `/` is repository-first Start here; `/architecture` and `/flows` are canonical pages; `/map` and `/flow` redirect; navigation is centralized in the new shell; Explore is explicitly a handoff confirmation surface; `npm run check` and `npm run build` passed |
 | `bed786a` | Replace the documentation visual system | Replaced the global stylesheet and route composition with a single light technical-editorial world, one repository shell, no duplicated tabs, map/list mobile reflow, semantic landmarks/focus styles, and route-specific document sections; `npm run check`, `npm run build`, and `git diff --check` passed |
+| `6da06d1` | Build the bounded, data-driven Architecture surface | Suricata fixture now has eight meaningful regions with roles, relationships, children, anchors, and a separate boot path; the map draws metadata-backed edges, has a visible text relationship summary, supports `/architecture/[region]`, preserves hosted loading, and switches to ordered content on mobile; `npm run check`, `npm run build`, and `git diff --check` passed |
 
 ## Rebuild brief audit
 
