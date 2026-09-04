@@ -36,6 +36,10 @@ Prefer a normal link when the reader needs the explanation, region chapters, flo
 accessible text relationship summary; use the embed for a visual orientation inside an existing
 document.
 
+For production sharing, set `NEXT_PUBLIC_SITE_URL` to the public Design Map origin. It is used by
+the sitemap and social-image metadata; `VERCEL_URL` is detected automatically on Vercel, while
+local development falls back to `http://localhost:3000`.
+
 The typed adapter in [`lib/design-map.ts`](./lib/design-map.ts) is the boundary for that integration. It accepts Lachesis graph-first bundle metadata and projects it into the smaller snapshot surface that an HLD renderer needs: repository identity, revision, coverage, limitations, and modules. Raw graph nodes should stay in Lachesis.
 
 [`lib/hosted.ts`](./lib/hosted.ts) is the companion transport boundary. It accepts only opaque `b_…` bundle IDs, uses the existing Lachesis bundle endpoint, caps response size, rejects redirects, and reports expired or malformed artifacts as user-readable errors.
