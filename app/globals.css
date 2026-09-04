@@ -209,6 +209,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 
 /* Keep visible reader-facing metadata above the 12px informational floor. */
 .revision-popover span, .snapshot-list dt, .embed-kicker, .embed-footer, .bar-revision, .snapshot-state, .intro-source,
+.rail-heading, .page-eyebrow, .thesis-label, .card-label, .evidence-label, .flow-label, .flow-handoff-label,
 .map-axis, .map-external, .map-focus-content li > span, .map-focus-content li small code,
 .map-node small, .inspector-label, .inspector-facts dt, .region-directory li::before,
 .region-directory li small, .relationship-summary button::before, .flow-step-nav button span,
