@@ -152,6 +152,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `4b975ca` | Protect contextual Flow and Trust previews | Route smoke now asserts repository-specific Open Graph and Twitter titles for the shareable Flows and Trust entry points, alongside their existing deep-link and filter assertions; `npm run smoke` passed. |
 | `d2d352a` | Document UX verification gates | README now gives maintainers the exact `check`, `build`, projection, and route-smoke commands and explains the states each gate protects before a map is shared; `git diff --check` passed. |
 | `9d0e50b` | Preserve context in preview snippet | The README’s GitHub image/link example now carries repository, revision, and opaque bundle parameters on both the preview URL and destination, preventing maintainers from publishing a generic handoff by accident; `git diff --check` passed. |
+| `419b01a` | Announce unknown region recovery | Unknown `/architecture/[region]` chapters now expose an atomic polite status panel, and route smoke covers the recovery landmark so stale region links remain perceivable and actionable without client hydration; smoke, check, and diff validation passed. |
 
 ## Rebuild brief audit
 
