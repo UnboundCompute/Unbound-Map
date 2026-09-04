@@ -11,7 +11,15 @@ npm install
 npm run dev
 ```
 
-The current UI is a focused Suricata prototype with fixture data. The map is intentionally kept at architectural altitude; the next integration step is a deep-link contract into Lachesis that preserves repository, commit, subsystem, and anchor context.
+The current UI is a focused Suricata prototype with fixture data and five documentation routes:
+
+- `/` — orientation and the recommended reading order
+- `/map` — bounded spatial HLD map plus a scalable region directory
+- `/flow` — one meaningful data path
+- `/trust` — trust-surface glossary
+- `/explore` — the handoff into Lachesis
+
+The map is intentionally kept at architectural altitude; code-level questions hand off to Lachesis with repository, commit, subsystem, and anchor context.
 
 The typed adapter in [`lib/design-map.ts`](./lib/design-map.ts) is the boundary for that integration. It accepts Lachesis graph-first bundle metadata and projects it into the smaller snapshot surface that an HLD renderer needs: repository identity, revision, coverage, limitations, and modules. Raw graph nodes should stay in Lachesis.
 
