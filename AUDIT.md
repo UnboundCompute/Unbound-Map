@@ -12,6 +12,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `3e61dd6` | Pin Turbopack to this repository | `npm run build` passed without workspace-root warning |
 | `a93f664` | Context-preserving Lachesis handoff | Playwright verified generated `repo`, `commit`, `focus`, and `anchor` query parameters |
 | `2efa208` | Distinct System, Data Flow, and Trust Surface reading models plus newcomer guidance | `npm run check`, `npm run build`, Playwright verified lens-specific helper text and labels at mobile width |
+| `1564feb` | First-viewport reading rail and explicit “Start with the system map” CTA | Playwright verified CTA anchor navigation, three rail steps, and zero mobile overflow |
 
 ## Current checks
 
@@ -32,6 +33,8 @@ Browser smoke checks performed against the local dev server:
 - `prefers-reduced-motion` disables long transitions.
 - System Map, Data Flow, and Trust Surface each change the user-facing reading model, not only the tab label.
 - The first screen tells a newcomer what to do next and the handoff button names the destination explicitly.
+- The first viewport exposes the complete reading sequence: Orient → Choose → Verify.
+- The primary CTA navigates to the map without requiring the reader to guess where to start.
 
 ## Known prototype limits
 
