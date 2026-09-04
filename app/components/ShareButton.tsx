@@ -12,7 +12,20 @@ export function ShareButton() {
         window.setTimeout(() => setState('idle'), 1800);
         return;
       }
-      await navigator.clipboard.writeText(window.location.href);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+      } else {
+        const field = document.createElement('textarea');
+        field.value = window.location.href;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        const copied = document.execCommand('copy');
+        field.remove();
+        if (!copied) throw new Error('Clipboard unavailable');
+      }
       setState('copied');
       window.setTimeout(() => setState('idle'), 1800);
     } catch (error) {
