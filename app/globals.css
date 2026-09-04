@@ -96,6 +96,11 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .map-scale { color: #90a090; }
 .map-banner { padding: 11px 17px; color: #efd5aa; background: #26382b; font: 11px/1.5 var(--mono); }
 .map-banner-error { color: #f1b2a5; background: #39251f; }
+.map-state-panel { max-width: 830px; margin-top: 35px; padding: 28px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.map-state-label { color: var(--muted); font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.map-state-panel h2 { max-width: 560px; margin: 13px 0 10px; font: 400 clamp(28px, 3.5vw, 40px)/1.08 var(--serif); }
+.map-state-panel p { max-width: 620px; margin: 0 0 19px; color: var(--body); font-size: 15px; line-height: 1.65; }
+.map-retry { border: 0; padding: 0; background: transparent; cursor: pointer; }
 .map-canvas { position: relative; min-height: 410px; overflow: hidden; }
 .map-grid { position: absolute; inset: 0; opacity: .38; background-size: 38px 38px; background-image: linear-gradient(to right, rgba(196, 215, 197, .08) 1px, transparent 1px), linear-gradient(to bottom, rgba(196, 215, 197, .08) 1px, transparent 1px); }
 .map-connections { position: absolute; inset: 0; width: 100%; height: 100%; } .map-connections line { stroke: #637669; stroke-width: .22; vector-effect: non-scaling-stroke; }

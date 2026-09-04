@@ -23,6 +23,7 @@ export function MapClient() {
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [bundleMessage, setBundleMessage] = useState('');
+  const [requestedBundle, setRequestedBundle] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -30,6 +31,7 @@ export function MapClient() {
     if (requestedRegion) setSelected(requestedRegion);
     const bundleId = params.get('bundle');
     if (!bundleId) return;
+    setRequestedBundle(bundleId);
     const controller = new AbortController();
     setBundleState('loading');
     loadHostedBundle(bundleId, controller.signal).then((bundle) => {
@@ -47,7 +49,13 @@ export function MapClient() {
   }, []);
 
   const regions = useMemo(() => snapshot.regions.slice(0, 9), [snapshot.regions]);
-  const current = regions.find((region) => region.id === selected) ?? regions[0] ?? illustrativeSnapshot.regions[1];
+  const current = regions.find((region) => region.id === selected) ?? regions[0];
+  if (requestedBundle && bundleState !== 'ready') {
+    return <section className="map-state-panel" role={bundleState === 'error' ? 'alert' : 'status'} aria-live="polite"><span className="map-state-label">{bundleState === 'loading' ? 'Loading graph snapshot' : 'Graph snapshot unavailable'}</span><h2>{bundleState === 'loading' ? 'Preparing the architecture map…' : 'This snapshot could not be loaded.'}</h2><p>{bundleState === 'loading' ? 'The hosted bundle is being validated. The illustrative map stays hidden until that result is known.' : bundleMessage}</p>{bundleState === 'error' && <button type="button" className="quiet-link map-retry" onClick={() => window.location.reload()}>Try loading this snapshot again <span aria-hidden="true">↻</span></button>}</section>;
+  }
+  if (!current) {
+    return <section className="map-state-panel" role="status"><span className="map-state-label">No regions in snapshot</span><h2>There is no architecture to draw yet.</h2><p>This snapshot is valid but contains no displayable top-level regions. Return to the repository start page or open the source explorer for coverage details.</p><Link className="quiet-link" href="/">Return to Start here <span aria-hidden="true">→</span></Link></section>;
+  }
   const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const selectRegion = (region: SystemRegion) => {
     setSelected(region.id);
