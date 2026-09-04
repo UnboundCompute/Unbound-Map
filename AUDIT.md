@@ -45,6 +45,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `690ed9f` | Expose hosted snapshot states | Hosted bundle requests now explicitly announce loading, unavailable/error, and valid-empty states; the illustrative fixture is hidden while a requested bundle is unresolved, and failed requests offer recovery instead of silently falling back; checks passed. |
 | `704bf95` | Distinguish coverage-limited snapshots | Added typed coverage state and page/rail language for illustrative, verified graph-backed, and graph-backed coverage-limited snapshots; fixture and projection paths now expose the distinction; `npm run check` and `git diff --check` passed. |
 | `e81c1ff` | Label map external boundaries | Added explicit `wire input` and `consumers` labels outside the repository map region so entry and exit points are readable without inferring them from position; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `fa29124` | Preserve map and flow history | Architecture selection now encodes level 1 and uses browser history with `popstate` restoration; flow step selection likewise uses history and restores the active step on Back/Forward; checks passed. |
 
 ## Rebuild brief audit
 
