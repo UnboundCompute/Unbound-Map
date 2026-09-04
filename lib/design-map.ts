@@ -30,6 +30,7 @@ export type LachesisBundle = {
     repository: string;
     language: string;
     revision: string;
+    generated_at?: string;
     description?: string;
     lines: number;
     indexed_nodes: number;
@@ -57,6 +58,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && candidate.schema_version === '2.0'
     && !!meta && typeof meta === 'object'
     && typeof meta.repository === 'string' && typeof meta.revision === 'string'
+    && (!meta.generated_at || typeof meta.generated_at === 'string')
     && !!graph && typeof graph === 'object'
     && Array.isArray(graph.nodes)
     && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number')
@@ -67,6 +69,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
 export type DesignMapSnapshot = {
   repository: string;
   revision: string;
+  generatedAt?: string;
   language: string;
   lines: number;
   indexedNodes: number;
@@ -107,6 +110,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
   return {
     repository: bundle.meta.repository,
     revision: bundle.meta.revision,
+    generatedAt: bundle.meta.generated_at,
     language: bundle.meta.language,
     lines: positiveInteger(bundle.meta.lines, 0),
     indexedNodes,

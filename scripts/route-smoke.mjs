@@ -36,7 +36,7 @@ async function redirect(path, target) {
   console.log(`ok ${path} → ${response.headers.get('location')}`);
 }
 
-await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek: see the system before you read it', 'Follow a packet', 'Explore architecture', 'full revision']);
+await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek: see the system before you read it', 'Follow a packet', 'Explore architecture', 'full revision', 'Not supplied by snapshot']);
 await image('/opengraph-image?repository=Zeek&revision=main');
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
 await page('/flows?repository=Zeek&revision=main&step=ipv4', ['validated IPv4 payload', 'step=ipv4', '<meta property="og:title" content="Zeek architectural flows · Design Map"', '<meta name="twitter:title" content="Zeek architectural flows · Design Map"']);
