@@ -19,6 +19,8 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `4b55c54` | Transparent hosted loading, identity, coverage, and error states in the HLD page | Playwright verified invalid bundle IDs produce an accessible alert, default pages remain fixture-ready, and mobile overflow stays at zero |
 | `7fe9963` | Deterministic bounded projection from Lachesis modules to HLD regions | `npm run check` and `npm run build`; projection ranks top-level modules by footprint and emits an explicit remainder roll-up |
 | `4d07d04` | Render projected hosted region labels and footprints in the HLD canvas | Playwright fulfilled a mocked graph-first bundle and verified live repository/revision metadata, three projected region labels, and module footprint text |
+| `9952590` | Capture product context and persist the UI/UX Pro Max design system | PRODUCT.md records audience, boundaries, evidence, and accessibility commitments; generated MASTER.md records typography, palette, spacing, and anti-pattern checks |
+| `48730c0` | Split the single dashboard into documentation routes with a human-authored reading rail | `npm run check`, `npm run build`, and local HTTP smoke tests returned 200 for `/`, `/map`, `/flow`, `/trust`, and `/explore`; Impeccable detector findings were reduced to the permitted map-canvas grid advisory |
 
 ## Current checks
 
@@ -43,6 +45,9 @@ Browser smoke checks performed against the local dev server:
 - The primary CTA navigates to the map without requiring the reader to guess where to start.
 - The selected claim exposes its evidence status before the reader opens the code-level explorer.
 - “How this map was made” is available as a disclosure rather than forcing methodology into the primary reading path.
+- The home page is a concise orientation document; each route answers one question and links to the next depth.
+- A persistent sidebar carries route context, snapshot facts, coverage, and the Lachesis handoff.
+- Live browser visual inspection was unavailable in this environment; route/build/static checks were used instead.
 
 ## Known prototype limits
 
