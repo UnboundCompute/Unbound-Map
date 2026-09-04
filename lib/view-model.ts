@@ -30,6 +30,9 @@ export type SystemRegion = {
   upstream?: string[];
   downstream?: string[];
   children?: { label: string; summary: string; anchor?: string }[];
+  inputs?: string[];
+  outputs?: string[];
+  structures?: string[];
   anchor?: { id: string; label: string; file: string; line: number };
 };
 
@@ -118,6 +121,9 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       rolledUp: region.rolledUp,
       anchor: region.anchor,
       children: region.children,
+      inputs: region.inputs,
+      outputs: region.outputs,
+      structures: region.structures,
     })),
   };
 }

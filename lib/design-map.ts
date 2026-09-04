@@ -85,6 +85,9 @@ export type HLDRegion = {
   rolledUp: boolean;
   anchor?: Pick<BundleNode, 'id' | 'label' | 'file' | 'line'>;
   children?: { label: string; summary: string; anchor?: string }[];
+  inputs?: string[];
+  outputs?: string[];
+  structures?: string[];
 };
 
 function positiveInteger(value: unknown, fallback: number) {
