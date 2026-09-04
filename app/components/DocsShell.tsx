@@ -39,7 +39,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         <span className="bar-repo">{snapshot.repository}</span>
         <code className="bar-revision">{snapshot.revision}</code>
         <SnapshotState snapshot={snapshot} />
-        <a className="bar-lachesis" href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">Lachesis <span aria-hidden="true">↗</span></a>
+        <a className="bar-lachesis" href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>
       </header>
       <div className="docs-layout">
         <aside className="reading-rail" aria-label="Repository guide">
