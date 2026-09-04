@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { MapClient } from '../components/MapClient';
-import { EmbedSnippet } from '../components/EmbedSnippet';
 import { illustrativeSnapshot } from '../../lib/view-model';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -19,5 +18,5 @@ export default async function EmbedPage({ searchParams }: { searchParams: Search
   const query = await searchParams;
   const bundle = one(query.bundle);
   const repository = one(query.repository) ?? (bundle ? 'Graph-backed repository' : illustrativeSnapshot.repository);
-  return <main className="embed-page"><header className="embed-header"><div><span className="embed-kicker">Design Map · HLD</span><h1>{repository} architecture</h1><p>Read the system shape before the source.</p></div><Link href="/architecture">Open full guide <span aria-hidden="true">↗</span></Link></header><MapClient route="/embed" /><EmbedSnippet /><footer className="embed-footer"><span>{bundle ? 'Graph-backed bundle requested' : `Illustrative snapshot · ${illustrativeSnapshot.revision}`}</span><Link href="/">About this map</Link></footer></main>;
+  return <main className="embed-page"><header className="embed-header"><div><span className="embed-kicker">Design Map · HLD</span><h1>{repository} architecture</h1><p>Read the system shape before the source.</p></div><Link href="/architecture">Open full guide <span aria-hidden="true">↗</span></Link></header><MapClient route="/embed" /><footer className="embed-footer"><span>{bundle ? 'Graph-backed bundle requested' : `Illustrative snapshot · ${illustrativeSnapshot.revision}`}</span><Link href="/">About this map</Link></footer></main>;
 }
