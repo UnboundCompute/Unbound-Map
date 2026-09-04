@@ -33,7 +33,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
     <div className="docs-shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
       <header className="repo-bar" role="banner">
-        <Link href="/" className="wordmark" aria-label="Design Map start here"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Design Map</span></Link>
+        <Link href={contextualHref('/', context)} className="wordmark" aria-label="Design Map start here"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Design Map</span></Link>
         <span className="bar-divider" aria-hidden="true" />
         <span className="bar-repo">{snapshot.repository}</span>
         <code className="bar-revision">{snapshot.revision}</code>
