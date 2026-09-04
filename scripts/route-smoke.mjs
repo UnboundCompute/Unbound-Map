@@ -24,7 +24,7 @@ await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek: see the s
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
 await page('/flows?repository=Zeek&revision=main&step=ipv4', ['validated IPv4 payload', 'step=ipv4', '<meta property="og:title" content="Zeek architectural flows · Design Map"', '<meta name="twitter:title" content="Zeek architectural flows · Design Map"']);
 await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="memory"', 'value="input"', 'Memory safety', '<meta property="og:title" content="Zeek trust surfaces · Design Map"', '<meta name="twitter:title" content="Zeek trust surfaces · Design Map"']);
-await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo123', ['Context ready', 'DecodeIPV4()', 'b_demo123']);
+await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo123', ['Context ready', 'DecodeIPV4()', 'b_demo123', 'aria-label="Open DecodeIPV4() in Lachesis in a new tab"']);
 await page('/embed?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture', 'Graph-backed bundle requested', 'Preparing the architecture map', 'Skip to map', 'id="embed-content"']);
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
