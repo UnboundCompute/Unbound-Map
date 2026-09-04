@@ -212,5 +212,5 @@ Static and live route checks performed against the local dev server:
 
 - Suricata counts and node facts are fixture data, not yet read from a Lachesis graph endpoint.
 - The Lachesis query string is the agreed handoff shape; the explorer must implement its parser and focused-bundle loading.
-- The architecture map currently renders eight illustrative regions; the scalable community roll-up engine is the next product slice.
+- The default map still renders eight illustrative regions; hosted snapshots now use the deterministic bounded projection and roll-up adapter, while live relationship evidence depends on the Lachesis bundle schema.
 - `/embed` is shareable and bundle-aware, but defaults to the explicitly labeled illustrative fixture until a valid `?bundle=b_…` identifier is supplied.
