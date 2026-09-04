@@ -48,6 +48,8 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `fa29124` | Preserve map and flow history | Architecture selection now encodes level 1 and uses browser history with `popstate` restoration; flow step selection likewise uses history and restores the active step on Back/Forward; checks passed. |
 | `a134391` | Make Start here map stages actionable | Replaced decorative macro-stage spans with keyboard-accessible links into each corresponding architecture region at `level=1`, while retaining the compact ordered path and responsive layout; checks passed. |
 | `271d8e4` | Add semantic document footer | Added a restrained footer landmark with a contextual Lachesis continuation link and mobile reflow, completing the shell's semantic header/nav/main/aside/footer landmarks without adding competing navigation; `npm run check` and `git diff --check` passed. |
+| `61f65e5` | Default flow linear mode on mobile | The accessible all-steps text fallback now opens automatically at the mobile breakpoint, tracks viewport changes, and remains user-toggleable while the guided stepper stays available; `npm run check` and `git diff --check` passed. |
+| `3c44c7e` | Add shareable page metadata and links | Added a reusable Copy link control to every page intro and search-friendly title/description, Open Graph, Twitter, author, application, and keyword metadata at the root; `npm run check`, `npm run build`, and `git diff --check` passed. Clipboard behavior remains progressively optional when browser permissions deny access. |
 
 ## Rebuild brief audit
 
