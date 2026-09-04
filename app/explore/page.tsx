@@ -1,0 +1,6 @@
+import Link from 'next/link';
+import { DocsShell } from '../components/DocsShell';
+
+export default function ExplorePage() {
+  return <DocsShell active="/explore"><div className="doc-page explore-page"><p className="doc-kicker">Lachesis · code-level reading room</p><h1 className="doc-title">Now read how it works.</h1><p className="doc-lede">Design Map gives you the chapter. Lachesis gives you the paragraph: symbols, call paths, request traces, and source evidence tied to the same repository revision.</p><section className="handoff-panel"><div><span className="handoff-mark">→</span><h2>Open the Suricata reading room</h2><p>Start at the selected region’s anchor, then follow the graph where the question gets specific.</p></div><a className="button-primary" href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">Open Lachesis <span>↗</span></a></section><div className="explore-columns"><article><h2>Use Design Map for</h2><p>Orientation, vocabulary, ownership, and the shape of the main route.</p></article><article><h2>Use Lachesis for</h2><p>Symbol-level paths, callers, callees, and the exact source evidence behind a handoff.</p></article></div><Link className="text-link" href="/map">Back to the system map →</Link></div></DocsShell>;
+}
