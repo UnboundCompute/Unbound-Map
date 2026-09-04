@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../components/DocsShell';
 import { TrustGlossary } from '../components/TrustGlossary';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../lib/view-model';
+import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -10,7 +11,7 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return { title: `${label} trust surfaces · Design Map`, description: `Use a searchable glossary to understand security and correctness obligations in ${label} without mistaking presence for a finding.` };
+  return documentMetadata(`${label} trust surfaces · Design Map`, `Use a searchable glossary to understand security and correctness obligations in ${label} without mistaking presence for a finding.`);
 }
 
 export default async function TrustPage({ searchParams }: { searchParams: SearchParams }) {

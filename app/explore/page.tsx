@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { DocsShell, PageIntro } from '../components/DocsShell';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../lib/view-model';
+import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Record<string, string | string[] | undefined>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -11,7 +12,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
   const repository = one(query.repository);
   const anchor = one(query.anchor);
   const label = repository ?? illustrativeSnapshot.repository;
-  return { title: `${anchor ? `${anchor} · ` : ''}${label} handoff · Lachesis`, description: `Open ${anchor ?? 'the selected architecture context'} in Lachesis for ${label}, tied to the shared repository revision.` };
+  return documentMetadata(`${anchor ? `${anchor} · ` : ''}${label} handoff · Lachesis`, `Open ${anchor ?? 'the selected architecture context'} in Lachesis for ${label}, tied to the shared repository revision.`);
 }
 
 export default async function ExplorePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {

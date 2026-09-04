@@ -4,6 +4,7 @@ import { DocsShell, EvidenceNote, PageIntro } from '../components/DocsShell';
 import { MapClient } from '../components/MapClient';
 import { EmbedSnippet } from '../components/EmbedSnippet';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../lib/view-model';
+import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -11,7 +12,7 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return { title: `${label} architecture · Design Map`, description: `Explore ${label}'s bounded responsibilities, relationships, and region chapters before opening the source.` };
+  return documentMetadata(`${label} architecture · Design Map`, `Explore ${label}'s bounded responsibilities, relationships, and region chapters before opening the source.`);
 }
 
 export default async function ArchitecturePage({ searchParams }: { searchParams: SearchParams }) {

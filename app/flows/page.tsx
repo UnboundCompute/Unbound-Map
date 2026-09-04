@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../components/DocsShell';
 import { FlowDiagram } from '../components/FlowDiagram';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../lib/view-model';
+import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -10,7 +11,7 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return { title: `${label} architectural flows · Design Map`, description: `Follow a canonical packet journey through ${label}, one design boundary at a time.` };
+  return documentMetadata(`${label} architectural flows · Design Map`, `Follow a canonical packet journey through ${label}, one design boundary at a time.`);
 }
 
 export default async function FlowsPage({ searchParams }: { searchParams: SearchParams }) {

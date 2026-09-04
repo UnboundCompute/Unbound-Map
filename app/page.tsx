@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from './components/DocsShell';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../lib/view-model';
+import { documentMetadata } from '../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -9,7 +10,7 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return { title: `${label} · Design Map`, description: `See ${label}'s structure, responsibilities, and first architectural path before reading the source.` };
+  return documentMetadata(`${label} · Design Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`);
 }
 
 export default async function HomePage({ searchParams }: { searchParams: SearchParams }) {

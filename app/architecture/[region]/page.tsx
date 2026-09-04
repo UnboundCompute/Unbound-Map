@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../../lib/view-model';
+import { documentMetadata } from '../../../lib/seo';
 
 export function generateStaticParams() { return illustrativeSnapshot.regions.map((region) => ({ region: region.id })); }
 
@@ -13,7 +14,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const repository = one((await searchParams).repository);
   const region = illustrativeSnapshot.regions.find((item) => item.id === regionId);
   const label = repository ?? illustrativeSnapshot.repository;
-  return region ? { title: `${region.label} · ${label} architecture`, description: `${region.summary} Read the ${region.label} chapter in Design Map before opening the source.` } : { title: `Architecture region · ${label}` };
+  return region ? documentMetadata(`${region.label} · ${label} architecture`, `${region.summary} Read the ${region.label} chapter in Design Map before opening the source.`) : documentMetadata(`Architecture region · ${label}`, `This architecture region is not present in the illustrative index. Open the matching snapshot or continue to Lachesis.`);
 }
 
 export default async function RegionPage({ params, searchParams }: { params: Promise<{ region: string }>; searchParams: SearchParams }) {

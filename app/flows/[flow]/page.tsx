@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
 import { FlowDiagram } from '../../components/FlowDiagram';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../../lib/view-model';
+import { documentMetadata } from '../../../lib/seo';
 
 const flows = { 'packet-decode': { title: 'Packet decode into flow state', intro: 'Follow one architectural journey from bytes on the wire into the stateful unit used by downstream parsers.' } };
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const repository = one((await searchParams).repository);
   const entry = flows[flow as keyof typeof flows];
   const label = repository ? `${repository} · ` : '';
-  return entry ? { title: `${label}${entry.title} · Design Map`, description: `${entry.intro} Read the architectural handoffs before the source.` } : { title: `${label}Architectural flow · Design Map` };
+  return entry ? documentMetadata(`${label}${entry.title} · Design Map`, `${entry.intro} Read the architectural handoffs before the source.`) : documentMetadata(`${label}Architectural flow · Design Map`, 'Read the architectural handoffs before the source.');
 }
 
 export default async function FlowPage({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }) {

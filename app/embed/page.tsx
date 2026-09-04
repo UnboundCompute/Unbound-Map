@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { MapClient } from '../components/MapClient';
 import { illustrativeSnapshot } from '../../lib/view-model';
+import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
@@ -11,7 +12,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const repository = one(query.repository);
   const bundle = one(query.bundle);
   const label = repository ?? (bundle ? 'Graph-backed repository' : illustrativeSnapshot.repository);
-  return { title: `${label} architecture map · Design Map`, description: `An embeddable high-level architecture map for ${label}.` };
+  return documentMetadata(`${label} architecture map · Design Map`, `An embeddable high-level architecture map for ${label}.`);
 }
 
 export default async function EmbedPage({ searchParams }: { searchParams: SearchParams }) {
