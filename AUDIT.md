@@ -63,6 +63,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `30584a8` | Preserve legacy link context | `/map` and `/flow` redirects now carry all incoming query parameters into `/architecture` and `/flows`, preserving selected regions, levels, and flow steps for shared legacy links; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `c09d328` | Add host-aware sitemap | Added a sitemap route for public guide, flow, trust, embed, and illustrative region pages using `NEXT_PUBLIC_SITE_URL`/`VERCEL_URL` with a local fallback; build verified `/sitemap.xml` generation. |
 | `339ea95` | Make unknown region links recoverable | Dynamic region chapters no longer 404 when a shared graph-backed region ID is outside the fixture; they explain the missing snapshot context and offer a Lachesis recovery link, avoiding invented architecture facts; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `11623d1` | Document public metadata host | README now explains that production deployments should set `NEXT_PUBLIC_SITE_URL` (with automatic `VERCEL_URL` support) so sitemap and social metadata never point maintainers at localhost; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
