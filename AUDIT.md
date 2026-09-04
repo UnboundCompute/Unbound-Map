@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `084aa22` | Contain long repository context on mobile | Long `repository`/`revision` URLs now keep the mobile repository bar and open revision disclosure within the viewport; Playwright confirmed zero overflow at 375px in both states, with `npm run check`, `npm run build`, and `git diff --check` passing. |
 | `204256f` | Raise visible section labels to the type floor | Repository rail headings, page labels, evidence labels, flow labels, and handoff labels now inherit the 12px informational minimum alongside metadata; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `61b4954` | Make the global skip target keyboard-focusable | The shell’s `main#main-content` now accepts focus, so activating `Skip to content` moves keyboard focus to the document landmark instead of only changing the URL hash; Playwright confirmed `document.activeElement.id === "main-content"`, with `npm run check` and `git diff --check` passing. |
 | `9e3bb06` | Raise visible informational text to the 12px floor | Reader-facing revision, provenance, coverage, map labels, flow metadata, trust filters, and handoff metadata now override legacy 10–11px declarations to meet the brief’s minimum informational type size; `npm run check`, `npm run build`, and `git diff --check` passed. |
