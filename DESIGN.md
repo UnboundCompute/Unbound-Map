@@ -53,9 +53,9 @@ Normal text pairs must meet 4.5:1. Large text must meet 3:1. Muted tokens are no
 ## Layout
 
 - Desktop: one reading column with a 240–260px documentation rail.
-- The overview should use editorial sections and a deliberate reading order, not a hero-plus-card dashboard.
+- Start here should use editorial sections and a deliberate reading order, not a hero-plus-card dashboard.
 - The System Map may use a map frame and inspector, but it must have an adjacent ordered text summary for keyboard and mobile readers.
-- Flow is an ordered vertical or horizontal narrative; Trust is a filterable glossary/index.
+- Flow is a step-synchronized narrative with a linear text fallback; Trust is a searchable glossary/index.
 - Keep generous whitespace around sections. Avoid equal-height card matrices.
 - Mobile below 768px: the rail becomes a horizontal, scrollable navigation row; map geometry becomes an ordered list or a verified single-column path. Never depend on absolute positioning for comprehension.
 - All content must fit 375px without viewport-level horizontal overflow.
@@ -85,9 +85,11 @@ Prefer these primitives:
 - `DocsShell`: repository identity, one primary navigation, snapshot provenance.
 - `PageIntro`: question heading, concise explanation, source/provenance note.
 - `EvidenceNote`: generated vs editorial vs illustrative distinction.
-- `MapFrame`: spatial HLD only.
-- `OrderedPath`: flow and mobile map fallback.
-- `GlossaryList`: trust surfaces with kind, obligation, location, anchor.
+- `MapClient`: bounded spatial HLD, relationship summary, and context-preserving region handoff.
+- `FlowDiagram`: synchronized architectural steps with a linear fallback.
+- `TrustGlossary`: searchable trust domains with meaning, obligation, families, and locations.
+- `PageIntro`: one direct reader question, concise explanation, and snapshot context.
+- `EvidenceNote`: generated, editorial, and illustrative boundaries.
 - `HandoffPanel`: the selected context and a single Lachesis action.
 
 Avoid generic `Card`, `Badge`, `Metric`, or `DashboardPanel` primitives unless the content model proves they are necessary.
