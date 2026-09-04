@@ -68,6 +68,7 @@ export type HLDRegion = {
   nodeCount: number;
   rolledUp: boolean;
   anchor?: Pick<BundleNode, 'id' | 'label' | 'file' | 'line'>;
+  children?: { label: string; summary: string; anchor?: string }[];
 };
 
 function positiveInteger(value: unknown, fallback: number) {
@@ -107,6 +108,22 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
  */
 export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12): HLDRegion[] {
   const safeLimit = Math.max(1, Math.floor(limit));
+  const nodeById = new Map(snapshot.nodes.map((node) => [node.id, node]));
+  const childProjection = (parentId: string) => {
+    const children = snapshot.modules
+      .filter((module) => module.parent_id === parentId)
+      .map((module) => ({
+        label: module.name,
+        summary: `${module.node_ids?.length ?? 0} indexed nodes${module.path ? ` · ${module.path}` : ''}.`,
+        anchor: module.node_ids?.map((id) => nodeById.get(id)).find(Boolean)?.label,
+        nodeCount: module.node_ids?.length ?? 0,
+      }))
+      .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
+    if (children.length <= 12) return children.map(({ nodeCount: _nodeCount, ...child }) => child);
+    const visible = children.slice(0, 11).map(({ nodeCount: _nodeCount, ...child }) => child);
+    const remainder = children.slice(11);
+    return [...visible, { label: `Other ${remainder.length} regions`, summary: `${remainder.reduce((total, child) => total + child.nodeCount, 0)} indexed nodes across the bounded remainder.` }];
+  };
   const topLevel = snapshot.modules
     .filter((module) => !module.parent_id)
     .map((module) => ({
@@ -115,7 +132,8 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       path: module.path,
       nodeCount: module.node_ids?.length ?? 0,
       rolledUp: false,
-      anchor: module.node_ids?.map((id) => snapshot.nodes.find((node) => node.id === id)).find(Boolean),
+      anchor: module.node_ids?.map((id) => nodeById.get(id)).find(Boolean),
+      children: childProjection(module.id),
     }))
     .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
 

@@ -113,6 +113,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       metricLabel: `${region.nodeCount.toLocaleString()} indexed nodes`,
       rolledUp: region.rolledUp,
       anchor: region.anchor,
+      children: region.children,
     })),
   };
 }
