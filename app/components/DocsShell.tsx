@@ -45,6 +45,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot }:
         </aside>
         <main id="main-content" className="docs-main">{children}</main>
       </div>
+      <footer className="docs-footer"><span>Design Map · read this before the source</span><Link href="/explore">Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
     </div>
   );
 }
