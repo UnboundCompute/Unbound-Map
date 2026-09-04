@@ -240,6 +240,7 @@ Static and live route checks performed against the local dev server:
 - Desktop visual pass at 1440px captured and inspected Start here, Flows, and Trust full-page screenshots; the editorial reading hierarchy, bounded map/flow surfaces, and restrained CTA treatment remain coherent with zero horizontal overflow.
 - Latest 375px Flow screenshot inspection confirmed the branch explanation stacks before the step selector, the five-step navigation remains full-width and readable, the mobile linear fallback is open by default, and the route has zero horizontal overflow.
 - Latest 375px Trust screenshot inspection confirmed the long domain search and kind filter remain operable, the selected domain stays readable as a single document section, query/filter state remains visible in the URL, and zero horizontal overflow persists.
+- Playwright deep-link smoke at 375px confirmed `/trust?domain=memory-safety` selects and scrolls the `#memory-safety` article to the 20px reading offset, with zero horizontal overflow.
 - Playwright desktop history smoke confirmed Architecture selection semantics: selecting `Application protocols` entered `?region=protocols&level=1`, Back restored level 0 with all eight nodes, and Forward restored the focused region plus inspector content.
 
 ## Known prototype limits
