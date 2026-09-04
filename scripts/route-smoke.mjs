@@ -22,7 +22,7 @@ await page('/architecture?repository=Zeek&revision=main&region=decode&level=2', 
 await page('/flows?repository=Zeek&revision=main&step=ipv4', ['validated IPv4 payload', 'step=ipv4']);
 await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="memory"', 'value="input"', 'Memory safety']);
 await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo123', ['Context ready', 'DecodeIPV4()', 'b_demo123']);
-await page('/embed?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture', 'Graph-backed bundle requested']);
+await page('/embed?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture', 'Graph-backed bundle requested', 'Preparing the architecture map']);
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
 await redirect('/flow?step=ipv4', '/flows?step=ipv4');
