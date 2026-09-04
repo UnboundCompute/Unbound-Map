@@ -3,6 +3,7 @@ import type { RepositorySnapshotView } from './view-model';
 /** Deliberately non-live content used until a real Lachesis bundle is supplied. */
 export const illustrativeSnapshot: RepositorySnapshotView = {
   provenance: 'illustrative',
+  coverageState: 'limited',
   repository: 'Suricata',
   revision: '8f4c1b2',
   language: 'C',

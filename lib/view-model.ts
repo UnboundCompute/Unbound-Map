@@ -2,9 +2,11 @@ import type { DesignMapSnapshot, HLDRegion } from './design-map';
 export { illustrativeSnapshot } from './illustrative-suricata';
 
 export type SnapshotProvenance = 'illustrative' | 'graph-backed';
+export type CoverageState = 'limited' | 'verified';
 
 export type RepositorySnapshotView = {
   provenance: SnapshotProvenance;
+  coverageState: CoverageState;
   repository: string;
   revision: string;
   language: string;
@@ -85,6 +87,7 @@ export const trustDomains: TrustDomain[] = [
 export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLDRegion[]): RepositorySnapshotView {
   return {
     provenance: 'graph-backed',
+    coverageState: snapshot.includedNodes < snapshot.indexedNodes || snapshot.limitations.length > 0 ? 'limited' : 'verified',
     repository: snapshot.repository,
     revision: snapshot.revision,
     language: snapshot.language,

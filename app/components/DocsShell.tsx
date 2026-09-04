@@ -14,7 +14,7 @@ function isActive(href: string, active?: string) {
 }
 
 export function SnapshotState({ snapshot }: { snapshot: RepositorySnapshotView }) {
-  const label = snapshot.provenance === 'illustrative' ? 'Illustrative prototype' : 'Graph-backed snapshot';
+  const label = snapshot.provenance === 'illustrative' ? 'Illustrative fixture · coverage limited' : snapshot.coverageState === 'limited' ? 'Graph-backed · coverage limited' : 'Verified graph-backed';
   return <span className={`snapshot-state snapshot-${snapshot.provenance}`}><i aria-hidden="true" />{label}</span>;
 }
 
@@ -41,7 +41,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot }:
           <div className="rail-rule" />
           <div className="rail-heading">Snapshot</div>
           <dl className="snapshot-list"><div><dt>revision</dt><dd><code>{snapshot.revision}</code></dd></div><div><dt>coverage</dt><dd>{snapshot.coverageScope}</dd></div><div><dt>indexed</dt><dd>{snapshot.indexedNodes.toLocaleString()} nodes</dd></div></dl>
-          <p className="rail-note">{isFixture ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p>
+          <p className="rail-note">{isFixture ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : snapshot.coverageState === 'limited' ? 'Generated from the Lachesis graph, but this view covers only part of the indexed repository.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p>
         </aside>
         <main id="main-content" className="docs-main">{children}</main>
       </div>
