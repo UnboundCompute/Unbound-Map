@@ -205,7 +205,7 @@ Static and live route checks performed against the local dev server:
 - Queryful `/architecture?repository=Zeek&revision=main&region=decode&level=1` was re-smoked after the SSR guard and returned 200; the browser-level zoom control remains available without a server-side `window` error.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
 - Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
-- `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
+- `npm run check`, `npm run build`, `npm run projection-smoke`, `npm run smoke`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
 - Live browser screenshot inspection was attempted through the required browser surface, but no browser was available; visual screenshot evidence remains an explicit limitation.
 
 ## Known prototype limits
