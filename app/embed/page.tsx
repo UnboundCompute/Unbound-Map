@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const repository = one(query.repository);
   const bundle = one(query.bundle);
   const label = repository ?? (bundle ? 'Graph-backed repository' : illustrativeSnapshot.repository);
-  return documentMetadata(`${label} architecture map · Design Map`, `An embeddable high-level architecture map for ${label}.`);
+  return documentMetadata(`${label} architecture map · Design Map`, `An embeddable high-level architecture map for ${label}.`, { repository, revision: one(query.revision) });
 }
 
 export default async function EmbedPage({ searchParams }: { searchParams: SearchParams }) {

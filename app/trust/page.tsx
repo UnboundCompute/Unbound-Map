@@ -11,7 +11,8 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} trust surfaces · Design Map`, `Use a searchable glossary to understand security and correctness obligations in ${label} without mistaking presence for a finding.`);
+  const query = await searchParams;
+  return documentMetadata(`${label} trust surfaces · Design Map`, `Use a searchable glossary to understand security and correctness obligations in ${label} without mistaking presence for a finding.`, { repository, revision: one(query.revision) });
 }
 
 export default async function TrustPage({ searchParams }: { searchParams: SearchParams }) {

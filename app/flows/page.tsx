@@ -9,9 +9,10 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
 
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
-  const repository = one((await searchParams).repository);
+  const query = await searchParams;
+  const repository = one(query.repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} architectural flows · Design Map`, `Follow a canonical packet journey through ${label}, one design boundary at a time.`);
+  return documentMetadata(`${label} architectural flows · Design Map`, `Follow a canonical packet journey through ${label}, one design boundary at a time.`, { repository, revision: one(query.revision) });
 }
 
 export default async function FlowsPage({ searchParams }: { searchParams: SearchParams }) {

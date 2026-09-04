@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 
 /** Keep browser titles and social previews aligned with the same document context. */
-export function documentMetadata(title: string, description: string): Metadata {
-  const image = { url: '/opengraph-image', alt: `${title} — Design Map architecture guide` };
+export function documentMetadata(title: string, description: string, context: { repository?: string; revision?: string } = {}): Metadata {
+  const imageQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}) }).toString();
+  const image = { url: `/opengraph-image${imageQuery ? `?${imageQuery}` : ''}`, alt: `${title} — Design Map architecture guide` };
   return {
     title,
     description,

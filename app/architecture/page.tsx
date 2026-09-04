@@ -12,7 +12,8 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} architecture · Design Map`, `Explore ${label}'s bounded responsibilities, relationships, and region chapters before opening the source.`);
+  const query = await searchParams;
+  return documentMetadata(`${label} architecture · Design Map`, `Explore ${label}'s bounded responsibilities, relationships, and region chapters before opening the source.`, { repository, revision: one(query.revision) });
 }
 
 export default async function ArchitecturePage({ searchParams }: { searchParams: SearchParams }) {

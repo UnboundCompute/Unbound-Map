@@ -14,10 +14,12 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }): Promise<Metadata> {
   const { flow } = await params;
-  const repository = one((await searchParams).repository);
+  const metadataQuery = await searchParams;
+  const repository = one(metadataQuery.repository);
   const entry = flows[flow as keyof typeof flows];
   const label = repository ? `${repository} · ` : '';
-  return entry ? documentMetadata(`${label}${entry.title} · Design Map`, `${entry.intro} Read the architectural handoffs before the source.`) : documentMetadata(`${label}Architectural flow · Design Map`, 'Read the architectural handoffs before the source.');
+  const imageContext = { repository, revision: one(metadataQuery.revision) };
+  return entry ? documentMetadata(`${label}${entry.title} · Design Map`, `${entry.intro} Read the architectural handoffs before the source.`, imageContext) : documentMetadata(`${label}Architectural flow · Design Map`, 'Read the architectural handoffs before the source.', imageContext);
 }
 
 export default async function FlowPage({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }) {

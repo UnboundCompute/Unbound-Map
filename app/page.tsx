@@ -8,9 +8,10 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
 
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
-  const repository = one((await searchParams).repository);
+  const query = await searchParams;
+  const repository = one(query.repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} · Design Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`);
+  return documentMetadata(`${label} · Design Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`, { repository, revision: one(query.revision) });
 }
 
 export default async function HomePage({ searchParams }: { searchParams: SearchParams }) {
