@@ -130,6 +130,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `188dde5` | Connect flow selectors to their detail region | Guided-flow step controls now declare `aria-controls` and the changing narrative panel exposes a matching labelled region, making the selector-to-content relationship explicit for keyboard and assistive-technology users; `npm run check` and `git diff --check` passed. |
 | `731f69e` | Announce share outcomes reliably | Share-link and README-embed controls now expose dedicated polite live statuses for successful and unavailable copy outcomes, keeping the button name stable enough for assistive technology while preserving visible feedback; `npm run check` and `git diff --check` passed. |
 | `722fa5d` | Label the architecture map landmark | The reusable map workbench is now a named section with an explicit `Architecture map` heading, giving landmark navigation a reliable entry point before the visible relationship alternative; `npm run check` and `git diff --check` passed. |
+| `c1289a4` | Add skip navigation to the embed surface | Standalone `/embed` now offers a keyboard skip link targeting a focusable map boundary, so README/social embeds can bypass the header and enter the architecture content directly; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
