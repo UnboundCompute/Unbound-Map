@@ -22,6 +22,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `9952590` | Capture product context and persist the UI/UX Pro Max design system | PRODUCT.md records audience, boundaries, evidence, and accessibility commitments; generated MASTER.md records typography, palette, spacing, and anti-pattern checks |
 | `48730c0` | Split the single dashboard into documentation routes with a human-authored reading rail | `npm run check`, `npm run build`, and local HTTP smoke tests returned 200 for `/`, `/map`, `/flow`, `/trust`, and `/explore`; Impeccable detector findings were reduced to the permitted map-canvas grid advisory |
 | `06047cf` | Preserve hosted-bundle loading, error, and graph-backed status in the new map surface | `npm run check` and `npm run build` passed; map client still validates the hosted transport through the existing adapter and announces loading/error/ready states |
+| `795c946` | Add a scalable region directory beneath the bounded spatial projection | `npm run check` and `npm run build` passed; hosted projections can expose all bounded regions in a readable list while the canvas stays limited to four placed regions |
 
 ## Current checks
 
