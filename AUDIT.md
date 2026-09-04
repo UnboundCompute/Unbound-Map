@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `dfb5c53` | Make the recommended first read explicit | Start here now places a labelled `Start with` decision immediately after the repository path, with context-preserving `Follow a packet` and `Explore architecture` actions; the homepage route smoke asserts both actions and `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `76a1663` | Add descriptive social-preview image alternatives | Shared document metadata and root metadata now expose meaningful `og:image:alt` and Twitter image alt text derived from the page title, improving link-preview context for distribution and assistive tooling; `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
 | `1206ab1` | Next app scaffold, HLD shell, map fixture, three lenses | `npm run build` passed |
 | `d017257` | README, ignore rules, lockfile and TypeScript config normalization | clean repository after commit |
