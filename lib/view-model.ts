@@ -3,6 +3,7 @@ export { illustrativeSnapshot } from './illustrative-suricata';
 
 export type SnapshotProvenance = 'illustrative' | 'graph-backed';
 export type CoverageState = 'limited' | 'verified';
+export type SharedSnapshotContext = { repository?: string; revision?: string; bundle?: string };
 
 export type RepositorySnapshotView = {
   provenance: SnapshotProvenance;
@@ -64,6 +65,14 @@ export type LachesisHandoff = {
   anchor: string;
   bundleId?: string;
 };
+
+export function snapshotWithContext(snapshot: RepositorySnapshotView, context: SharedSnapshotContext): RepositorySnapshotView {
+  return {
+    ...snapshot,
+    repository: context.repository || snapshot.repository,
+    revision: context.revision || snapshot.revision,
+  };
+}
 
 export const flowSteps: FlowStep[] = [
   { id: 'ethernet', noun: 'Ethernet frame', handoff: 'wire → packet decode', regionId: 'decode', guard: 'Reject a runt frame before reading EtherType.', anchor: 'DecodeEthernet()', description: 'Reads the outer frame and establishes the protocol type carried by its payload.', input: 'raw network bytes', output: 'payload + EtherType', decision: 'Which layer-three decoder should receive this payload?' },
