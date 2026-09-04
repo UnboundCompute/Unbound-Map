@@ -119,7 +119,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .map-status { display: inline-flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: .06em; }
 .map-status i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal-light); }
 .map-scale { display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 10px; color: #90a090; }
-.map-level-reset { min-height: 32px; display: inline-flex; align-items: center; color: #e6c58f; font: 600 10px var(--sans); text-decoration: underline; text-underline-offset: 3px; }
+.map-level-reset { min-height: 44px; display: inline-flex; align-items: center; color: #e6c58f; font: 600 10px var(--sans); text-decoration: underline; text-underline-offset: 3px; }
 .map-banner { padding: 11px 17px; color: #efd5aa; background: #26382b; font: 11px/1.5 var(--mono); }
 .map-banner-caution { color: #f0d4a9; background: #3a3022; }
 .map-state-panel { max-width: 830px; margin-top: 35px; padding: 28px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
