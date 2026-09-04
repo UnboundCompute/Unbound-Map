@@ -60,6 +60,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `22f9b99` | Fix mobile map boundary labels | The mobile ordered relationship composition now hides spatial-only external boundary labels along with the diagram axes, preventing overlap and preserving a clean linear reading order; `npm run check` and `git diff --check` passed. |
 | `b7ea8eb` | Avoid inferred graph relationships | Graph-backed maps no longer fabricate sequential edges when relationship evidence is absent; the map and ordered summary state that relationships are unavailable instead, preserving honest provenance; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `b687cc1` | Add technical article structured data | Root layout now emits JSON-LD `TechArticle` metadata describing the architecture field guide and its publisher, improving technical-document discovery without changing the reading UI; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `30584a8` | Preserve legacy link context | `/map` and `/flow` redirects now carry all incoming query parameters into `/architecture` and `/flows`, preserving selected regions, levels, and flow steps for shared legacy links; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
