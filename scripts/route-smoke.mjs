@@ -23,6 +23,12 @@ async function pageWithout(path, forbidden) {
   console.log(`ok ${path} (without fixture fallback)`);
 }
 
+async function image(path) {
+  const response = await fetch(`${origin}${path}`);
+  if (!response.ok || !response.headers.get('content-type')?.startsWith('image/png')) throw new Error(`${path} did not return a PNG preview image`);
+  console.log(`ok ${path} (contextual preview image)`);
+}
+
 async function redirect(path, target) {
   const response = await fetch(`${origin}${path}`, { redirect: 'manual' });
   if (![301, 302, 307, 308].includes(response.status)) throw new Error(`${path} returned HTTP ${response.status}, expected redirect`);
@@ -31,6 +37,7 @@ async function redirect(path, target) {
 }
 
 await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek: see the system before you read it', 'Follow a packet', 'Explore architecture']);
+await image('/opengraph-image?repository=Zeek&revision=main');
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
 await page('/flows?repository=Zeek&revision=main&step=ipv4', ['validated IPv4 payload', 'step=ipv4', '<meta property="og:title" content="Zeek architectural flows · Design Map"', '<meta name="twitter:title" content="Zeek architectural flows · Design Map"']);
 await page('/flows?step=missing-step', ['requested step is not in this flow']);
