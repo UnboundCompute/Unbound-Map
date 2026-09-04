@@ -4,14 +4,19 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { illustrativeSnapshot, trustDomains, type SharedSnapshotContext } from '../../lib/view-model';
 
+const trustKinds = ['all', 'input', 'effect', 'lifecycle'] as const;
+function normalizeKind(value: string | null | undefined) {
+  return trustKinds.includes(value as (typeof trustKinds)[number]) ? value! : 'all';
+}
+
 export function TrustGlossary({ context = {}, initialQuery = '', initialKind = 'all' }: { context?: SharedSnapshotContext; initialQuery?: string; initialKind?: string }) {
   const [query, setQuery] = useState(initialQuery);
-  const [kind, setKind] = useState(initialKind);
+  const [kind, setKind] = useState(normalizeKind(initialKind));
   useEffect(() => {
     const restoreFilters = () => {
       const params = new URLSearchParams(window.location.search);
       setQuery(params.get('q') ?? '');
-      setKind(params.get('kind') ?? 'all');
+      setKind(normalizeKind(params.get('kind')));
     };
     restoreFilters();
     window.addEventListener('popstate', restoreFilters);
