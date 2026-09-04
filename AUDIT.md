@@ -11,6 +11,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `f6a171e` | Responsive map path for small screens | Playwright: `390px` viewport, `scrollWidth - clientWidth = 0` |
 | `3e61dd6` | Pin Turbopack to this repository | `npm run build` passed without workspace-root warning |
 | `a93f664` | Context-preserving Lachesis handoff | Playwright verified generated `repo`, `commit`, `focus`, and `anchor` query parameters |
+| `2efa208` | Distinct System, Data Flow, and Trust Surface reading models plus newcomer guidance | `npm run check`, `npm run build`, Playwright verified lens-specific helper text and labels at mobile width |
 
 ## Current checks
 
@@ -29,6 +30,8 @@ Browser smoke checks performed against the local dev server:
 - Clicking `Trust surface` changes the lens caption.
 - Mobile viewport has no horizontal overflow.
 - `prefers-reduced-motion` disables long transitions.
+- System Map, Data Flow, and Trust Surface each change the user-facing reading model, not only the tab label.
+- The first screen tells a newcomer what to do next and the handoff button names the destination explicitly.
 
 ## Known prototype limits
 
