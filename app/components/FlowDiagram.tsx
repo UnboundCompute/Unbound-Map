@@ -9,15 +9,16 @@ function exploreHref(stepId: string, context: SharedSnapshotContext) {
   return `/explore?${new URLSearchParams({ repository: context.repository ?? illustrativeSnapshot.repository, revision: context.revision ?? illustrativeSnapshot.revision, region: step.regionId, label: step.noun, flow: step.id, step: step.id, anchor: step.anchor, ...(context.bundle ? { bundle: context.bundle } : {}) }).toString()}`;
 }
 
-export function FlowDiagram({ route = '/flows', context = {} }: { route?: string; context?: SharedSnapshotContext }) {
-  const [active, setActive] = useState(0);
+export function FlowDiagram({ route = '/flows', context = {}, initialStep }: { route?: string; context?: SharedSnapshotContext; initialStep?: string }) {
+  const initialIndex = flowSteps.findIndex((item) => item.id === initialStep);
+  const [active, setActive] = useState(initialIndex >= 0 ? initialIndex : 0);
   const [linearOpen, setLinearOpen] = useState(false);
   const step = flowSteps[active];
   useEffect(() => {
     const restoreStep = () => {
       const value = new URLSearchParams(window.location.search).get('step');
       const index = flowSteps.findIndex((item) => item.id === value);
-      setActive(index >= 0 ? index : 0);
+      setActive(index >= 0 ? index : (flowSteps.findIndex((item) => item.id === initialStep) >= 0 ? flowSteps.findIndex((item) => item.id === initialStep) : 0));
     };
     restoreStep();
     window.addEventListener('popstate', restoreStep);
