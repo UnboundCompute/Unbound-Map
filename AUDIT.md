@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `76e3048` | Preserve focused state in embeds on first render | `/embed` now passes `region`, `level`, and `anchor` into the server-rendered `MapClient` initial state instead of waiting for hydration; route smoke covers a level-2 focused embed URL, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `1c76f6d` | Keep social previews tied to repository context | `documentMetadata` now passes repository/revision into `/opengraph-image` for Start, Architecture, region, Flows, Trust, Embed, and Lachesis handoff routes; route smoke asserts the contextual image URL, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `02c8b9b` | Run the Impeccable implementation detector | Detector returned one advisory for `.map-grid`'s two-axis line field. Verified as an intentional map-canvas measurement surface (the design system explicitly permits grid only inside the map), not a page-wide generated-UI pattern; no fix warranted. |
 | `ff4c4e1` | Carry snapshot generation provenance | Validated Lachesis metadata now preserves `generated_at` through the HLD projection and exposes it as a semantic `<time>` in the repository rail; malformed non-string timestamps are rejected, while missing timestamps remain explicitly labelled `Not supplied by snapshot`; `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
