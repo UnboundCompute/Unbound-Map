@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `61b4954` | Make the global skip target keyboard-focusable | The shell’s `main#main-content` now accepts focus, so activating `Skip to content` moves keyboard focus to the document landmark instead of only changing the URL hash; Playwright confirmed `document.activeElement.id === "main-content"`, with `npm run check` and `git diff --check` passing. |
 | `9e3bb06` | Raise visible informational text to the 12px floor | Reader-facing revision, provenance, coverage, map labels, flow metadata, trust filters, and handoff metadata now override legacy 10–11px declarations to meet the brief’s minimum informational type size; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `ca53a73` | Disclose full revision context accessibly | The repository bar now shortens long revisions while exposing the complete value in a keyboard-operable disclosure; the full revision remains in the reading rail, and route smoke asserts the disclosure label; `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
 | `d5cb889` | Personalize share preview images | `/opengraph-image` now accepts repository/revision query context and renders it into the share card, while retaining a safe generic default for direct image requests; the route smoke verifies a contextual PNG response, with `npm run check`, `npm run build`, and `git diff --check` passing. |
