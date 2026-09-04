@@ -78,14 +78,14 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .embed-snippet h2 { margin: 0 0 5px; font: 400 25px/1.1 var(--serif); }
 .embed-snippet p { margin: 0 0 13px; color: var(--body); font-size: 13px; }
 .embed-snippet code { display: block; overflow: auto; padding: 12px; color: var(--body); background: var(--paper-deep); font: 11px/1.5 var(--mono); white-space: nowrap; }
-.embed-snippet button { min-height: 40px; margin-top: 11px; padding: 0 12px; border: 1px solid var(--rule); color: var(--signal); background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; }
+.embed-snippet button { min-height: 44px; margin-top: 11px; padding: 0 12px; border: 1px solid var(--rule); color: var(--signal); background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; }
 .embed-snippet button:hover { border-color: var(--signal); background: var(--paper-deep); }
 .doc-page { width: min(100% - 96px, 930px); margin: 0 auto; padding: 72px 0 100px; }
 .page-intro { max-width: 730px; padding-bottom: 54px; }
 .page-intro h1 { max-width: 720px; margin: 0; font: 400 clamp(44px, 6vw, 76px)/.98 var(--serif); letter-spacing: -.035em; }
 .page-lede { max-width: 680px; margin: 25px 0 0; color: var(--body); font-size: 18px; line-height: 1.68; }
 .intro-source { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 22px; color: var(--muted); font: 11px var(--mono); }
-.share-button { min-height: 36px; margin-left: auto; padding: 0 10px; border: 1px solid var(--rule); color: var(--signal); background: transparent; font: 600 11px var(--sans); cursor: pointer; }
+.share-button { min-height: 44px; margin-left: auto; padding: 0 10px; border: 1px solid var(--rule); color: var(--signal); background: transparent; font: 600 11px var(--sans); cursor: pointer; }
 .share-button:hover { border-color: var(--signal); background: var(--paper-deep); }
 .thesis-block { max-width: 780px; padding: 27px 0 29px; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .thesis-block h2, .flow-intro h2, .trust-intro h2, .architecture-next h2, .flow-next h2, .handoff-boundary h2 { max-width: 680px; margin: 14px 0 12px; font: 400 clamp(28px, 3.4vw, 43px)/1.08 var(--serif); letter-spacing: -.025em; }
@@ -167,6 +167,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline
 .handoff-card { display: flex; align-items: center; justify-content: space-between; gap: 34px; max-width: 790px; margin-top: 12px; padding: 30px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); } .handoff-card h2 { margin: 12px 0 9px; font: 400 34px/1.05 var(--serif); } .handoff-card p:not(.card-label) { max-width: 510px; margin: 0; color: var(--body); font-size: 15px; line-height: 1.6; } .primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 18px; color: var(--paper); background: var(--ink); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; } .primary-button:hover { background: var(--signal); }
 .handoff-card.has-context { border-top-color: var(--signal); } .handoff-context { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 790px; margin: 0; padding: 20px 0; border-bottom: 1px solid var(--rule); } .handoff-context div { display: grid; gap: 7px; } .handoff-context dt { color: var(--muted); font: 10px var(--mono); letter-spacing: .07em; text-transform: uppercase; } .handoff-context dd { margin: 0; color: var(--body); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; } .handoff-context code { color: var(--ink); font: 11px var(--mono); }
 .handoff-boundary { max-width: 790px; margin-top: 68px; } .boundary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; padding-top: 19px; border-top: 1px solid var(--rule); } .boundary-grid strong { font: 600 13px var(--mono); } .boundary-grid p { margin: 10px 0 0; color: var(--body); font-size: 14px; line-height: 1.6; }
+.trust-meta .quiet-link { min-height: 44px; }
 
 @media (max-width: 820px) {
   .repo-bar { min-height: 64px; padding: 0 18px; gap: 11px; } .bar-divider, .bar-lachesis { display: none; } .bar-repo { margin-left: auto; font-size: 13px; } .bar-revision { font-size: 10px; } .snapshot-state { font-size: 10px; } .wordmark { font-size: 13px; }
