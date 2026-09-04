@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `86f0a7c` | Make Trust domain deep links real | `/trust?domain=memory-safety` now preserves a selected-domain state, scrolls to the matching glossary article, labels it semantically, and highlights it without relying on color alone; route smoke covers the stable article/title IDs, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `d8df4b0` | Keep projected region links URL-safe | Hosted module IDs are now encoded whenever they become `/architecture/[region]` paths, including map selection, inspector, directory, mobile recovery, and chapter neighbor links; this prevents slash/space/colon IDs from breaking deep links. `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `76e3048` | Preserve focused state in embeds on first render | `/embed` now passes `region`, `level`, and `anchor` into the server-rendered `MapClient` initial state instead of waiting for hydration; route smoke covers a level-2 focused embed URL, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `1c76f6d` | Keep social previews tied to repository context | `documentMetadata` now passes repository/revision into `/opengraph-image` for Start, Architecture, region, Flows, Trust, Embed, and Lachesis handoff routes; route smoke asserts the contextual image URL, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
