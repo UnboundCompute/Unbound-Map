@@ -20,6 +20,7 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, bun
 
 export function MapClient() {
   const [selected, setSelected] = useState('decode');
+  const [level, setLevel] = useState('0');
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [bundleMessage, setBundleMessage] = useState('');
@@ -29,8 +30,15 @@ export function MapClient() {
     const params = new URLSearchParams(window.location.search);
     const requestedRegion = params.get('region');
     if (requestedRegion) setSelected(requestedRegion);
+    if (params.get('level')) setLevel(params.get('level')!);
+    const restoreFocus = () => {
+      const next = new URLSearchParams(window.location.search);
+      setSelected(next.get('region') ?? 'decode');
+      setLevel(next.get('level') ?? '0');
+    };
+    window.addEventListener('popstate', restoreFocus);
     const bundleId = params.get('bundle');
-    if (!bundleId) return;
+    if (!bundleId) return () => window.removeEventListener('popstate', restoreFocus);
     setRequestedBundle(bundleId);
     const controller = new AbortController();
     setBundleState('loading');
@@ -45,7 +53,7 @@ export function MapClient() {
       setBundleState('error');
       setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
     });
-    return () => controller.abort();
+    return () => { controller.abort(); window.removeEventListener('popstate', restoreFocus); };
   }, []);
 
   const regions = useMemo(() => snapshot.regions.slice(0, 9), [snapshot.regions]);
@@ -61,7 +69,8 @@ export function MapClient() {
     setSelected(region.id);
     const params = new URLSearchParams(window.location.search);
     params.set('region', region.id);
-    window.history.replaceState(null, '', `/architecture?${params.toString()}`);
+    params.set('level', '1');
+    window.history.pushState(null, '', `/architecture?${params.toString()}`);
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
   const edges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
@@ -70,7 +79,7 @@ export function MapClient() {
   return <>
     <div className="map-workbench">
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level 0 · system shape</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown</span></div>
+        <div className="map-toolbar"><span className="map-status"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : 'region focus'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {regions.length} regions shown</span></div>
         {bundleState === 'loading' && <div className="map-banner" role="status">Loading the hosted graph bundle…</div>}
         {bundleState === 'error' && <div className="map-banner map-banner-error" role="alert">{bundleMessage}</div>}
         {bundleState === 'ready' && <div className="map-banner" role="status">Graph-backed snapshot loaded. Placement is a bounded reading projection.</div>}
