@@ -1,17 +1,31 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { flowSteps, illustrativeSnapshot } from '../../lib/view-model';
 
+function exploreHref(stepId: string) {
+  const step = flowSteps.find((item) => item.id === stepId) ?? flowSteps[0];
+  return `/explore?${new URLSearchParams({ repository: illustrativeSnapshot.repository, revision: illustrativeSnapshot.revision, region: step.regionId, label: step.noun, flow: step.id, anchor: step.anchor }).toString()}`;
+}
+
 export function FlowDiagram() {
-  return (
-    <section className="ordered-path" aria-label="Packet processing path">
-      <div className="path-line" aria-hidden="true" />
-      {flowSteps.map((step, index) => {
-        const region = illustrativeSnapshot.regions.find((item) => item.id === step.regionId);
-        return <article className="path-step" key={step.id}>
-          <div className="path-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</div>
-          <div className="path-copy"><p className="path-handoff">{step.handoff}</p><h2>{step.noun}</h2><p>{region?.summary}</p>{step.guard && <p className="path-guard"><strong>Guard</strong>{step.guard}</p>}<Link className="text-link" href={`/explore?repository=${encodeURIComponent(illustrativeSnapshot.repository)}&revision=${illustrativeSnapshot.revision}&region=${step.regionId}&anchor=${encodeURIComponent(step.anchor)}`}>Inspect {step.anchor} in Lachesis →</Link></div>
-        </article>;
-      })}
-    </section>
-  );
+  const [active, setActive] = useState(0);
+  const step = flowSteps[active];
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get('step');
+    const index = flowSteps.findIndex((item) => item.id === value);
+    if (index >= 0) setActive(index);
+  }, []);
+  const choose = (index: number) => {
+    setActive(index);
+    window.history.replaceState(null, '', `/flows?step=${flowSteps[index].id}`);
+  };
+  return <section className="guided-flow" aria-labelledby="flow-steps-title">
+    <div className="flow-progress"><div><span className="flow-label">One flow · {flowSteps.length} handoffs</span><h2 id="flow-steps-title">Read the path one boundary at a time.</h2></div><span className="flow-count">{String(active + 1).padStart(2, '0')} / {String(flowSteps.length).padStart(2, '0')}</span></div>
+    <ol className="flow-step-nav" aria-label="Flow steps">{flowSteps.map((item, index) => <li key={item.id}><button className={index === active ? 'is-active' : ''} onClick={() => choose(index)} aria-current={index === active ? 'step' : undefined}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item.noun}</strong></button></li>)}</ol>
+    <div className="flow-stage"><div className="flow-stage-track" aria-hidden="true"><span className="flow-stage-fill" style={{ width: `${(active / Math.max(1, flowSteps.length - 1)) * 100}%` }} /></div><p className="flow-handoff-label">{step.handoff}</p><h3>{step.noun}</h3><p className="flow-description">{step.description}</p><dl className="flow-fields"><div><dt>input</dt><dd><code>{step.input}</code></dd></div><div><dt>output</dt><dd><code>{step.output}</code></dd></div>{step.decision && <div><dt>decision</dt><dd>{step.decision}</dd></div>}</dl>{step.guard && <p className="flow-guard"><strong>Guard</strong><span>{step.guard}</span></p>}<Link className="quiet-link" href={exploreHref(step.id)}>Open {step.anchor} in Lachesis <span aria-hidden="true">↗</span></Link></div>
+    <div className="flow-controls"><button type="button" onClick={() => choose(Math.max(0, active - 1))} disabled={active === 0}>← Previous</button><button type="button" onClick={() => choose(Math.min(flowSteps.length - 1, active + 1))} disabled={active === flowSteps.length - 1}>Next →</button></div>
+    <details className="flow-linear"><summary>Read all five handoffs as text</summary><ol>{flowSteps.map((item, index) => <li key={item.id}><strong>{index + 1}. {item.noun}</strong><span>{item.description}</span><small>{item.input} → {item.output}</small></li>)}</ol></details>
+  </section>;
 }

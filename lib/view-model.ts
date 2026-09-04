@@ -37,6 +37,10 @@ export type FlowStep = {
   regionId: string;
   guard?: string;
   anchor: string;
+  description: string;
+  input: string;
+  output: string;
+  decision?: string;
 };
 
 export type TrustSurface = {
@@ -58,10 +62,11 @@ export type LachesisHandoff = {
 };
 
 export const flowSteps: FlowStep[] = [
-  { id: 'bytes', noun: 'packet bytes', handoff: 'capture adapter → decode', regionId: 'input', guard: 'length and framing established', anchor: 'DecodePacket()' },
-  { id: 'event', noun: 'normalized event', handoff: 'decode → run mode', regionId: 'core', guard: 'parser invariants carried forward', anchor: 'RunModeDispatch()' },
-  { id: 'cursor', noun: 'signature cursor', handoff: 'run mode → detection', regionId: 'detect', guard: 'resolved operations table', anchor: 'SigMatchSignatures()' },
-  { id: 'record', noun: 'alert record', handoff: 'detection → output', regionId: 'output', anchor: 'OutputRegisterModules()' },
+  { id: 'ethernet', noun: 'Ethernet frame', handoff: 'wire → packet decode', regionId: 'decode', guard: 'Reject a runt frame before reading EtherType.', anchor: 'DecodeEthernet()', description: 'Reads the outer frame and establishes the protocol type carried by its payload.', input: 'raw network bytes', output: 'payload + EtherType', decision: 'Which layer-three decoder should receive this payload?' },
+  { id: 'network', noun: 'network payload', handoff: 'EtherType → network decoder', regionId: 'decode', guard: 'The EtherType switch selects an enumerated L3 decoder.', anchor: 'DecodeNetworkLayer()', description: 'Dispatches the frame to IPv4, IPv6, VLAN, ARP, or another supported network-layer decoder.', input: 'payload + EtherType', output: 'network header + L4 payload', decision: 'Which protocol branch is valid for this frame?' },
+  { id: 'ipv4', noun: 'validated IPv4 payload', handoff: 'network header → transport', regionId: 'decode', guard: 'HLEN, IPLEN, and the available buffer length must agree.', anchor: 'DecodeIPV4()', description: 'Validates the IP header, extracts the transport protocol, and exposes the next payload window.', input: 'network header + L4 payload', output: 'proto + transport payload', decision: 'Is the transport header inside the validated window?' },
+  { id: 'tcp', noun: 'validated TCP packet', handoff: 'transport payload → flow', regionId: 'core', guard: 'The TCP header is present before the packet enters flow state.', anchor: 'DecodeTCP()', description: 'Validates the TCP header and prepares the packet for the bidirectional flow manager.', input: 'proto + transport payload', output: 'packet', decision: 'Which existing connection owns this packet?' },
+  { id: 'flow', noun: 'packet + owning Flow', handoff: 'packet → flow state', regionId: 'core', guard: 'Failed decoding returns an error; a half-decoded packet is not passed downstream.', anchor: 'FlowSetupPacket()', description: 'Attaches the decoded packet to its flow—the stateful unit used by stream and application parsers.', input: 'packet', output: 'packet with flow back-pointer', decision: 'What downstream parser state should this flow carry?' },
 ];
 
 export const trustSurfaces: TrustSurface[] = [
