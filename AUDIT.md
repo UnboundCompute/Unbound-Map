@@ -23,6 +23,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `48730c0` | Split the single dashboard into documentation routes with a human-authored reading rail | `npm run check`, `npm run build`, and local HTTP smoke tests returned 200 for `/`, `/map`, `/flow`, `/trust`, and `/explore`; Impeccable detector findings were reduced to the permitted map-canvas grid advisory |
 | `06047cf` | Preserve hosted-bundle loading, error, and graph-backed status in the new map surface | `npm run check` and `npm run build` passed; map client still validates the hosted transport through the existing adapter and announces loading/error/ready states |
 | `795c946` | Add a scalable region directory beneath the bounded spatial projection | `npm run check` and `npm run build` passed; hosted projections can expose all bounded regions in a readable list while the canvas stays limited to four placed regions |
+| `1a7f60e` | Keep the spatial canvas on its newcomer-safe fixture when a hosted projection is too sparse to place | `npm run check` and `npm run build` passed; empty or single-region projections no longer leave the inspector without a selected region |
 
 ## Current checks
 
