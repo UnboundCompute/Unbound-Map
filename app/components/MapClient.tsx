@@ -33,8 +33,10 @@ export function MapClient({ mode = 'system' }: { mode?: 'system' | 'flow' | 'tru
     });
     return () => controller.abort();
   }, [mode]);
-  const visibleNodes = hostedRegions?.slice(0, 4).map((region, index) => ({ ...mapNodes[index], label: region.label, meta: `${region.path ?? 'top-level region'} · ${region.nodeCount} nodes`, anchor: region.anchor?.label ?? mapNodes[index].anchor })) ?? mapNodes;
-  const current = visibleNodes.find((node) => node.id === selected) ?? visibleNodes[1];
+  const projectedNodes = hostedRegions?.slice(0, 4).map((region, index) => ({ ...mapNodes[index], label: region.label, meta: `${region.path ?? 'top-level region'} · ${region.nodeCount} nodes`, anchor: region.anchor?.label ?? mapNodes[index].anchor })) ?? [];
+  const visibleNodes = projectedNodes.length >= 2 ? projectedNodes : mapNodes;
+  const renderedNodes = visibleNodes;
+  const current = renderedNodes.find((node) => node.id === selected) ?? renderedNodes[1];
   const directory = hostedRegions ?? mapNodes.map((node) => ({ id: node.id, label: node.label, path: node.meta.split(' · ')[0], nodeCount: Number(node.meta.match(/\d+/)?.[0] ?? 0), rolledUp: false }));
   return (
     <>
