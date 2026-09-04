@@ -46,6 +46,7 @@ await page('/flows?step=missing-step', ['requested step is not in this flow']);
 await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="memory"', 'value="input"', 'Memory safety', '<meta property="og:title" content="Zeek trust surfaces · Design Map"', '<meta name="twitter:title" content="Zeek trust surfaces · Design Map"']);
 await page('/trust?repository=Zeek&revision=main&domain=memory-safety', ['id="memory-safety"', 'id="memory-safety-title"', 'Selected trust domain.', 'Memory safety']);
 await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo123', ['Context ready', 'DecodeIPV4()', 'b_demo123', 'aria-label="Open DecodeIPV4() in Lachesis in a new tab"']);
+await page('/explore?region=decode&anchor=DecodeIPV4%28%29', ['href="https://lachesis.unboundcompute.com/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;anchor=DecodeIPV4%28%29"']);
 await page('/embed?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture', 'Graph-backed bundle requested', 'Preparing the architecture map', 'Skip to map', 'id="embed-content"']);
 await page('/embed?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Zeek architecture', 'Design anchors', 'DecodeEthernet()', 'id="embed-content"']);
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
