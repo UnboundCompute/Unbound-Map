@@ -94,6 +94,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `6268130` | Make Start here repository-aware | The canonical `/` distribution entry now derives metadata, title, orientation copy, macro-path links, and recommended routes from incoming repository/revision/bundle context while retaining fixture provenance; checks passed. |
 | `f0ff27e` | Preserve context in embed snippet | The Architecture guide’s copyable iframe now includes incoming repository, revision, and opaque bundle parameters and uses a repository-specific iframe title, so pasted embeds open the reviewed snapshot; checks passed. |
 | `f935aac` | Make bundle loading honest on first render | Architecture and Embed pass the requested bundle into `MapClient`'s initial state, so server-rendered HTML shows the loading state instead of briefly exposing the illustrative map before hydration; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `1f8944c` | Sanitize embed title labels | Copied iframe markup now normalizes repository labels before placing them in the HTML `title` attribute, keeping unusual query-supplied names from producing malformed share snippets; checks passed. |
 
 ## Rebuild brief audit
 
