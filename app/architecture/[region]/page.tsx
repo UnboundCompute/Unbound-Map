@@ -13,10 +13,12 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 
 export async function generateMetadata({ params, searchParams }: { params: Promise<{ region: string }>; searchParams: SearchParams }): Promise<Metadata> {
   const { region: regionId } = await params;
-  const repository = one((await searchParams).repository);
-  const region = illustrativeSnapshot.regions.find((item) => item.id === regionId);
+  const metadataQuery = await searchParams;
+  const repository = one(metadataQuery.repository);
+  const bundle = one(metadataQuery.bundle);
+  const region = bundle ? undefined : illustrativeSnapshot.regions.find((item) => item.id === regionId);
   const label = repository ?? illustrativeSnapshot.repository;
-  return region ? documentMetadata(`${region.label} · ${label} architecture`, `${region.summary} Read the ${region.label} chapter in Design Map before opening the source.`) : documentMetadata(`Architecture region · ${label}`, `This architecture region is not present in the illustrative index. Open the matching snapshot or continue to Lachesis.`);
+  return region ? documentMetadata(`${region.label} · ${label} architecture`, `${region.summary} Read the ${region.label} chapter in Design Map before opening the source.`) : documentMetadata(`Architecture region · ${label}`, bundle ? `A graph-backed architecture region for ${label}. Verify the selected snapshot before relying on its claims.` : `This architecture region is not present in the current projection. Open the matching snapshot or continue to Lachesis.`);
 }
 
 export default async function RegionPage({ params, searchParams }: { params: Promise<{ region: string }>; searchParams: SearchParams }) {
