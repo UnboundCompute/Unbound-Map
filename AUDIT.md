@@ -25,6 +25,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `795c946` | Add a scalable region directory beneath the bounded spatial projection | `npm run check` and `npm run build` passed; hosted projections can expose all bounded regions in a readable list while the canvas stays limited to four placed regions |
 | `1a7f60e` | Keep the spatial canvas on its newcomer-safe fixture when a hosted projection is too sparse to place | `npm run check` and `npm run build` passed; empty or single-region projections no longer leave the inspector without a selected region |
 | `0351079` | Document the multipage route model in the repository handoff | README now names all five routes and the map/explorer boundary |
+| `dc113df` | Audit the current UI/UX and write Luna's replacement implementation goal | `LUNA_UI_UX_REBUILD_GOAL.md` records a 5-dimension 8/20 audit, 14 prioritized findings, a phased commit plan, and measurable acceptance criteria; `npm run check` and `npm run build` passed before the report was committed |
 
 ## Current checks
 
