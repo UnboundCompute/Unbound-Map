@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { loadHostedBundle } from '../../lib/hosted';
 import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../../lib/design-map';
@@ -20,12 +21,18 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anc
 }
 
 export function MapClient({ route = '/architecture', initialBundle, initialLevel = '0', initialRegion = 'decode', initialQuery = '' }: { route?: string; initialBundle?: string; initialLevel?: string; initialRegion?: string; initialQuery?: string }) {
+  const searchParams = useSearchParams();
   const [selected, setSelected] = useState(initialRegion);
   const [level, setLevel] = useState(initialLevel);
   const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(illustrativeSnapshot);
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
+
+  useEffect(() => {
+    setSelected(searchParams.get('region') ?? 'decode');
+    setLevel(normalizeLevel(searchParams.get('level')));
+  }, [searchParams]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
