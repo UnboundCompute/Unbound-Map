@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `04b55dd` | Keep graph-backed region previews out of fixture SEO | Region metadata now uses a generic verified-snapshot description whenever `bundle=…` is present instead of leaking an illustrative region summary; route smoke asserts the generic Zeek preview title and all gates passed. |
 | `e0f5b05` | Reject fixture fallback in graph chapter smoke | Route smoke now asserts that an unavailable bundle chapter contains neither fixture headings nor fixture structure facts, making the provenance boundary executable; live `npm run smoke` passed. |
 | `6d68738` | Surface sparse graph projections explicitly | The repository shell now labels a valid graph-backed snapshot with one or zero regions as `Graph-backed · sparse projection` and explains the limited architectural confidence in the reading rail; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `5a3e946` | Clarify current-projection region recovery | Unknown region chapters now describe the active projection rather than incorrectly calling every missing region “illustrative”; hosted chapter projection also normalizes the bundle once instead of repeating the adapter work; `npm run check` and `git diff --check` passed. |
