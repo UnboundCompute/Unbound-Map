@@ -43,15 +43,6 @@ export type FlowStep = {
   decision?: string;
 };
 
-export type TrustSurface = {
-  id: string;
-  kind: 'source' | 'guard' | 'sink';
-  label: string;
-  obligation: string;
-  location: string;
-  anchor: string;
-};
-
 export type TrustDomain = {
   id: string;
   label: string;
@@ -78,12 +69,6 @@ export const flowSteps: FlowStep[] = [
   { id: 'ipv4', noun: 'validated IPv4 payload', handoff: 'network header → transport', regionId: 'decode', guard: 'HLEN, IPLEN, and the available buffer length must agree.', anchor: 'DecodeIPV4()', description: 'Validates the IP header, extracts the transport protocol, and exposes the next payload window.', input: 'network header + L4 payload', output: 'proto + transport payload', decision: 'Is the transport header inside the validated window?' },
   { id: 'tcp', noun: 'validated TCP packet', handoff: 'transport payload → flow', regionId: 'core', guard: 'The TCP header is present before the packet enters flow state.', anchor: 'DecodeTCP()', description: 'Validates the TCP header and prepares the packet for the bidirectional flow manager.', input: 'proto + transport payload', output: 'packet', decision: 'Which existing connection owns this packet?' },
   { id: 'flow', noun: 'packet + owning Flow', handoff: 'packet → flow state', regionId: 'core', guard: 'Failed decoding returns an error; a half-decoded packet is not passed downstream.', anchor: 'FlowSetupPacket()', description: 'Attaches the decoded packet to its flow—the stateful unit used by stream and application parsers.', input: 'packet', output: 'packet with flow back-pointer', decision: 'What downstream parser state should this flow carry?' },
-];
-
-export const trustSurfaces: TrustSurface[] = [
-  { id: 'external', kind: 'source', label: 'External packet', obligation: 'Establish length and framing before treating bytes as a protocol value.', location: 'src/decode', anchor: 'DecodePacket()' },
-  { id: 'validation', kind: 'guard', label: 'Validation gate', obligation: 'Preserve the invariants downstream stages assume after normalization.', location: 'src/runmodes', anchor: 'RunModeDispatch()' },
-  { id: 'alert', kind: 'sink', label: 'Alert sink', obligation: 'Keep serialized output within the configured alert and telemetry contract.', location: 'src/output', anchor: 'OutputRegisterModules()' },
 ];
 
 export const trustDomains: TrustDomain[] = [

@@ -11,13 +11,15 @@ npm install
 npm run dev
 ```
 
-The current UI is a focused Suricata prototype with fixture data and five documentation routes:
+The current UI is a focused Suricata prototype with fixture data and these documentation routes:
 
-- `/` — orientation and the recommended reading order
-- `/map` — bounded spatial HLD map plus a scalable region directory
-- `/flow` — one meaningful data path
-- `/trust` — trust-surface glossary
-- `/explore` — the handoff into Lachesis
+- `/` — Start here orientation and the recommended reading order
+- `/architecture` — bounded spatial HLD map, relationship summary, and region chapters
+- `/flows` — guided architectural data flow with a linear reading fallback
+- `/trust` — searchable trust-domain glossary and repository index
+- `/explore` — context-preserving handoff into Lachesis
+
+The old `/map` and `/flow` paths redirect to `/architecture` and `/flows` for shared links.
 
 The map is intentionally kept at architectural altitude; code-level questions hand off to Lachesis with repository, commit, subsystem, and anchor context.
 
