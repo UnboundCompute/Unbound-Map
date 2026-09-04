@@ -84,6 +84,8 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `9f17437` | Make embed identity-aware | `/embed` now derives its title, description, heading, and footer state from incoming repository/bundle context, avoiding a misleading Suricata fixture label when a maintainer shares a graph-backed bundle; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `382f836` | Make map identity repository-aware | The accessible map canvas label now derives from the loaded snapshot repository instead of hardcoding Suricata, so hosted bundles do not expose a misleading screen-reader name; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `2bf1b23` | Keep embed surface focused | Moved the README iframe authoring snippet from `/embed` into the full Architecture guide, so an embedded map contains only its repository header, map, accessible relationship summary, and recovery links; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `4bcae08` | Preserve context across reading surfaces | Flow and Trust pages now accept shared repository/revision/bundle context, keep it in step/filter URLs, show the contextual identity while retaining the illustrative label, and include it in every Lachesis handoff; checks passed. |
+| `f1331be` | Scope flow metadata to repository | Dedicated flow pages now derive their document title from the shared repository query, keeping search and social previews aligned with the visible maintainer context; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
@@ -120,6 +122,7 @@ Static and live route checks performed against the local dev server:
 - Legacy `/map` and `/flow` returned redirects to `/architecture` and `/flows`, preserving incoming query context.
 - Contextful `/explore?repository=Suricata&revision=8f4c1b2&region=decode&anchor=DecodeEthernet%28%29` rendered `Context ready`, the repository/revision, region, anchor, and Lachesis handoff.
 - Contextful `/embed?bundle=b_demo123&repository=Zeek&revision=main` rendered `Zeek architecture`, `Graph-backed bundle requested`, and a Zeek-specific document title; `/embed?bundle=b_demo123` uses the honest generic `Graph-backed repository` label.
+- Contextful `/flows?repository=Zeek&revision=main&bundle=b_demo123`, `/flows/packet-decode?...&step=ipv4`, and `/trust?...&q=memory` rendered the Zeek identity and preserved repository/revision/bundle in handoff links; the dedicated flow title was `Zeek · Packet decode into flow state · Design Map`.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
 - Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
 - `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
