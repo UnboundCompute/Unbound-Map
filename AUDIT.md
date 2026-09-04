@@ -93,6 +93,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `1a6d41c` | Preserve context in shell navigation | `DocsShell` now carries shared repository/revision/bundle context through the primary rail and footer handoff, and all contextual pages pass that contract into the shell; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `6268130` | Make Start here repository-aware | The canonical `/` distribution entry now derives metadata, title, orientation copy, macro-path links, and recommended routes from incoming repository/revision/bundle context while retaining fixture provenance; checks passed. |
 | `f0ff27e` | Preserve context in embed snippet | The Architecture guide’s copyable iframe now includes incoming repository, revision, and opaque bundle parameters and uses a repository-specific iframe title, so pasted embeds open the reviewed snapshot; checks passed. |
+| `f935aac` | Make bundle loading honest on first render | Architecture and Embed pass the requested bundle into `MapClient`'s initial state, so server-rendered HTML shows the loading state instead of briefly exposing the illustrative map before hydration; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
@@ -135,6 +136,7 @@ Static and live route checks performed against the local dev server:
 - Contextful `/explore?repository=Zeek&revision=main&bundle=b_demo123&region=decode&anchor=DecodeEthernet%28%29` rendered primary rail and footer links with the same `repository=Zeek`, `revision=main`, and `bundle=b_demo123` query context.
 - Contextful `/?repository=Zeek&revision=main&bundle=b_demo123` rendered `Zeek · Design Map`, `Zeek: see the system before you read it`, and preserved the same context on every Architecture/Flows/Trust entry link and macro-path stage.
 - Contextful `/architecture?repository=Zeek&revision=main&bundle=b_demo123` rendered an iframe snippet with `/embed?repository=Zeek&revision=main&bundle=b_demo123` and `title="Zeek architecture map"`.
+- Server-rendered `/embed?repository=Zeek&revision=main&bundle=b_demo123` showed `Preparing the architecture map` and did not include the fixture relationship summary before hydration; its return link retained the Zeek bundle context.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
 - Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
 - `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
