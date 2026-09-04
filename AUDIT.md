@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `bcc8970` | Announce selected Trust domains without color | Deep-linked Trust articles now include an explicit screen-reader “Selected trust domain” signal in addition to the visual state; route smoke asserts the accessible marker, with `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `b4588b3` | Validate optional graph coverage metadata | Coverage scope, counts, limitations, and capabilities now require their declared types before graph-backed projection; projection smoke rejects malformed arrays and fractional counts, with `npm run check`, `npm run projection-smoke`, `npm run build`, and `git diff --check` passing. |
 | `ea88c9f` | Validate graph node and module identity fields | The Lachesis schema guard now requires node `kind`, validates optional node metadata, and ensures module paths/parents/node IDs have the declared string types; projection smoke rejects malformed node kinds and module IDs, with `npm run check`, `npm run projection-smoke`, `npm run build`, and `git diff --check` passing. |
 | `483f687` | Harden the verified-bundle boundary | Lachesis bundles now require language, non-negative integer line/count metadata, and integer node lines; malformed timestamps and counts are rejected. `npm run projection-smoke` now exercises valid and malformed bundles, alongside `npm run check`, `npm run build`, and `git diff --check`. |
