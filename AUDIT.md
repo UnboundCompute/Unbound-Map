@@ -41,6 +41,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `b10f86c` | Resolve the Impeccable detector's mechanical flow warning | Replaced animated `width` with transform-based progress scaling and preserved the intentional map grid advisory; `npm run check`, `npm run build`, and `git diff --check` passed |
 | `99fdce4` | Remove superseded UI vocabulary and align README routes | Deleted unused legacy flow/trust CSS and the obsolete three-entry trust model, removed stale `mode`/tab vocabulary from the tree, and documented canonical routes plus redirects in README; `npm run check`, `npm run build`, `git diff --check`, and stale-pattern search passed |
 | `5e38d55` | Final implementation consistency audit | `DESIGN.md` now names the implemented shell/map/flow/trust components; `npm run check`, `npm run build`, `git diff --check`, canonical route smoke checks, context-query smoke check, and the one-time Impeccable detector pass completed. Browser screenshot inspection was attempted through the required browser surface but was unavailable, so visual screenshot evidence remains an explicit limitation. |
+| `1fa3844` | Make the canonical flow deep-linkable | Added the required `/flows/[flow]` route for `packet-decode`, preserved step state in that route's URL, linked to it from the flow index, and corrected the architecture evidence note to describe the shipped eight-region fixture; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
@@ -71,28 +72,16 @@ npm run check
 npm run build
 ```
 
-Browser smoke checks performed against the local dev server:
+Static and live route checks performed against the local dev server:
 
-- Document title: `Design Map — Read this before the source`
-- H1: `See the system before you read it.`
-- Three accessible tabs are rendered.
-- Four map nodes are rendered.
-- Clicking `Detection engine` changes the selected-region inspector.
-- Clicking `Trust surface` changes the lens caption.
-- Mobile viewport has no horizontal overflow.
-- `prefers-reduced-motion` disables long transitions.
-- System Map, Data Flow, and Trust Surface each change the user-facing reading model, not only the tab label.
-- The first screen tells a newcomer what to do next and the handoff button names the destination explicitly.
-- The first viewport exposes the complete reading sequence: Orient → Choose → Verify.
-- The primary CTA navigates to the map without requiring the reader to guess where to start.
-- The selected claim exposes its evidence status before the reader opens the code-level explorer.
-- “How this map was made” is available as a disclosure rather than forcing methodology into the primary reading path.
-- The home page is a concise orientation document; each route answers one question and links to the next depth.
-- A persistent sidebar carries route context, snapshot facts, coverage, and the Lachesis handoff.
-- Live browser visual inspection was unavailable in this environment; route/build/static checks were used instead.
+- `/`, `/architecture`, `/architecture/decode`, `/flows`, `/flows?step=ipv4`, `/flows/packet-decode`, `/trust`, and `/explore` returned 200.
+- Legacy `/map` and `/flow` returned redirects to `/architecture` and `/flows`.
+- Contextful `/explore?repository=Suricata&revision=8f4c1b2&region=decode&anchor=DecodeEthernet%28%29` rendered `Context ready`, the repository/revision, region, anchor, and Lachesis handoff.
+- `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation.
+- Live browser screenshot inspection was attempted through the required browser surface, but no browser was available; visual screenshot evidence remains an explicit limitation.
 
 ## Known prototype limits
 
 - Suricata counts and node facts are fixture data, not yet read from a Lachesis graph endpoint.
 - The Lachesis query string is the agreed handoff shape; the explorer must implement its parser and focused-bundle loading.
-- The system map currently renders four illustrative regions; the scalable community roll-up engine is the next product slice.
+- The architecture map currently renders eight illustrative regions; the scalable community roll-up engine is the next product slice.
