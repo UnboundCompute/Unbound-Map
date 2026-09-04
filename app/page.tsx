@@ -13,10 +13,10 @@ const nodes: Record<NodeId, { system: NodeView; flow: NodeView; trust: NodeView;
   output: { system: { label: 'Outputs & telemetry', eyebrow: '04 · effects', description: 'Serializes alerts and metrics for the configured output consumers.' }, flow: { label: 'Alert record', eyebrow: '04 · effect', description: 'The resulting record is serialized for the configured output consumers.' }, trust: { label: 'Alert sink', eyebrow: '04 · effect', description: 'Data leaves the processing boundary through configured alert and telemetry sinks.' }, files: 'src/output · 74 files', anchor: 'OutputRegisterModules()' },
 };
 
-const tabCopy: Record<Tab, { label: string; title: string; caption: string }> = {
-  system: { label: 'System map', title: 'The shape of the system', caption: 'HLD · rolled-up communities' },
-  flow: { label: 'Data flow', title: 'Follow one meaningful path', caption: 'LLD · request / value route' },
-  trust: { label: 'Trust surface', title: 'Where obligations begin', caption: 'Glossary · static taxonomy' },
+const tabCopy: Record<Tab, { label: string; title: string; helper: string; caption: string }> = {
+  system: { label: 'System map', title: 'The shape of the system', helper: 'Start here: choose a region to see what it owns.', caption: 'HLD · top-level regions' },
+  flow: { label: 'Data flow', title: 'Follow one meaningful path', helper: 'Follow the handoffs from input to effect.', caption: 'LLD · request / value route' },
+  trust: { label: 'Trust surface', title: 'Where obligations begin', helper: 'See where data becomes trusted—or leaves the system.', caption: 'Glossary · trust boundaries' },
 };
 
 export default function Page() {
@@ -38,7 +38,7 @@ export default function Page() {
           <div>
             <div className="eyebrow">Architecture / Suricata</div>
             <h1 id="page-title">See the system before you read it.</h1>
-            <p className="hero-copy">A living design map generated from the code graph. Start at the altitude of subsystems, then follow one clear path into the exact source.</p>
+            <p className="hero-copy">A living design map generated from the code graph. Start with the system shape, choose one question, then follow the answer into the exact source.</p>
           </div>
           <aside className="snapshot" aria-label="Repository snapshot">
             <div className="snapshot-meta"><span>commit 4e8b2d</span><span>just now</span></div>
@@ -50,7 +50,7 @@ export default function Page() {
 
       <section className="workspace" aria-labelledby="map-title">
         <div className="workspace-top">
-          <div><div className="eyebrow">01 / orientation</div><h2 id="map-title" className="workspace-title">{tabCopy[activeTab].title}</h2></div>
+          <div><div className="eyebrow">01 / orientation</div><h2 id="map-title" className="workspace-title">{tabCopy[activeTab].title}</h2><p className="workspace-helper">{tabCopy[activeTab].helper}</p></div>
           <div className="tabs" role="tablist" aria-label="Map lenses">
             {(Object.keys(tabCopy) as Tab[]).map((tab) => <button key={tab} className="tab" role="tab" aria-selected={activeTab === tab} data-active={activeTab === tab} onClick={() => setActiveTab(tab)}>{tabCopy[tab].label}</button>)}
           </div>
@@ -58,12 +58,12 @@ export default function Page() {
 
         <div className="bezel"><div className="core map-layout">
           <div className="map-stage" aria-label="Interactive system map">
-            <div className="map-caption"><span>●</span> {tabCopy[activeTab].caption}</div>
+            <div className="map-caption"><span>●</span> {tabCopy[activeTab].caption}<b>Select a region</b></div>
             <div className="route" aria-hidden="true" />
             {(Object.keys(nodes) as NodeId[]).map((id) => <button key={id} className={`node node-${id}`} data-selected={selected === id} onClick={() => setSelected(id)} aria-pressed={selected === id}><small>{nodes[id][activeTab].eyebrow}</small><b>{nodes[id][activeTab].label}</b><p>{nodes[id][activeTab].description}</p></button>)}
             <div className="stage-footer"><span><i /> entry / handoff</span><span><i className="teal" /> verified edge</span></div>
           </div>
-          <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected {activeTab === 'system' ? 'region' : activeTab === 'flow' ? 'handoff' : 'boundary'}</div><h2>{view.label}</h2><p>{view.description}</p><dl><dt>Anchored by</dt><dd>{node.anchor}</dd><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : activeTab === 'flow' ? 'Where does this value go next?' : 'What happens next?'}</dd></dl><a className="inspector-link" href={lachesisHref} target="_blank" rel="noreferrer">Explore in Lachesis <span aria-hidden="true">↗</span></a></aside>
+          <aside className="inspector" aria-live="polite"><div className="eyebrow">Selected {activeTab === 'system' ? 'region' : activeTab === 'flow' ? 'handoff' : 'boundary'}</div><h2>{view.label}</h2><p>{view.description}</p><dl><dt>Anchored by</dt><dd>{node.anchor}</dd><dt>Source footprint</dt><dd>{node.files}</dd><dt>Next question</dt><dd>{activeTab === 'trust' ? 'What crosses this boundary?' : activeTab === 'flow' ? 'Where does this value go next?' : 'What happens next?'}</dd></dl><a className="inspector-link" href={lachesisHref} target="_blank" rel="noreferrer">Open this in Lachesis <span aria-hidden="true">↗</span></a><small className="inspector-handoff">Code-level path · commit 4e8b2d</small></aside>
         </div></div>
         <div className="footer-note"><span>Map generated from commit 4e8b2d · 96% graph coverage</span><a href="https://lachesis.unboundcompute.com/" target="_blank" rel="noreferrer">How the evidence works ↗</a></div>
       </section>
