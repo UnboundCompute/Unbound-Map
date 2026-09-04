@@ -47,6 +47,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `e81c1ff` | Label map external boundaries | Added explicit `wire input` and `consumers` labels outside the repository map region so entry and exit points are readable without inferring them from position; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `fa29124` | Preserve map and flow history | Architecture selection now encodes level 1 and uses browser history with `popstate` restoration; flow step selection likewise uses history and restores the active step on Back/Forward; checks passed. |
 | `a134391` | Make Start here map stages actionable | Replaced decorative macro-stage spans with keyboard-accessible links into each corresponding architecture region at `level=1`, while retaining the compact ordered path and responsive layout; checks passed. |
+| `271d8e4` | Add semantic document footer | Added a restrained footer landmark with a contextual Lachesis continuation link and mobile reflow, completing the shell's semantic header/nav/main/aside/footer landmarks without adding competing navigation; `npm run check` and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
