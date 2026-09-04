@@ -17,8 +17,9 @@ function isActive(href: string, active?: string) {
 export function SnapshotState({ snapshot }: { snapshot: RepositorySnapshotView }) {
   const bundlePending = snapshot.provenance === 'illustrative' && snapshot.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item));
   const stale = snapshot.provenance === 'graph-backed' && snapshot.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
-  const label = bundlePending ? 'Graph-backed bundle requested' : snapshot.provenance === 'illustrative' ? 'Illustrative fixture · coverage limited' : stale ? 'Graph-backed · stale snapshot' : snapshot.coverageState === 'limited' ? 'Graph-backed · coverage limited' : 'Verified graph-backed';
-  return <span className={`snapshot-state snapshot-${snapshot.provenance}${stale ? ' snapshot-stale' : ''}${bundlePending ? ' snapshot-pending' : ''}`}><i aria-hidden="true" />{label}</span>;
+  const sparse = snapshot.provenance === 'graph-backed' && snapshot.regions.length <= 1;
+  const label = bundlePending ? 'Graph-backed bundle requested' : snapshot.provenance === 'illustrative' ? 'Illustrative fixture · coverage limited' : stale ? 'Graph-backed · stale snapshot' : sparse ? 'Graph-backed · sparse projection' : snapshot.coverageState === 'limited' ? 'Graph-backed · coverage limited' : 'Verified graph-backed';
+  return <span className={`snapshot-state snapshot-${snapshot.provenance}${stale ? ' snapshot-stale' : ''}${bundlePending ? ' snapshot-pending' : ''}${sparse ? ' snapshot-sparse' : ''}`}><i aria-hidden="true" />{label}</span>;
 }
 
 function contextualHref(href: string, context?: SharedSnapshotContext) {
@@ -50,7 +51,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
           <div className="rail-rule" />
           <div className="rail-heading">Snapshot</div>
           <dl className="snapshot-list"><div><dt>revision</dt><dd><code>{snapshot.revision}</code></dd></div><div><dt>coverage</dt><dd>{snapshot.coverageScope}</dd></div><div><dt>indexed</dt><dd>{snapshot.indexedNodes.toLocaleString()} nodes</dd></div></dl>
-          <p className="rail-note">{snapshot.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item)) ? 'A graph-backed bundle is requested. The map will replace the fixture only after validation succeeds.' : isFixture ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : snapshot.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item)) ? 'Generated from the Lachesis graph, but this snapshot is marked stale. Confirm the revision before relying on it.' : snapshot.coverageState === 'limited' ? 'Generated from the Lachesis graph, but this view covers only part of the indexed repository.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p>
+          <p className="rail-note">{snapshot.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item)) ? 'A graph-backed bundle is requested. The map will replace the fixture only after validation succeeds.' : isFixture ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : snapshot.regions.length <= 1 ? 'Generated from the Lachesis graph, but only one top-level region is available. Treat this as a sparse projection until coverage expands.' : snapshot.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item)) ? 'Generated from the Lachesis graph, but this snapshot is marked stale. Confirm the revision before relying on it.' : snapshot.coverageState === 'limited' ? 'Generated from the Lachesis graph, but this view covers only part of the indexed repository.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p>
         </aside>
         <main id="main-content" className="docs-main">{children}</main>
       </div>
