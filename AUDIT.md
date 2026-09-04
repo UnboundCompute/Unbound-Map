@@ -256,6 +256,27 @@ Static and live route checks performed against the local dev server:
 - Playwright desktop history smoke confirmed Architecture selection semantics: selecting `Application protocols` entered `?region=protocols&level=1`, Back restored level 0 with all eight nodes, and Forward restored the focused region plus inspector content.
 - Token contrast audit found no reader-facing paper-surface failure: `--muted`/paper is 4.56:1, `--body`/paper 6.24:1, `--signal`/paper 5.74:1, and map ink/map surface 14.54:1; the 4.23:1 axis annotation is decorative secondary map geometry and has an adjacent text relationship summary.
 
+## Acceptance checklist (current)
+
+This matrix is intentionally conservative: “Pass” means the requirement is evidenced in the current
+prototype; “Partial” marks a dependency on a live Lachesis bundle or a contract that cannot be
+verified from the fixture alone.
+
+| Requirement | Status | Evidence / remaining proof |
+| --- | --- | --- |
+| First viewport identifies the repository and an obvious first action | Pass | Start here renders repository-led copy and the `Start with` action pair; mobile and desktop screenshots were inspected. |
+| Start, Architecture, Flows, and Trust use different reading structures | Pass | Separate route components and distinct map, flow-step, and glossary interaction models. |
+| Architecture remains bounded at scale | Pass | Nine placed regions, twelve rendered connections, twelve-child/region bounds, and projection smoke for 0/1/8/30/500 modules. |
+| Selection updates content, URL/history, and a Lachesis handoff | Pass | Playwright Back/Forward and focused handoff URL checks; live graph relationship semantics remain Partial. |
+| Flow synchronizes step, narrative, URL/history, and linear text | Pass | Mobile and desktop step smoke, malformed-step recovery, and reduced-motion checks. |
+| Trust educates without becoming a vulnerability scorecard | Pass | Eight-domain glossary, obligation/non-claim copy, filters, and deep-linked selected-domain behavior. |
+| Fixture facts cannot masquerade as verified evidence | Pass | Explicit provenance labels, graph-requested hiding, chapter fallback rejection, and bundle schema guards. |
+| Complete Lachesis context survives handoff | Pass | Repository, revision, bundle, region, label, anchor, flow, step, and domain are encoded and smoke-tested where present. |
+| Loading, error, empty, sparse, stale, and coverage states are designed | Partial | Fixture, malformed/failed, empty, sparse, stale, and limited-copy paths are implemented; a real hosted bundle exercising every state remains external proof. |
+| Mobile reflow, keyboard operation, contrast, and reduced motion pass | Pass | Playwright 375/768/1024/1440, 720px reflow, focus, reduced-motion, clipboard, and contrast evidence above. |
+| Share/embed/SEO surfaces are reusable by maintainers | Pass | Contextual social previews, focused embeds, sitemap/robots, README snippets, and route smoke coverage. |
+| Live Lachesis graph relationship projection is verified end-to-end | Partial | Adapter boundary and honest “relationship evidence unavailable” state exist; no live bundle endpoint is available in this workspace to prove populated relationships. |
+
 ## Known prototype limits
 
 - Suricata counts and node facts are fixture data, not yet read from a Lachesis graph endpoint.
