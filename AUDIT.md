@@ -31,6 +31,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `1d3b288` | Give Data Flow a distinct ordered reading surface | `FlowDiagram` renders four data nouns, handoffs, guards, region ownership, and symbol-specific Lachesis links; `npm run check` and `npm run build` passed |
 | `3a96cbb` | Give Trust Surface its own glossary/index | `TrustGlossary` renders source/guard/sink kinds, plain-language obligations, repository locations, and anchor-specific Lachesis links; `npm run check` and `npm run build` passed |
 | `111943b` | Replace Luna's incremental UI plan with a researched, from-scratch implementation specification | The brief defines product boundaries, authoritative inputs, 12 official online references, canonical routes, page-level interaction contracts, semantic zoom limits, responsive and accessible alternatives, Suricata proof content, staged commits, end-to-end tasks, acceptance criteria, and automatic rejection conditions; `git diff --check` passed before commit |
+| `158a661` | Record the researched UI references and frontend teardown/retain decision | `UI_REFERENCE_NOTES.md` links the official references, names the observed interaction pattern, records the Design Map decision, and separates replaceable presentation from retained adapters; `git diff --check` passed |
 
 ## Rebuild brief audit
 
