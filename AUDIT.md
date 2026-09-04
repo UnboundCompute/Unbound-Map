@@ -95,6 +95,8 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `f0ff27e` | Preserve context in embed snippet | The Architecture guide’s copyable iframe now includes incoming repository, revision, and opaque bundle parameters and uses a repository-specific iframe title, so pasted embeds open the reviewed snapshot; checks passed. |
 | `f935aac` | Make bundle loading honest on first render | Architecture and Embed pass the requested bundle into `MapClient`'s initial state, so server-rendered HTML shows the loading state instead of briefly exposing the illustrative map before hydration; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `1f8944c` | Sanitize embed title labels | Copied iframe markup now normalizes repository labels before placing them in the HTML `title` attribute, keeping unusual query-supplied names from producing malformed share snippets; checks passed. |
+| `ceacec8` | Make semantic zoom reversible | Focused Architecture links now declare `level=1`, the map exposes a keyboard-operable `Back to system shape` action, and chapter/directory links retain the semantic level and snapshot context; checks passed. |
+| `828dde5` | Guard semantic zoom URL on server | Fixed a server-render regression introduced by the zoom control by guarding `window.location` access, restoring 200 responses for queryful Architecture routes; `npm run check`, `npm run build`, and `git diff --check` passed. |
 
 ## Rebuild brief audit
 
@@ -138,6 +140,7 @@ Static and live route checks performed against the local dev server:
 - Contextful `/?repository=Zeek&revision=main&bundle=b_demo123` rendered `Zeek · Design Map`, `Zeek: see the system before you read it`, and preserved the same context on every Architecture/Flows/Trust entry link and macro-path stage.
 - Contextful `/architecture?repository=Zeek&revision=main&bundle=b_demo123` rendered an iframe snippet with `/embed?repository=Zeek&revision=main&bundle=b_demo123` and `title="Zeek architecture map"`.
 - Server-rendered `/embed?repository=Zeek&revision=main&bundle=b_demo123` showed `Preparing the architecture map` and did not include the fixture relationship summary before hydration; its return link retained the Zeek bundle context.
+- Queryful `/architecture?repository=Zeek&revision=main&region=decode&level=1` was re-smoked after the SSR guard and returned 200; the browser-level zoom control remains available without a server-side `window` error.
 - Rendered HTML smoke confirmed `/embed` contains the relationship summary without the README authoring panel, while `/architecture` retains `Use this map in a README` for maintainers preparing an embed.
 - Unknown `/architecture/graph%3Amodule%3Aunknown?bundle=b_demo123` returned 200 with `Region context unavailable`, `Continue to Lachesis`, and the preserved bundle ID rather than a false 404.
 - `npm run check`, `npm run build`, and `git diff --check` passed after the latest implementation; the build generated 22 routes including the share/discovery surfaces.
