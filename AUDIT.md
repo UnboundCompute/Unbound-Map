@@ -17,6 +17,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `a053424` | Typed Lachesis graph-first bundle adapter | `npm run check` and `npm run build`; adapter preserves indexed-vs-included counts and projected-subset limitations |
 | `5da2f52` | Safe opaque hosted-bundle loader | `npm run check` and `npm run build`; loader validates IDs, rejects redirects, caps body size, and handles expiry/malformed JSON |
 | `4b55c54` | Transparent hosted loading, identity, coverage, and error states in the HLD page | Playwright verified invalid bundle IDs produce an accessible alert, default pages remain fixture-ready, and mobile overflow stays at zero |
+| `7fe9963` | Deterministic bounded projection from Lachesis modules to HLD regions | `npm run check` and `npm run build`; projection ranks top-level modules by footprint and emits an explicit remainder roll-up |
 
 ## Current checks
 
