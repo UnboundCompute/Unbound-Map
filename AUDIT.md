@@ -86,6 +86,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 | `2bf1b23` | Keep embed surface focused | Moved the README iframe authoring snippet from `/embed` into the full Architecture guide, so an embedded map contains only its repository header, map, accessible relationship summary, and recovery links; `npm run check`, `npm run build`, and `git diff --check` passed. |
 | `4bcae08` | Preserve context across reading surfaces | Flow and Trust pages now accept shared repository/revision/bundle context, keep it in step/filter URLs, show the contextual identity while retaining the illustrative label, and include it in every Lachesis handoff; checks passed. |
 | `f1331be` | Scope flow metadata to repository | Dedicated flow pages now derive their document title from the shared repository query, keeping search and social previews aligned with the visible maintainer context; `npm run check`, `npm run build`, and `git diff --check` passed. |
+| `0937bd8` | Retain context in secondary links | Flow’s handoff-contract link and Trust’s return-to-Architecture link now preserve repository, revision, and bundle parameters instead of resetting a shared review to the fixture default; checks passed. |
 
 ## Rebuild brief audit
 
