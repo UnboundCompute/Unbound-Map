@@ -34,5 +34,6 @@ export function EmbedSnippet({ context = {} }: { context?: SharedSnapshotContext
     }
   };
   const label = state === 'copied' ? 'Embed code copied' : state === 'unavailable' ? 'Copy unavailable' : 'Copy embed code';
-  return <section className="embed-snippet" aria-labelledby="embed-snippet-title"><div><h2 id="embed-snippet-title">Use this map in a README</h2><p>Copy the iframe when a visual orientation belongs inside an existing document.</p></div><code>{snippet}</code><button type="button" onClick={copy} aria-live="polite" title={state === 'unavailable' ? 'Copy the snippet from the code block above.' : undefined}>{label}</button></section>;
+  const announcement = state === 'copied' ? 'Embed code copied.' : state === 'unavailable' ? 'Copy unavailable. Select the iframe code manually.' : '';
+  return <section className="embed-snippet" aria-labelledby="embed-snippet-title"><div><h2 id="embed-snippet-title">Use this map in a README</h2><p>Copy the iframe when a visual orientation belongs inside an existing document.</p></div><code>{snippet}</code><button type="button" onClick={copy} title={state === 'unavailable' ? 'Copy the snippet from the code block above.' : undefined}>{label}</button><span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</span></section>;
 }

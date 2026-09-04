@@ -38,5 +38,6 @@ export function ShareButton() {
     }
   };
   const label = state === 'copied' ? 'Link ready' : state === 'unavailable' ? 'Copy unavailable' : 'Copy link';
-  return <button type="button" className="share-button" onClick={copy} aria-live="polite" title={state === 'unavailable' ? 'Copy the page URL from your browser address bar.' : undefined}>{label} <span aria-hidden="true">{state === 'copied' ? '✓' : state === 'unavailable' ? '!' : '↗'}</span></button>;
+  const announcement = state === 'copied' ? 'Share link ready.' : state === 'unavailable' ? 'Copy unavailable. Use the browser address bar to copy this page URL.' : '';
+  return <><button type="button" className="share-button" onClick={copy} title={state === 'unavailable' ? 'Copy the page URL from your browser address bar.' : undefined}>{label} <span aria-hidden="true">{state === 'copied' ? '✓' : state === 'unavailable' ? '!' : '↗'}</span></button><span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</span></>;
 }
