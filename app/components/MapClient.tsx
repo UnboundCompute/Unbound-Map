@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { loadHostedBundle } from '../../lib/hosted';
-import { projectTopLevelRegions, toDesignMapSnapshot, type LachesisBundle } from '../../lib/design-map';
+import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../../lib/design-map';
 import { illustrativeSnapshot, snapshotFromProjection, toHandoff, type RepositorySnapshotView, type SystemRegion } from '../../lib/view-model';
 
 type Position = { x: number; y: number; tone: 'gold' | 'blue' | 'violet' | 'green' };
@@ -44,7 +44,8 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     const controller = new AbortController();
     setBundleState('loading');
     loadHostedBundle(bundleId, controller.signal).then((bundle) => {
-      const raw = toDesignMapSnapshot(bundle as LachesisBundle);
+      if (!isLachesisBundle(bundle)) throw new Error('This hosted map is malformed. Ask for a fresh bundle link from the repository owner.');
+      const raw = toDesignMapSnapshot(bundle);
       const next = snapshotFromProjection(raw, projectTopLevelRegions(raw));
       setSnapshot(next);
       setSelected((current) => next.regions.some((region) => region.id === current) ? current : next.regions[0]?.id ?? '');

@@ -48,6 +48,20 @@ export type LachesisBundle = {
   };
 };
 
+export function isLachesisBundle(value: unknown): value is LachesisBundle {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<LachesisBundle>;
+  const meta = candidate.meta;
+  const graph = candidate.graph;
+  return candidate.format === 'lachesis-explorer-bundle'
+    && candidate.schema_version === '2.0'
+    && !!meta && typeof meta === 'object'
+    && typeof meta.repository === 'string' && typeof meta.revision === 'string'
+    && !!graph && typeof graph === 'object'
+    && Array.isArray(graph.nodes)
+    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.file === 'string' && typeof node.line === 'number');
+}
+
 export type DesignMapSnapshot = {
   repository: string;
   revision: string;
