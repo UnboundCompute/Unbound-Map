@@ -308,6 +308,7 @@ Static and live route checks performed against the local dev server:
 - Playwright mobile embed smoke confirmed selecting the first map node stays on `/embed?region=input&level=1` with zero horizontal overflow; the full Architecture route still uses the region chapter destination.
 - Token contrast audit found no reader-facing paper-surface failure: `--muted`/paper is 4.56:1, `--body`/paper 6.24:1, `--signal`/paper 5.74:1, and map ink/map surface 14.54:1; the 4.23:1 axis annotation is decorative secondary map geometry and has an adjacent text relationship summary.
 - Visual anti-pattern audit found no broad `transition: all`, glow/backdrop effects, or dashboard-style gradients; the remaining gradient is scoped to the map grid, and compact 10–11px hits are identifiers/indices or overridden reader metadata covered by the 12px informational floor.
+- Latest mobile inspector check at 375×812 confirmed the new relationship facts fit within the 337px content column with zero document overflow; all five visible fact values had equal client and scroll widths.
 
 ## Acceptance checklist (current)
 
