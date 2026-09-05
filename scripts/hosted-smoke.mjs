@@ -19,6 +19,9 @@ assert.equal(calls[0].options.headers.Accept, 'application/json');
 globalThis.fetch = async () => new Response('<html>not json</html>', { status: 200 });
 await assert.rejects(() => loadHostedBundle('b_demo1234'), /response was not valid JSON/);
 
+globalThis.fetch = async () => ({ ok: true, status: 200, headers: new Headers(), text: async () => { throw new Error('stream failed'); } });
+await assert.rejects(() => loadHostedBundle('b_demo1234'), /response could not be read/);
+
 globalThis.fetch = async () => new Response('', { status: 410 });
 await assert.rejects(() => loadHostedBundle('b_demo1234'), /expired or no longer exists/);
 

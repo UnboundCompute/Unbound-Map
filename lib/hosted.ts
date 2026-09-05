@@ -39,7 +39,12 @@ export async function loadHostedBundle(bundleId: string, signal?: AbortSignal): 
 
   const declared = Number(response.headers.get('content-length'));
   if (Number.isFinite(declared) && declared > MAX_BUNDLE_BYTES) throw new Error('This hosted map is too large to open.');
-  const body = await response.text();
+  let body: string;
+  try {
+    body = await response.text();
+  } catch {
+    throw new Error('The hosted map response could not be read. Try loading the snapshot again.');
+  }
   if (new TextEncoder().encode(body).byteLength > MAX_BUNDLE_BYTES) throw new Error('This hosted map is too large to open.');
   try {
     return JSON.parse(body);
