@@ -11,7 +11,7 @@ function exploreHref(stepId: string, context: SharedSnapshotContext) {
 
 const branches = [
   { id: 'protocol', title: 'Static protocol dispatch', summary: 'EtherType selects the layer-three decoder.', detail: 'IPv4, IPv6, VLAN, ARP, or another supported branch is selected from the enumerated EtherType before deeper parsing.' },
-  { id: 'runtime', title: 'Runtime flow dispatch', summary: 'Observed state selects the parser path.', detail: 'Once a flow exists, state allocation and protocol detection choose the parser state carried by that flow.' },
+  { id: 'runtime', title: 'Runtime flow dispatch', summary: 'StateAlloc selects the parser path from observed flow state.', detail: 'Once a flow exists, StateAlloc and protocol detection choose the parser state carried by that flow.' },
 ] as const;
 type BranchId = (typeof branches)[number]['id'];
 function normalizeBranch(value: string | null | undefined): BranchId { return value === 'runtime' ? 'runtime' : 'protocol'; }
