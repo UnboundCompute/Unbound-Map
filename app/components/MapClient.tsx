@@ -10,9 +10,9 @@ import { illustrativeSnapshot, snapshotFromProjection, snapshotWithContext, toHa
 type Position = { x: number; y: number; tone: 'gold' | 'blue' | 'violet' | 'green' };
 function normalizeLevel(value: string | null | undefined) { return value === '1' || value === '2' ? value : '0'; }
 const positions: Position[] = [
-  { x: 9, y: 52, tone: 'gold' }, { x: 23, y: 52, tone: 'gold' }, { x: 38, y: 52, tone: 'blue' },
-  { x: 53, y: 52, tone: 'violet' }, { x: 68, y: 38, tone: 'gold' }, { x: 68, y: 67, tone: 'blue' },
-  { x: 88, y: 52, tone: 'green' }, { x: 38, y: 16, tone: 'violet' }, { x: 82, y: 24, tone: 'green' },
+  { x: 16, y: 74, tone: 'gold' }, { x: 40, y: 74, tone: 'gold' }, { x: 64, y: 74, tone: 'blue' },
+  { x: 88, y: 74, tone: 'violet' }, { x: 64, y: 44, tone: 'gold' }, { x: 64, y: 17, tone: 'blue' },
+  { x: 88, y: 44, tone: 'green' }, { x: 40, y: 17, tone: 'violet' }, { x: 88, y: 17, tone: 'green' },
 ];
 
 function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anchor = region.anchor?.label ?? region.label, bundleId?: string) {
