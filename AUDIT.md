@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `e1f7691` | Complete typed Lachesis handoff context | `LachesisHandoff` now models optional flow, step, and trust-domain identifiers in addition to repository, revision, region, anchor, and opaque bundle identity, matching the URL contract already exercised by the UI; typecheck, route smoke, and diff checks passed. |
 | `audit-2026-09-05` | Full-route touch-target sweep | Playwright measured every visible link, button, summary, input, and select at 375px across Start, Architecture, region chapter, Flows, dedicated flow, Trust, Explore, and Embed; no rendered control was below 44px in either dimension. |
 | `audit-2026-09-05` | Semantic control sweep | Playwright inspected every `button`, link, input, select, and summary on Start, Architecture, Flows, Trust, Explore, and Embed at 375px with no unlabeled controls; the skip link focused and activated `#main-content` successfully. |
 | `1237827` | Document Trace boundary for distribution | README now states the Design Map/Lachesis/Trace separation alongside the share/embed guidance, so maintainers arriving through repository documentation receive the same altitude contract as handoff readers. `git diff --check` passed. |
