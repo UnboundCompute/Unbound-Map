@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `1237827` | Document Trace boundary for distribution | README now states the Design Map/Lachesis/Trace separation alongside the share/embed guidance, so maintainers arriving through repository documentation receive the same altitude contract as handoff readers. `git diff --check` passed. |
 | `3bd823c` | Surface Architecture text alternative | Architecture now shows a concise data-derived `Text view` sentence before the optional relationship transcript, including explicit wire-input and consumer-output boundaries; graph-backed bundles without edge evidence state that no path is inferred. Route smoke, typecheck, build, and diff checks passed. |
 | `b132c0d` | Clarify Design Map / Lachesis / Trace boundaries | The Lachesis handoff now names Trace as the destination for reviewed, adjudicated findings, keeping raw suspicion and source evidence out of Design Map; the boundary is protected by route smoke alongside the existing two product descriptions. `npm run check`, `npm run smoke`, `npm run build`, and `git diff --check` passed. |
 | `bf1f3cb` | Compact mobile Start path | At 375px the six-stage ordered path now uses a readable two-row grid (118px tall instead of 290px), preserving DOM order, individual deep links, and zero horizontal overflow while bringing the map surface 180px closer to the first viewport; `npm run smoke`, `npm run build`, and `git diff --check` passed. |
