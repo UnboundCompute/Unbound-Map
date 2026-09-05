@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `3fcc24c` | Cover hosted network failures | Hosted transport smoke now asserts a pre-response network exception becomes the reader-facing “could not be reached” error, completing the unavailable-state branch alongside read, JSON, expiry, and size failures; `npm run hosted-smoke`, `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
 | `ff6461e` | Publish the hosted transport gate | README’s pre-share verification sequence now includes `npm run hosted-smoke`, making the transport boundary test discoverable alongside projection, build, and route checks; `git diff --check` passed. |
 | `27f217d` | Normalize hosted response read failures | Hosted bundle loading now translates stream/body-read exceptions into a recoverable reader-facing message; `hosted-smoke` covers the failure alongside malformed JSON, expiry, size, and opaque-ID cases, with `npm run hosted-smoke`, `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `c72a289` | Add focused hosted transport smoke | New `npm run hosted-smoke` coverage verifies opaque-ID rejection before fetch, JSON/no-redirect request options, successful parsing, expired bundles, malformed responses, and the 25 MiB size limit; `npm run hosted-smoke`, `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
