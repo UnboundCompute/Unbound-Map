@@ -12,6 +12,9 @@ async function page(path, expected) {
   const h1Count = (body.match(/<h1\b/g) ?? []).length;
   if (h1Count !== 1) throw new Error(`${path} rendered ${h1Count} h1 elements; expected exactly one`);
   if (!body.includes('<main')) throw new Error(`${path} is missing its main landmark`);
+  const ids = [...body.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
+  const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+  if (duplicateIds.length) throw new Error(`${path} rendered duplicate IDs: ${[...new Set(duplicateIds)].join(', ')}`);
   console.log(`ok ${path}`);
 }
 
