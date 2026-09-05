@@ -190,9 +190,12 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .flow-branches { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); gap: 28px; margin-top: 34px; padding: 20px 0; border-bottom: 1px solid var(--rule); }
 .flow-branches h3 { margin: 9px 0 0; font: 400 25px/1.1 var(--serif); }
 .flow-branch-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.flow-branch-grid div { padding-left: 14px; border-left: 2px solid var(--signal); }
+.flow-branch-grid button { display: block; width: 100%; min-height: 78px; padding: 0 14px; border: 0; border-left: 2px solid var(--rule); color: var(--ink); background: transparent; text-align: left; cursor: pointer; }
+.flow-branch-grid button:hover, .flow-branch-grid button.is-selected { border-left-color: var(--signal); }
+.flow-branch-grid button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .flow-branch-grid strong { display: block; margin-bottom: 7px; font-size: 14px; }
 .flow-branch-grid p { margin: 0; color: var(--body); font-size: 13px; line-height: 1.55; }
+.flow-branch-detail { margin: 18px 0 0; padding: 13px 14px; border-top: 1px solid var(--rule); color: var(--body); font-size: 13px; line-height: 1.55; }
 .flow-label { color: var(--signal); }
 .guided-flow { max-width: 830px; margin-top: 48px; border-top: 2px solid var(--ink); }
 .flow-progress { display: flex; justify-content: space-between; gap: 24px; padding: 24px 0 22px; border-bottom: 1px solid var(--rule); } .flow-progress h2 { max-width: 550px; margin: 11px 0 0; font: 400 30px/1.06 var(--serif); } .flow-count { color: var(--muted); font: 12px var(--mono); }

@@ -3,7 +3,7 @@ export { illustrativeSnapshot } from './illustrative-suricata';
 
 export type SnapshotProvenance = 'illustrative' | 'graph-backed';
 export type CoverageState = 'limited' | 'verified';
-export type SharedSnapshotContext = { repository?: string; revision?: string; bundle?: string; region?: string; label?: string; anchor?: string; flow?: string; step?: string; domain?: string };
+export type SharedSnapshotContext = { repository?: string; revision?: string; bundle?: string; region?: string; label?: string; anchor?: string; flow?: string; step?: string; branch?: string; domain?: string };
 
 export type RepositorySnapshotView = {
   provenance: SnapshotProvenance;
