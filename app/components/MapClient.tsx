@@ -28,6 +28,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
+  const bundleFromUrl = searchParams.get('bundle') ?? initialBundle;
 
   useEffect(() => {
     setSelected(searchParams.get('region') ?? 'decode');
@@ -35,22 +36,22 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   }, [searchParams]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const requestedRegion = params.get('region');
-    if (requestedRegion) setSelected(requestedRegion);
-    setLevel(normalizeLevel(params.get('level')));
     const restoreFocus = () => {
       const next = new URLSearchParams(window.location.search);
       setSelected(next.get('region') ?? 'decode');
       setLevel(normalizeLevel(next.get('level')));
     };
     window.addEventListener('popstate', restoreFocus);
-    const bundleId = params.get('bundle') ?? initialBundle;
-    if (!bundleId) return () => window.removeEventListener('popstate', restoreFocus);
-    setRequestedBundle(bundleId);
+    if (!bundleFromUrl) {
+      setRequestedBundle('');
+      setBundleState('idle');
+      setSnapshot(illustrativeSnapshot);
+      return () => window.removeEventListener('popstate', restoreFocus);
+    }
+    setRequestedBundle(bundleFromUrl);
     const controller = new AbortController();
     setBundleState('loading');
-    loadHostedBundle(bundleId, controller.signal).then((bundle) => {
+    loadHostedBundle(bundleFromUrl, controller.signal).then((bundle) => {
       if (!isLachesisBundle(bundle)) throw new Error('This hosted map is malformed. Ask for a fresh bundle link from the repository owner.');
       const raw = toDesignMapSnapshot(bundle);
       const next = snapshotFromProjection(raw, projectTopLevelRegions(raw));
@@ -64,7 +65,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
     });
     return () => { controller.abort(); window.removeEventListener('popstate', restoreFocus); };
-  }, []);
+  }, [bundleFromUrl]);
 
   const allRegions = snapshot.regions;
   const regions = useMemo(() => allRegions.slice(0, 9), [allRegions]);
