@@ -351,6 +351,7 @@ Static and live route checks performed against the local dev server:
 - Visual anti-pattern audit found no broad `transition: all`, glow/backdrop effects, or dashboard-style gradients; the remaining gradient is scoped to the map grid, and compact 10–11px hits are identifiers/indices or overridden reader metadata covered by the 12px informational floor.
 - Latest mobile Architecture check at 375×812 confirmed the map reflows into a readable region list, the redundant adjacent inspector stays hidden because selection navigates to a region chapter, and the optional text projection starts closed with zero document overflow.
 - Production-preview verification was repeated after rebuilding `.next`: the earlier 18–21px target readings came from a stale Next server, not the current stylesheet. The rebuilt 375px Architecture surface reports 44px quiet links/share controls, 58px relationship disclosure, 68px map nodes, and a 48px compact primary-nav target; route smoke, typecheck, and diff checks remain clean.
+- End-to-end newcomer/maintainer journey was replayed against the rebuilt production preview at 375px: Start → `Follow a packet` → `validated IPv4 payload` → Lachesis preserved repository, revision, region, flow, step, and anchor; Trust search updated `q=memory`; mobile Architecture selection opened the matching region chapter with snapshot context intact.
 
 ## Acceptance checklist (current)
 
