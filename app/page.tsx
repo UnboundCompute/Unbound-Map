@@ -65,7 +65,6 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
               <p>Select a region for its architecture chapter.</p>
             </div>
           </div>
-          <MapClient compact regionIds={['input', 'decode', 'core', 'protocols', 'detect', 'output']} route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
           <div className="start-path-reading">
             <h3>Ordered reading path</h3>
             <p>For a linear introduction, follow these same handoffs from the wire to output.</p>
@@ -80,6 +79,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
             ].map(([label, region], index) => <Link key={label} href={architectureHref(region)} className={index === 4 ? 'path-emphasis' : ''}>{label}</Link>)}
           </nav>
           </div>
+          <MapClient compact regionIds={['input', 'decode', 'core', 'protocols', 'detect', 'output']} route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
           <p className="map-caption">Detection is intentionally wider: protocol-aware rules, prefilters, and matchers meet the normalized stream here.</p>
         </section>
 
