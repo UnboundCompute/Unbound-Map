@@ -164,6 +164,9 @@ export type HLDRegion = {
   inputs?: string[];
   outputs?: string[];
   structures?: string[];
+  upstream?: string[];
+  downstream?: string[];
+  relationshipKinds?: Record<string, string>;
 };
 
 function positiveInteger(value: unknown, fallback: number) {
@@ -283,6 +286,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   };
   const outgoing = new Map<string, Set<string>>();
   const incoming = new Map<string, Set<string>>();
+  const relationshipKinds = new Map<string, Map<string, Set<string>>>();
   (snapshot.relationships ?? []).forEach((edge) => {
     const from = ambiguousNodeModules.has(edge.source) ? undefined : regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.source)) ?? '');
     const to = ambiguousNodeModules.has(edge.target) ? undefined : regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.target)) ?? '');
@@ -291,11 +295,17 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     if (!incoming.has(to)) incoming.set(to, new Set());
     outgoing.get(from)!.add(to);
     incoming.get(to)!.add(from);
+    if (edge.kind) {
+      if (!relationshipKinds.has(from)) relationshipKinds.set(from, new Map());
+      if (!relationshipKinds.get(from)!.has(to)) relationshipKinds.get(from)!.set(to, new Set());
+      relationshipKinds.get(from)!.get(to)!.add(edge.kind);
+    }
   });
   const withRelationships = (regions: HLDRegion[]) => regions.map((region) => ({
     ...region,
     upstream: [...(incoming.get(region.id) ?? [])].sort(),
     downstream: [...(outgoing.get(region.id) ?? [])].sort(),
+    relationshipKinds: Object.fromEntries([... (relationshipKinds.get(region.id) ?? new Map())].sort(([a], [b]) => a.localeCompare(b)).map(([target, kinds]) => [target, [...kinds].sort().join(', ')])),
   }));
 
   if (topLevel.length <= safeLimit) return withRelationships(topLevel);

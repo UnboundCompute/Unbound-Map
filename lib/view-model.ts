@@ -30,6 +30,7 @@ export type SystemRegion = {
   role?: 'entry' | 'runtime' | 'fanout' | 'output' | 'boot';
   upstream?: string[];
   downstream?: string[];
+  relationshipKinds?: Record<string, string>;
   children?: { label: string; summary: string; anchor?: string }[];
   inputs?: string[];
   outputs?: string[];
@@ -126,6 +127,9 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       inputs: region.inputs,
       outputs: region.outputs,
       structures: region.structures,
+      upstream: region.upstream,
+      downstream: region.downstream,
+      relationshipKinds: region.relationshipKinds,
     })),
   };
 }
