@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `audit-2026-09-05` | Final acceptance gate replay | `check`, `projection-smoke`, `hosted-smoke`, `smoke`, `build`, and `git diff --check` all passed after the latest handoff/metadata changes; route matrix still covers canonical, contextual, malformed, redirect, embed, and discovery paths. |
 | `4e53082` | Identify default flow repository in metadata | Dedicated `/flows/packet-decode` now includes the default `Suricata` identity when no repository query is supplied, matching contextual titles on all other canonical routes; server-rendered title, typecheck, smoke, build, and diff checks passed. |
 | `audit-2026-09-05` | Verify route title coverage | Server-rendered canonical routes now expose repository-specific titles for Start, Architecture, Flows, Trust, Explore, Embed, region chapters, and dedicated flow pages; no route falls back to a generic product-only title. |
 | `audit-2026-09-05` | Review three-product handoff layout | Contextual Explore at 1440px renders three equal 247px boundary columns; at 375px they stack to 339px with zero overflow, one `h1`, and the full Trace explanation visible. Desktop/mobile screenshots were captured and inspected. |
