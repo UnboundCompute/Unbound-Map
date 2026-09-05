@@ -247,7 +247,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 /* Trust families and guard labels are reader-facing vocabulary, not identifiers. */
 .trust-domain-index, .trust-families code, .flow-guard strong { font-size: 12px; }
 
-@media (max-width: 1100px) {
+@media (max-width: 1279px) {
   .map-workbench { grid-template-columns: minmax(0, 1fr); }
   .map-inspector { border-top: 1px solid var(--map-rule); border-left: 0; }
   .map-canvas { display: flex; flex-direction: column; gap: 9px; min-height: 0; padding: 14px; }
