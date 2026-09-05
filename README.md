@@ -82,6 +82,18 @@ example `http://localhost:3210`). Invalid values or values with credentials/quer
 fall back to `https://lachesis.unboundcompute.com`; production deployments should leave the
 default unless the public Explorer origin is intentionally changed.
 
+Graph-backed pages load opaque bundles through `NEXT_PUBLIC_BUNDLE_API_URL`. For the local
+companion server, build or run Design Map with both origins configured:
+
+```bash
+NEXT_PUBLIC_LACHESIS_URL=http://localhost:3210 \\
+NEXT_PUBLIC_BUNDLE_API_URL=http://localhost:3210 \\
+npm run dev -- -p 3304
+```
+
+The bundle API value is required to be an origin/path without credentials, query, or fragment;
+production values must use HTTPS. If it is omitted, Design Map uses its same-origin API route.
+
 Suggested maintainer-share framing:
 
 - **README / issue:** “Start with the [architecture map](https://<your-design-map-host>/architecture) to see the repository’s major responsibilities before reading source.”
