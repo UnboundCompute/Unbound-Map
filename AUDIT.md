@@ -302,7 +302,7 @@ verified from the fixture alone.
 | First viewport identifies the repository and an obvious first action | Pass | Start here renders repository-led copy and the `Start with` action pair; mobile and desktop screenshots were inspected. |
 | Start, Architecture, Flows, and Trust use different reading structures | Pass | Separate route components and distinct map, flow-step, and glossary interaction models. |
 | Architecture remains bounded at scale | Pass | Nine placed regions, twelve rendered connections, twelve-child/region bounds, and projection smoke for 0/1/8/30/500 modules. |
-| Selection updates content, URL/history, and a Lachesis handoff | Pass | Playwright Back/Forward and focused handoff URL checks; live graph relationship semantics remain Partial. |
+| Selection updates content, URL/history, and a Lachesis handoff | Pass | Playwright Back/Forward and focused handoff URL checks; populated `graph.edges` now project into hosted region relationships, while live endpoint semantics remain Partial until a hosted bundle is exercised. |
 | Flow synchronizes step, narrative, URL/history, and linear text | Pass | Mobile and desktop step smoke, malformed-step recovery, and reduced-motion checks. |
 | Trust educates without becoming a vulnerability scorecard | Pass | Eight-domain glossary, obligation/non-claim copy, filters, and deep-linked selected-domain behavior. |
 | Fixture facts cannot masquerade as verified evidence | Pass | Explicit provenance labels, graph-requested hiding, chapter fallback rejection, and bundle schema guards. |
@@ -310,11 +310,11 @@ verified from the fixture alone.
 | Loading, error, empty, sparse, stale, and coverage states are designed | Partial | Fixture, malformed/failed, empty, sparse, stale, and limited-copy paths are implemented; a real hosted bundle exercising every state remains external proof. |
 | Mobile reflow, keyboard operation, contrast, and reduced motion pass | Pass | Playwright 375/768/1024/1440, 720px reflow, focus, reduced-motion, clipboard, and contrast evidence above. |
 | Share/embed/SEO surfaces are reusable by maintainers | Pass | Contextual social previews, focused embeds, sitemap/robots, README snippets, and route smoke coverage. |
-| Live Lachesis graph relationship projection is verified end-to-end | Partial | Adapter boundary and honest “relationship evidence unavailable” state exist; no live bundle endpoint is available in this workspace to prove populated relationships. |
+| Live Lachesis graph relationship projection is verified end-to-end | Partial | The adapter validates and projects optional 2.0 `graph.edges` with populated fixture coverage; no live bundle endpoint is available in this workspace to prove the hosted response and relationship semantics together. |
 
 ## Known prototype limits
 
 - Suricata counts and node facts are fixture data, not yet read from a Lachesis graph endpoint.
 - The Lachesis query string is the agreed handoff shape; the explorer must implement its parser and focused-bundle loading.
-- The default map still renders eight illustrative regions; hosted snapshots use the deterministic bounded projection and roll-up adapter, while live relationship evidence depends on the Lachesis bundle schema.
+- The default map still renders eight illustrative regions; hosted snapshots use the deterministic bounded projection and roll-up adapter, projecting optional Lachesis `graph.edges` when present and remaining explicit when relationship evidence is absent.
 - `/embed` is shareable and bundle-aware, but defaults to the explicitly labeled illustrative fixture until a valid `?bundle=b_…` identifier is supplied.
