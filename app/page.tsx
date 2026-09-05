@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from './components/DocsShell';
+import { MapClient } from './components/MapClient';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../lib/view-model';
 import { documentMetadata } from '../lib/seo';
 
@@ -66,10 +67,14 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
         <section className="start-map-preview" aria-labelledby="preview-title">
           <div className="section-heading-row">
             <div>
-              <h2 id="preview-title">The route through the repository</h2>
-              <p>Select a stage when you already know which responsibility you need.</p>
+              <h2 id="preview-title">The bounded shape of the repository</h2>
+              <p>Select a region to open its architecture chapter; the map stays at design altitude.</p>
             </div>
           </div>
+          <MapClient compact route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
+          <div className="start-path-reading">
+            <h3>Ordered reading path</h3>
+            <p>For a linear introduction, follow these same handoffs from the wire to output.</p>
           <nav className="macro-path" aria-label="Network input to output architecture path">
             {[
               ['wire', 'input'],
@@ -80,6 +85,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
               ['output', 'output'],
             ].map(([label, region], index) => <Link key={label} href={architectureHref(region)} className={index === 4 ? 'path-emphasis' : ''}>{label}</Link>)}
           </nav>
+          </div>
           <p className="map-caption">Detection is intentionally wider: protocol-aware rules, prefilters, and matchers meet the normalized stream here.</p>
         </section>
 
