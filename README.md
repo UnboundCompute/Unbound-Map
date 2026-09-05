@@ -44,8 +44,10 @@ The old `/map` and `/flow` paths redirect to `/architecture` and `/flows` for sh
 
 The map is intentionally kept at architectural altitude; code-level questions hand off to Lachesis with repository, commit, subsystem, and anchor context.
 
-Every page has a **Copy link** action. For a compact README or issue embed, use the `/embed` path
-for the same revision-addressed map:
+The full guide pages have a **Copy link** action. The `/embed` route is intentionally a clean,
+map-only artifact; share its URL directly or use the full Architecture page’s README snippet when
+you need a copyable iframe. For a compact README or issue embed, use the `/embed` path for the
+same revision-addressed map:
 
 ```html
 <iframe src="https://<your-design-map-host>/embed" title="Suricata architecture map" width="100%" height="620" loading="lazy"></iframe>
