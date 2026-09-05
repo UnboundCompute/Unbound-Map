@@ -28,7 +28,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
-  const bundleFromUrl = searchParams.get('bundle') ?? initialBundle;
+  const bundleFromUrl = searchParams.has('bundle') ? (searchParams.get('bundle') ?? undefined) : (typeof window === 'undefined' ? initialBundle : undefined);
 
   useEffect(() => {
     setSelected(searchParams.get('region') ?? 'decode');
