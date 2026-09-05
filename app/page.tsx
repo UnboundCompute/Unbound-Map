@@ -59,11 +59,6 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
           </div>
         </section>
 
-        <section className="thesis-block" aria-labelledby="thesis-title">
-          <h2 id="thesis-title">A long packet-processing path with a broad detection stage in the middle.</h2>
-          <p>Start at the wire and follow the handoffs. The map names responsibilities; Lachesis opens the exact implementation.</p>
-        </section>
-
         <section className="start-map-preview" aria-labelledby="preview-title">
           <div className="section-heading-row">
             <div>
@@ -71,7 +66,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
               <p>Select a region to open its architecture chapter; the map stays at design altitude.</p>
             </div>
           </div>
-          <MapClient compact route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
+          <MapClient compact regionIds={['input', 'decode', 'core', 'protocols', 'detect', 'output']} route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
           <div className="start-path-reading">
             <h3>Ordered reading path</h3>
             <p>For a linear introduction, follow these same handoffs from the wire to output.</p>

@@ -20,7 +20,7 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anc
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
 }
 
-export function MapClient({ route = '/architecture', initialBundle, initialLevel = '0', initialRegion = 'decode', initialQuery = '', compact = false }: { route?: string; initialBundle?: string; initialLevel?: string; initialRegion?: string; initialQuery?: string; compact?: boolean }) {
+export function MapClient({ route = '/architecture', initialBundle, initialLevel = '0', initialRegion = 'decode', initialQuery = '', compact = false, maxRegions = 9, regionIds }: { route?: string; initialBundle?: string; initialLevel?: string; initialRegion?: string; initialQuery?: string; compact?: boolean; maxRegions?: number; regionIds?: string[] }) {
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState(initialRegion);
   const [level, setLevel] = useState(initialLevel);
@@ -75,7 +75,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   }, [bundleFromUrl, repositoryFromUrl, revisionFromUrl]);
 
   const allRegions = snapshot.regions;
-  const regions = useMemo(() => allRegions.slice(0, 9), [allRegions]);
+  const regions = useMemo(() => regionIds?.length ? regionIds.map((id) => allRegions.find((region) => region.id === id)).filter((region): region is SystemRegion => Boolean(region)) : allRegions.slice(0, Math.max(1, Math.floor(maxRegions))), [allRegions, maxRegions, regionIds]);
   const current = allRegions.find((region) => region.id === selected) ?? regions[0];
   const startParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
   const startContext = new URLSearchParams();
