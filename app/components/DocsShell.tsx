@@ -44,6 +44,7 @@ function lachesisHref(context: SharedSnapshotContext | undefined, snapshot: Repo
 export function DocsShell({ children, active, snapshot = illustrativeSnapshot, context }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
   const activeRoute = active ?? '/';
   const isFixture = snapshot.provenance === 'illustrative';
+  const hasHandoffContext = Boolean(context && (context.region || context.label || context.anchor || context.flow || context.step || context.domain));
   const shortRevision = snapshot.revision.length > 14 ? `${snapshot.revision.slice(0, 8)}…${snapshot.revision.slice(-5)}` : snapshot.revision;
   return (
     <div className="docs-shell">
@@ -54,7 +55,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         <span className="bar-repo">{snapshot.repository}</span>
         <details className="revision-detail"><summary aria-label={`Revision ${snapshot.revision}`}><code className="bar-revision">{shortRevision}</code></summary><div className="revision-popover"><span>full revision</span><code>{snapshot.revision}</code></div></details>
         <SnapshotState snapshot={snapshot} />
-        <a className="bar-lachesis" href={lachesisHref(context, snapshot)} target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>
+        {hasHandoffContext && <a className="bar-lachesis" href={lachesisHref(context, snapshot)} target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>}
       </header>
       <div className="docs-layout">
         <aside className="reading-rail" aria-label="Repository guide">
