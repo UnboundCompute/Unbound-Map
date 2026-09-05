@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `audit-2026-09-05` | Re-run the projection, hosted-state, and Explorer handoff gates after focus-order fix | `npm run projection-smoke`, `npm run hosted-smoke`, and the local `npm run explorer-smoke` all passed; the live integration projected 1 bounded region and 7 graph relationships without changing the mobile focus-order fix. |
 | `5c8da0a` | Align Start visual and keyboard order | Start now keeps the DOM order identical to the map-first visual order: heading → map → ordered reading path → caption. Typecheck, diff check, and Playwright probes at 375px/1440px passed with zero horizontal overflow. |
 | `33be658` | Fix relationship transcript reading width | The ordered Architecture relationship alternative now places each explanation in the content column instead of the counter column, preventing desktop rows from wrapping one word per line. Computed Playwright layout at 1440px reports a 642px explanation width; the corrected screenshot was inspected, with `npm run check` and `git diff --check` passing. |
 | `3dee03f` | Make unavailable-bundle smoke deterministic | The missing graph-backed chapter case now uses an opaque ID that is distinct from the local demo fixture, so the designed unavailable state is verified consistently against either the public API or a locally running Explorer server. Full Design Map route smoke and the Explorer integration smoke passed with the local servers. |
