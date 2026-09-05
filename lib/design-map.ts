@@ -54,7 +54,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   const candidate = value as Partial<LachesisBundle>;
   const meta = candidate.meta;
   const graph = candidate.graph;
-  return candidate.format === 'lachesis-explorer-bundle'
+  const validShape = candidate.format === 'lachesis-explorer-bundle'
     && candidate.schema_version === '2.0'
     && !!meta && typeof meta === 'object'
     && typeof meta.repository === 'string' && typeof meta.language === 'string' && typeof meta.revision === 'string'
@@ -69,6 +69,15 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && (graph.modules === undefined || Array.isArray(graph.modules))
     && (graph.modules === undefined || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (module.path === undefined || typeof module.path === 'string') && (module.parent_id === undefined || typeof module.parent_id === 'string') && (module.node_ids === undefined || (Array.isArray(module.node_ids) && module.node_ids.every((id) => typeof id === 'string')))))
     && (graph.coverage === undefined || (!!graph.coverage && typeof graph.coverage === 'object' && (graph.coverage.scope === undefined || typeof graph.coverage.scope === 'string') && (graph.coverage.included_nodes === undefined || (typeof graph.coverage.included_nodes === 'number' && Number.isInteger(graph.coverage.included_nodes) && graph.coverage.included_nodes >= 0)) && (graph.coverage.indexed_nodes === undefined || (typeof graph.coverage.indexed_nodes === 'number' && Number.isInteger(graph.coverage.indexed_nodes) && graph.coverage.indexed_nodes >= 0)) && (graph.coverage.limitations === undefined || (Array.isArray(graph.coverage.limitations) && graph.coverage.limitations.every((item) => typeof item === 'string'))) && (graph.coverage.capabilities === undefined || (Array.isArray(graph.coverage.capabilities) && graph.coverage.capabilities.every((item) => typeof item === 'string')))));
+  if (!validShape) return false;
+
+  const nodeIds = new Set(graph!.nodes.map((node) => node.id));
+  if (nodeIds.size !== graph!.nodes.length) return false;
+  const modules = graph!.modules ?? [];
+  const moduleIds = new Set(modules.map((module) => module.id));
+  if (moduleIds.size !== modules.length) return false;
+  return modules.every((module) => (!module.parent_id || moduleIds.has(module.parent_id))
+    && (module.node_ids ?? []).every((nodeId) => nodeIds.has(nodeId)));
 }
 
 export type DesignMapSnapshot = {
