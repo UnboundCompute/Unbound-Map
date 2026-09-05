@@ -16,6 +16,9 @@ assert.deepEqual(success, { ok: true });
 assert.equal(calls[0].options.redirect, 'error');
 assert.equal(calls[0].options.headers.Accept, 'application/json');
 
+globalThis.fetch = async () => { throw new TypeError('network down'); };
+await assert.rejects(() => loadHostedBundle('b_demo1234'), /hosted map could not be reached/);
+
 globalThis.fetch = async () => new Response('<html>not json</html>', { status: 200 });
 await assert.rejects(() => loadHostedBundle('b_demo1234'), /response was not valid JSON/);
 
