@@ -50,4 +50,5 @@ if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: 
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { indexed_nodes: 2.5 } } })) throw new Error('non-integer coverage count accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], documentation: null }] } })) throw new Error('null node documentation accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { included_nodes: null } } })) throw new Error('null coverage count accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: null } })) throw new Error('null coverage object accepted by the schema guard');
 console.log('ok malformed metadata rejected by bundle guard');
