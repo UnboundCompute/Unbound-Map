@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `93aa5eb` | Complete region chapter orientation | Region chapters now explain why the region exists and identify the representative repository path before the Lachesis handoff, in addition to responsibility, neighbors, inputs/outputs, structures, and anchors. Typecheck, production build, contextual route smoke, and diff checks passed. |
 | `audit-2026-09-05` | Inspect the eight-region Start map visually | Full-page Playwright captures at 375px and 1440px show readable node labels, no node collisions, no horizontal overflow, and the separate Initialization/Pattern matching stages remain legible; the ordered text path remains available beneath the canvas. |
 | `ec58c71` | Replace stale generated design-system guidance | `design-system/design-map/MASTER.md` now reflects the Luna field-guide tokens, semantic/layout rules, accessibility floor, and explicit rejection patterns instead of the superseded blue dashboard/card direction. `git diff --check` passed. |
 | `82ca373` | Include boot and matcher in the Start projection | The compact Start map now shows eight bounded Suricata regions, including separate Initialization and Pattern matching stages; this preserves the boot/runtime distinction and detection fan-out without exceeding the nine-region limit. Desktop/mobile node probes found no overlap or horizontal overflow; route smoke passed. |
