@@ -20,7 +20,7 @@ npm run check
 npm run build
 npm run projection-smoke
 npm run hosted-smoke
-npm run explorer-smoke # with Lachesis Explorer running on port 3200
+npm run explorer-smoke # with Lachesis Explorer running on port 3210
 npm run smoke # with `npm run dev` running on port 3000
 ```
 

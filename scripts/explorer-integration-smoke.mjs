@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../lib/design-map.ts';
 
-const origin = (process.env.LACHESIS_EXPLORER_URL ?? 'http://127.0.0.1:3200').replace(/\/$/, '');
+const origin = (process.env.LACHESIS_EXPLORER_URL ?? 'http://127.0.0.1:3210').replace(/\/$/, '');
 const endpoint = `${origin}/api/bundles/b_demo1234`;
 
 const response = await fetch(endpoint, { headers: { Accept: 'application/json' } });
