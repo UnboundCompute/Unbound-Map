@@ -7,6 +7,6 @@ function siteOrigin() {
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const origin = siteOrigin();
-  const routes = ['/', '/architecture', '/flows', '/flows/packet-decode', '/trust', '/embed', ...illustrativeSnapshot.regions.map((region) => `/architecture/${region.id}`)];
+  const routes = ['/', '/architecture', '/flows', '/flows/packet-decode', '/trust', '/explore', '/embed', ...illustrativeSnapshot.regions.map((region) => `/architecture/${region.id}`)];
   return routes.map((route) => ({ url: `${origin}${route}`, changeFrequency: 'weekly', priority: route === '/' ? 1 : route === '/embed' ? 0.7 : 0.8 }));
 }

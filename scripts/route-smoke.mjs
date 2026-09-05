@@ -29,6 +29,16 @@ async function image(path) {
   console.log(`ok ${path} (contextual preview image)`);
 }
 
+async function xml(path, expected) {
+  const response = await fetch(`${origin}${path}`);
+  if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`);
+  const body = await response.text();
+  for (const marker of expected) {
+    if (!body.includes(marker)) throw new Error(`${path} is missing ${JSON.stringify(marker)}`);
+  }
+  console.log(`ok ${path} (discovery document)`);
+}
+
 async function redirect(path, target) {
   const response = await fetch(`${origin}${path}`, { redirect: 'manual' });
   if (![301, 302, 307, 308].includes(response.status)) throw new Error(`${path} returned HTTP ${response.status}, expected redirect`);
@@ -66,3 +76,4 @@ await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123'
 await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo123', ['What this region owns', 'Validated payload window']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
 await redirect('/flow?step=ipv4', '/flows?step=ipv4');
+await xml('/sitemap.xml', ['<loc>http://localhost:3000/explore</loc>']);
