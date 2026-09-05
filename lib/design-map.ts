@@ -92,7 +92,6 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || (node.parent_id !== undefined && (typeof node.parent_id !== 'string' || !node.parent_id.trim()))
     || (node.snippet !== undefined && (typeof node.snippet !== 'string' || !node.snippet.trim()))
     || (node.source_window !== undefined && (!node.source_window || typeof node.source_window !== 'object' || !Array.isArray(node.source_window.lines) || !node.source_window.lines.length || node.source_window.lines.some((line) => typeof line !== 'string') || (node.source_window.start_line !== undefined && (typeof node.source_window.start_line !== 'number' || !Number.isInteger(node.source_window.start_line) || node.source_window.start_line < 1))))
-    || (!node.snippet?.trim() && !node.source_window?.lines?.length)
     || (node.documentation !== undefined && typeof node.documentation !== 'string'))) return false;
   const nodesById = new Map(graph!.nodes.map((node) => [node.id, node]));
   if (graph!.nodes.some((node) => node.parent_id && (!nodesById.has(node.parent_id) || node.parent_id === node.id))) return false;

@@ -117,7 +117,7 @@ if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: 
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: null } })) throw new Error('null coverage object accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [] } })) throw new Error('empty graph accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], label: '' }] } })) throw new Error('blank node label accepted by the schema guard');
-if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined }] } })) throw new Error('node without snippet or source_window accepted by the schema guard');
+if (!isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined }] } })) throw new Error('source-less graph node was rejected by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined, source_window: { lines: [] } }] } })) throw new Error('empty source_window accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], parent_id: 'missing-node' }] } })) throw new Error('dangling node parent reference accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], parent_id: 'node-0' }] } })) throw new Error('self-referential node parent accepted by the schema guard');
