@@ -31,5 +31,8 @@ await assert.rejects(() => loadHostedBundle('b_demo1234'), /expired or no longer
 globalThis.fetch = async () => new Response('', { status: 200, headers: { 'content-length': String(25 * 1024 * 1024 + 1) } });
 await assert.rejects(() => loadHostedBundle('b_demo1234'), /too large to open/);
 
+globalThis.fetch = async () => new Response('x'.repeat(25 * 1024 * 1024 + 1), { status: 200 });
+await assert.rejects(() => loadHostedBundle('b_demo1234'), /too large to open/);
+
 globalThis.fetch = originalFetch;
 console.log('ok hosted transport validation and recovery cases');
