@@ -1,4 +1,4 @@
-import { isLachesisBundle, projectTopLevelRegions } from '../lib/design-map.ts';
+import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../lib/design-map.ts';
 
 function snapshot(count, childCount = 0) {
   const modules = Array.from({ length: count }, (_, index) => ({
@@ -91,6 +91,13 @@ const validBundle = {
   graph: { nodes: [{ id: 'node-0', label: 'Anchor', kind: 'function', file: 'src/main.c', line: 1, snippet: 'int main(void) {}' }] },
 };
 if (!isLachesisBundle(validBundle)) throw new Error('valid bundle rejected by the schema guard');
+const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: 'src/alpha/a.c', line: 1, snippet: 'void a() {}' }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
+if (!isLachesisBundle(noModuleBundle)) throw new Error('valid bundle without modules rejected by the schema guard');
+const noModuleSnapshot = toDesignMapSnapshot(noModuleBundle);
+const noModuleRegions = projectTopLevelRegions(noModuleSnapshot, 9);
+if (noModuleRegions.length !== 2 || !noModuleRegions[0]?.downstream?.includes(noModuleRegions[1]?.id ?? '')) throw new Error('nodes without declared modules did not derive a conservative relationship projection');
+if (!noModuleSnapshot.limitations.some((item) => /derived from node module\/file metadata/i.test(item))) throw new Error('derived-module limitation was not disclosed');
+console.log('ok bundles without declared modules derive conservative regions');
 const windowBundle = { ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined, source_window: { start_line: 1, lines: ['int main(void) {}'] } }] } };
 if (!isLachesisBundle(windowBundle)) throw new Error('valid source_window bundle rejected by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: { invalid: true } } })) throw new Error('non-string generated_at accepted by the schema guard');

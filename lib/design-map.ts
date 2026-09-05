@@ -176,11 +176,29 @@ function positiveInteger(value: unknown, fallback: number) {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : fallback;
 }
 
+function deriveModules(nodes: BundleNode[]): BundleModule[] {
+  const groups = new Map<string, string[]>();
+  nodes.forEach((node) => {
+    const key = node.module?.trim() || node.file.split('/').slice(0, -1).join('/') || 'root';
+    const ids = groups.get(key) ?? [];
+    ids.push(node.id);
+    groups.set(key, ids);
+  });
+  return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([name, node_ids], index) => ({
+    id: `derived:module:${index}:${name.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'root'}`,
+    name,
+    path: name === 'root' ? undefined : name,
+    node_ids,
+  }));
+}
+
 /** Normalize a validated Lachesis bundle into the HLD metadata surface. */
 export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
   const includedNodes = positiveInteger(bundle.graph.coverage?.included_nodes, bundle.graph.nodes.length);
   const indexedNodes = positiveInteger(bundle.graph.coverage?.indexed_nodes, bundle.meta.indexed_nodes);
   const limitations = [...(bundle.graph.coverage?.limitations ?? [])];
+  const modules = bundle.graph.modules?.length ? bundle.graph.modules : deriveModules(bundle.graph.nodes);
+  if (!bundle.graph.modules?.length) limitations.push('Top-level regions were conservatively derived from node module/file metadata because this bundle did not declare graph modules.');
 
   if (bundle.meta.fixture === true && !limitations.some((item) => /demo fixture/i.test(item))) {
     limitations.unshift('Demo fixture: graph shape is transport-valid but is not verified repository evidence.');
@@ -200,7 +218,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     includedNodes,
     coverageScope: bundle.graph.coverage?.scope ?? 'repository',
     limitations,
-    modules: bundle.graph.modules ?? [],
+    modules,
     relationships: bundle.graph.edges ?? [],
     nodes: bundle.graph.nodes,
   };
