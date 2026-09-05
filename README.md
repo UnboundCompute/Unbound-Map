@@ -74,7 +74,7 @@ Suggested maintainer-share framing:
 - **README / issue:** “Start with the [architecture map](https://<your-design-map-host>/architecture) to see the repository’s major responsibilities before reading source.”
 - **Twitter / LinkedIn:** “What does this codebase do before you open a file? Design Map gives you the HLD shape, one canonical flow, and a path into exact symbols: https://<your-design-map-host>/”
 
-The typed adapter in [`lib/design-map.ts`](./lib/design-map.ts) is the boundary for that integration. It accepts Lachesis graph-first bundle metadata and projects it into the smaller snapshot surface that an HLD renderer needs: repository identity, revision, coverage, limitations, and modules. Raw graph nodes should stay in Lachesis.
+The typed adapter in [`lib/design-map.ts`](./lib/design-map.ts) is the boundary for that integration. It accepts Lachesis graph-first bundle metadata and projects it into the smaller snapshot surface that an HLD renderer needs: repository identity, revision, coverage, limitations, modules, and validated module-level relationships. Raw graph nodes should stay in Lachesis.
 
 [`lib/hosted.ts`](./lib/hosted.ts) is the companion transport boundary. It accepts only opaque `b_…` bundle IDs, uses the existing Lachesis bundle endpoint, caps response size, rejects redirects, and reports expired or malformed artifacts as user-readable errors.
 
