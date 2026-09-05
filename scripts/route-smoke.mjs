@@ -36,7 +36,7 @@ async function redirect(path, target) {
   console.log(`ok ${path} → ${response.headers.get('location')}`);
 }
 
-await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture snapshot', 'Graph-backed bundle requested', 'Preparing a verified repository map.', 'Open Architecture loader', 'Open Lachesis context', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo123', 'full revision', 'Not supplied by snapshot', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo123"']);
+await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture snapshot', 'Graph-backed bundle requested', 'Awaiting a verified repository map.', 'Open Architecture loader', 'Open Lachesis context', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo123', 'full revision', 'Not supplied by snapshot', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo123"']);
 await pageWithout('/?repository=Zeek&revision=main&bundle=b_demo123', ['Suricata turns network traffic', 'The structural idea', 'A long packet-processing path']);
 await pageWithout('/', ['class="bar-lachesis"']);
 await image('/opengraph-image?repository=Zeek&revision=main');
