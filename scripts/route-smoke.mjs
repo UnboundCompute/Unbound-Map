@@ -83,8 +83,11 @@ await page('/architecture?region=unknown&level=1', ['requested region is not pre
 await page('/architecture/not-a-region', ['Region context unavailable', 'aria-atomic="true"']);
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
 await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state', 'href="/architecture?region=decode&amp;level=1"', `href="${lachesis}/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;label=Packet+decode&amp;anchor=DecodeEthernet%28%29"`]);
-await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo1234', ['Graph-backed chapter unavailable', 'will not substitute an illustrative chapter', '<meta property="og:title" content="Architecture region · Zeek"']);
-await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo1234', ['What this region owns', 'Validated payload window']);
+// Use an opaque ID that is guaranteed not to be the local demo fixture so the
+// unavailable-state assertion remains deterministic with either the public API
+// or a locally running Explorer server.
+await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_missing9999', ['Graph-backed chapter unavailable', 'will not substitute an illustrative chapter', '<meta property="og:title" content="Architecture region · Zeek"']);
+await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_missing9999', ['What this region owns', 'Validated payload window']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
 await redirect('/flow?step=ipv4', '/flows?step=ipv4');
 await xml('/sitemap.xml', ['<loc>http://localhost:3000/explore</loc>']);
