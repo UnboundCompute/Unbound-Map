@@ -43,6 +43,19 @@ const relationshipRegions = projectTopLevelRegions(relationshipSnapshot, 9);
 if (!relationshipRegions[0]?.downstream?.includes('module-1') || !relationshipRegions[1]?.upstream?.includes('module-0')) throw new Error('node relationships did not project to top-level regions');
 console.log('ok node relationships → top-level region relationships');
 
+function topologySnapshot(count, pairs) {
+  const base = snapshot(count);
+  return { ...base, relationships: pairs.map(([source, target]) => ({ source: `node-${source}`, target: `node-${target}`, kind: 'calls' })) };
+}
+const pipeline = projectTopLevelRegions(topologySnapshot(4, [[0, 1], [1, 2], [2, 3]]), 9);
+if (pipeline[0]?.downstream?.join() !== 'module-1' || pipeline[3]?.upstream?.join() !== 'module-2') throw new Error('pipeline topology was not preserved');
+const fan = projectTopLevelRegions(topologySnapshot(4, [[0, 1], [0, 2], [0, 3]]), 9);
+if (fan[0]?.downstream?.length !== 3 || fan.slice(1).some((region) => !region.upstream?.includes('module-0'))) throw new Error('fan-out topology was not preserved');
+const meshPairs = Array.from({ length: 4 }, (_, source) => Array.from({ length: 4 }, (_, target) => [source, target])).flat().filter(([source, target]) => source !== target);
+const mesh = projectTopLevelRegions(topologySnapshot(4, meshPairs), 9);
+if (mesh.some((region) => region.upstream?.length !== 3 || region.downstream?.length !== 3)) throw new Error('flat mesh topology was not preserved');
+console.log('ok pipeline, fan-out, and flat-mesh topology fixtures');
+
 const validBundle = {
   format: 'lachesis-explorer-bundle',
   schema_version: '2.0',
