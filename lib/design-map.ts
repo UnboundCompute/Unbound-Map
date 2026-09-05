@@ -25,6 +25,7 @@ export type BundleModule = {
 };
 
 export type BundleEdge = {
+  id?: string;
   source: string;
   target: string;
   kind?: string;
@@ -100,8 +101,10 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || typeof module.name !== 'string' || !module.name.trim() || (module.path !== undefined && typeof module.path !== 'string')
     || (module.parent_id !== undefined && (typeof module.parent_id !== 'string' || !module.parent_id.trim()))
     || (module.node_ids !== undefined && (!Array.isArray(module.node_ids) || module.node_ids.some((id) => typeof id !== 'string' || !id.trim()))))) return false;
-  if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || typeof edge.source !== 'string' || !edge.source.trim()
+  if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || (edge.id !== undefined && (typeof edge.id !== 'string' || !edge.id.trim())) || typeof edge.source !== 'string' || !edge.source.trim()
     || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string'))) return false;
+  const edgeIds = (graph!.edges ?? []).map((edge) => edge.id).filter((id): id is string => id !== undefined);
+  if (new Set(edgeIds).size !== edgeIds.length) return false;
 
   const nodeIds = new Set(graph!.nodes.map((node) => node.id));
   if (nodeIds.size !== graph!.nodes.length) return false;
