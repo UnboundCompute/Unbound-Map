@@ -29,6 +29,8 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
   const bundleFromUrl = searchParams.has('bundle') ? (searchParams.get('bundle') ?? undefined) : (typeof window === 'undefined' ? initialBundle : undefined);
+  const repositoryFromUrl = searchParams.get('repository') ?? undefined;
+  const revisionFromUrl = searchParams.get('revision') ?? undefined;
 
   useEffect(() => {
     setSelected(searchParams.get('region') ?? 'decode');
@@ -51,7 +53,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       return () => window.removeEventListener('popstate', restoreFocus);
     }
     setRequestedBundle(bundleFromUrl);
-    const pendingSnapshot = snapshotWithContext(illustrativeSnapshot, { repository: searchParams.get('repository') ?? undefined, revision: searchParams.get('revision') ?? undefined, bundle: bundleFromUrl });
+    const pendingSnapshot = snapshotWithContext(illustrativeSnapshot, { repository: repositoryFromUrl, revision: revisionFromUrl, bundle: bundleFromUrl });
     setSnapshot(pendingSnapshot);
     publishSnapshot(pendingSnapshot);
     const controller = new AbortController();
@@ -70,7 +72,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
     });
     return () => { controller.abort(); window.removeEventListener('popstate', restoreFocus); };
-  }, [bundleFromUrl]);
+  }, [bundleFromUrl, repositoryFromUrl, revisionFromUrl]);
 
   const allRegions = snapshot.regions;
   const regions = useMemo(() => allRegions.slice(0, 9), [allRegions]);
