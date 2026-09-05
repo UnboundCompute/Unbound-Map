@@ -15,14 +15,6 @@ function isActive(href: string, active?: string) {
   return href === '/' ? active === '/' || !active : active === href || Boolean(active?.startsWith(`${href}/`));
 }
 
-export function SnapshotState({ snapshot }: { snapshot: RepositorySnapshotView }) {
-  const bundlePending = snapshot.provenance === 'illustrative' && snapshot.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item));
-  const stale = snapshot.provenance === 'graph-backed' && snapshot.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
-  const sparse = snapshot.provenance === 'graph-backed' && snapshot.regions.length <= 1;
-  const label = bundlePending ? 'Graph-backed bundle requested' : snapshot.provenance === 'illustrative' ? 'Illustrative fixture · coverage limited' : stale ? 'Graph-backed · stale snapshot' : sparse ? 'Graph-backed · sparse projection' : snapshot.coverageState === 'limited' ? 'Graph-backed · coverage limited' : 'Verified graph-backed';
-  return <span className={`snapshot-state snapshot-${snapshot.provenance}${stale ? ' snapshot-stale' : ''}${bundlePending ? ' snapshot-pending' : ''}${sparse ? ' snapshot-sparse' : ''}`}><i aria-hidden="true" />{label}</span>;
-}
-
 function contextualHref(href: string, context?: SharedSnapshotContext) {
   if (!context || (!context.repository && !context.revision && !context.bundle)) return href;
   const query = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();

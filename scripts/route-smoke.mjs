@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 const origin = (process.env.DESIGN_MAP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 
 async function page(path, expected) {
@@ -50,6 +52,8 @@ await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architectu
 await pageWithout('/?repository=Zeek&revision=main&bundle=b_demo123', ['Suricata turns network traffic', 'The structural idea', 'A long packet-processing path']);
 await page('/', ['Suricata, before the source.', 'Follow a packet', 'Open Architecture']);
 await pageWithout('/', ['class="bar-lachesis"']);
+const shellSource = await readFile(new URL('../app/components/DocsShell.tsx', import.meta.url), 'utf8');
+if (shellSource.includes('export function SnapshotState')) throw new Error('superseded SnapshotState implementation remains in the shell');
 await image('/opengraph-image?repository=Zeek&revision=main');
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main', 'href="https://lachesis.unboundcompute.com/?repository=Zeek&amp;revision=main&amp;region=decode&amp;anchor=DecodeEthernet%28%29', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
 await page('/architecture?repository=Zeek&revision=main&bundle=b_demo123', ['A graph-backed bundle was requested', 'Preparing the architecture map', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo123']);
