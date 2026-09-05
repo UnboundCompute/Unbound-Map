@@ -59,7 +59,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   // Keep the server-provided bundle during the first client render. Next can
   // briefly expose an unhydrated search-param snapshot on a direct shared URL;
   // dropping `initialBundle` there leaves the map stuck in loading forever.
-  const bundleFromUrl = searchParams.has('bundle') ? (searchParams.get('bundle') ?? undefined) : initialBundle;
+  const bundleFromUrl = searchParams.get('bundle') ?? initialBundle;
   const repositoryFromUrl = searchParams.get('repository') ?? undefined;
   const revisionFromUrl = searchParams.get('revision') ?? undefined;
 
