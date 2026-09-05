@@ -12,6 +12,7 @@ export type BundleNode = {
   file: string;
   line: number;
   module?: string;
+  parent_id?: string;
   documentation?: string;
 };
 
@@ -81,7 +82,20 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || typeof node.label !== 'string' || !node.label.trim() || typeof node.kind !== 'string' || !node.kind.trim()
     || typeof node.file !== 'string' || !node.file.trim() || typeof node.line !== 'number' || !Number.isInteger(node.line) || node.line < 0
     || (node.module !== undefined && (typeof node.module !== 'string' || !node.module.trim()))
+    || (node.parent_id !== undefined && (typeof node.parent_id !== 'string' || !node.parent_id.trim()))
     || (node.documentation !== undefined && typeof node.documentation !== 'string'))) return false;
+  const nodesById = new Map(graph!.nodes.map((node) => [node.id, node]));
+  if (graph!.nodes.some((node) => node.parent_id && (!nodesById.has(node.parent_id) || node.parent_id === node.id))) return false;
+  if (graph!.nodes.some((node) => {
+    const seen = new Set<string>([node.id]);
+    let parent = node.parent_id;
+    while (parent) {
+      if (seen.has(parent)) return true;
+      seen.add(parent);
+      parent = nodesById.get(parent)?.parent_id;
+    }
+    return false;
+  })) return false;
   if ((graph!.modules ?? []).some((module) => !module || typeof module.id !== 'string' || !module.id.trim()
     || typeof module.name !== 'string' || !module.name.trim() || (module.path !== undefined && typeof module.path !== 'string')
     || (module.parent_id !== undefined && (typeof module.parent_id !== 'string' || !module.parent_id.trim()))
