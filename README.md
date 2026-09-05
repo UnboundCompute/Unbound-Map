@@ -17,6 +17,7 @@ Before sharing or opening a pull request, run the static and route gates:
 npm run check
 npm run build
 npm run projection-smoke
+npm run hosted-smoke
 npm run smoke # with `npm run dev` running on port 3000
 ```
 
