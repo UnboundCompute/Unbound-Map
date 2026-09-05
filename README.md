@@ -4,6 +4,8 @@ Design Map is the HLD reading layer for UnboundCompute: a generated, commit-addr
 
 It is designed to answer **“what is this system?”** before a newcomer opens the source. Code-level questions hand off to [Lachesis](https://lachesis.unboundcompute.com/), the graph reader.
 
+The boundary is deliberate: Design Map explains architecture, Lachesis exposes exact source and symbol context, and Trace is reserved for reviewed, adjudicated findings after investigation.
+
 ## Local development
 
 ```bash
