@@ -9,6 +9,7 @@
     "start": "next start",
     "smoke": "node scripts/route-smoke.mjs",
     "hosted-smoke": "node --experimental-strip-types scripts/hosted-smoke.mjs",
+    "explorer-smoke": "node --experimental-strip-types scripts/explorer-integration-smoke.mjs",
     "projection-smoke": "node --experimental-strip-types scripts/projection-smoke.mjs",
     "check": "tsc --noEmit"
   },
