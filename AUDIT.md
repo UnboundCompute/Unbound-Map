@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `audit-2026-09-05` | Full-route touch-target sweep | Playwright measured every visible link, button, summary, input, and select at 375px across Start, Architecture, region chapter, Flows, dedicated flow, Trust, Explore, and Embed; no rendered control was below 44px in either dimension. |
 | `audit-2026-09-05` | Semantic control sweep | Playwright inspected every `button`, link, input, select, and summary on Start, Architecture, Flows, Trust, Explore, and Embed at 375px with no unlabeled controls; the skip link focused and activated `#main-content` successfully. |
 | `1237827` | Document Trace boundary for distribution | README now states the Design Map/Lachesis/Trace separation alongside the share/embed guidance, so maintainers arriving through repository documentation receive the same altitude contract as handoff readers. `git diff --check` passed. |
 | `3bd823c` | Surface Architecture text alternative | Architecture now shows a concise data-derived `Text view` sentence before the optional relationship transcript, including explicit wire-input and consumer-output boundaries; graph-backed bundles without edge evidence state that no path is inferred. Route smoke, typecheck, build, and diff checks passed. |
