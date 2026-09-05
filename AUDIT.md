@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `4e53082` | Identify default flow repository in metadata | Dedicated `/flows/packet-decode` now includes the default `Suricata` identity when no repository query is supplied, matching contextual titles on all other canonical routes; server-rendered title, typecheck, smoke, build, and diff checks passed. |
 | `audit-2026-09-05` | Verify route title coverage | Server-rendered canonical routes now expose repository-specific titles for Start, Architecture, Flows, Trust, Explore, Embed, region chapters, and dedicated flow pages; no route falls back to a generic product-only title. |
 | `audit-2026-09-05` | Review three-product handoff layout | Contextual Explore at 1440px renders three equal 247px boundary columns; at 375px they stack to 339px with zero overflow, one `h1`, and the full Trace explanation visible. Desktop/mobile screenshots were captured and inspected. |
 | `e1f7691` | Complete typed Lachesis handoff context | `LachesisHandoff` now models optional flow, step, and trust-domain identifiers in addition to repository, revision, region, anchor, and opaque bundle identity, matching the URL contract already exercised by the UI; typecheck, route smoke, and diff checks passed. |
