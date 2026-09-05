@@ -90,7 +90,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const renderParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
   const requestedRegion = renderParams.get('region');
   const regionIsUnknown = Boolean(requestedRegion && !allRegions.some((region) => region.id === requestedRegion));
-  const activeBundle = renderParams.get('bundle') ?? initialBundle;
+  const activeBundle = renderParams.has('bundle') ? (renderParams.get('bundle') ?? undefined) : (typeof window === 'undefined' ? initialBundle : undefined);
   const linkSnapshot: RepositorySnapshotView = { ...snapshot, repository: renderParams.get('repository') ?? snapshot.repository, revision: renderParams.get('revision') ?? snapshot.revision };
   const systemShapeParams = new URLSearchParams(renderParams);
   systemShapeParams.delete('region');
