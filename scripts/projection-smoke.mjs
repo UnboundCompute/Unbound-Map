@@ -91,7 +91,7 @@ const validBundle = {
   graph: { nodes: [{ id: 'node-0', label: 'Anchor', kind: 'function', file: 'src/main.c', line: 1, snippet: 'int main(void) {}' }] },
 };
 if (!isLachesisBundle(validBundle)) throw new Error('valid bundle rejected by the schema guard');
-const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: 'src/alpha/a.c', line: 1, snippet: 'void a() {}' }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
+const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: '', line: 0 }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
 if (!isLachesisBundle(noModuleBundle)) throw new Error('valid bundle without modules rejected by the schema guard');
 const noModuleSnapshot = toDesignMapSnapshot(noModuleBundle);
 const noModuleRegions = projectTopLevelRegions(noModuleSnapshot, 9);

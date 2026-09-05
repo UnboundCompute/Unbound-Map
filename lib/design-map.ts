@@ -87,7 +87,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
 
   if (graph!.nodes.some((node) => !node || typeof node !== 'object' || typeof node.id !== 'string' || !node.id.trim()
     || typeof node.label !== 'string' || !node.label.trim() || typeof node.kind !== 'string' || !node.kind.trim()
-    || typeof node.file !== 'string' || !node.file.trim() || typeof node.line !== 'number' || !Number.isInteger(node.line) || node.line < 0
+    || typeof node.file !== 'string' || typeof node.line !== 'number' || !Number.isInteger(node.line) || node.line < 0
     || (node.module !== undefined && (typeof node.module !== 'string' || !node.module.trim()))
     || (node.parent_id !== undefined && (typeof node.parent_id !== 'string' || !node.parent_id.trim()))
     || (node.snippet !== undefined && (typeof node.snippet !== 'string' || !node.snippet.trim()))
