@@ -91,8 +91,23 @@ NEXT_PUBLIC_BUNDLE_API_URL=http://localhost:3210 \\
 npm run dev -- -p 3304
 ```
 
+To exercise the currently hosted Lachesis demo bundle without running a local backend, use the
+public Explorer origin for the bundle transport:
+
+```bash
+NEXT_PUBLIC_LACHESIS_URL=https://lachesis.unboundcompute.com \\
+NEXT_PUBLIC_BUNDLE_API_URL=https://lachesis.unboundcompute.com \\
+npm run dev -- -p 3304
+```
+
+Then open `/architecture?repository=demo%2Fatlas-commerce&revision=main&bundle=b_demo1234`.
+This fixture is intentionally labeled as a demo; it proves transport and rendering, not repository
+evidence.
+
 The bundle API value is required to be an origin/path without credentials, query, or fragment;
-production values must use HTTPS. If it is omitted, Design Map uses its same-origin API route.
+production values must use HTTPS. If it is omitted, Design Map requests `/api/bundles/{id}` from
+its own origin, which requires a same-origin reverse proxy or API route; a standalone static host
+does not provide that route automatically.
 
 Suggested maintainer-share framing:
 
