@@ -18,7 +18,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const repository = one(metadataQuery.repository);
   const entry = flows[flow as keyof typeof flows];
   const label = repository ? `${repository} · ` : '';
-  const imageContext = { repository, revision: one(metadataQuery.revision) };
+  const imageContext = { repository, revision: one(metadataQuery.revision), bundle: one(metadataQuery.bundle) };
   return entry ? documentMetadata(`${label}${entry.title} · Design Map`, `${entry.intro} Read the architectural handoffs before the source.`, imageContext) : documentMetadata(`${label}Architectural flow · Design Map`, 'Read the architectural handoffs before the source.', imageContext);
 }
 

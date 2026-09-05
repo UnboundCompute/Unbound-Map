@@ -59,7 +59,7 @@ await page('/flows?repository=Zeek&revision=main&bundle=b_demo123', ['Graph-back
 await pageWithout('/flows?repository=Zeek&revision=main&bundle=b_demo123', ['Packet bytes → validated layers → flow state', 'Read all five handoffs as text']);
 await page('/flows?step=missing-step', ['requested step is not in this flow']);
 await page('/flows?branch=runtime', ['Runtime flow dispatch', 'aria-pressed="true"', 'Observed state selects the parser path.']);
-await page('/flows/packet-decode?repository=Zeek&revision=main&bundle=b_demo123&step=ipv4', ['Graph-backed bundle requested', 'Open Architecture loader', 'Open Lachesis context']);
+await page('/flows/packet-decode?repository=Zeek&revision=main&bundle=b_demo123&step=ipv4', ['Graph-backed bundle requested', 'Open Architecture loader', 'Open Lachesis context', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo123']);
 await pageWithout('/flows/packet-decode?repository=Zeek&revision=main&bundle=b_demo123&step=ipv4', ['validated IPv4 payload', 'Read all five handoffs as text']);
 await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="memory"', 'value="input"', 'Memory safety', '<meta property="og:title" content="Zeek trust surfaces · Design Map"', '<meta name="twitter:title" content="Zeek trust surfaces · Design Map"']);
 await page('/trust?repository=Zeek&revision=main&domain=memory-safety', ['id="memory-safety"', 'id="memory-safety-title"', 'Selected trust domain.', 'Memory safety']);
