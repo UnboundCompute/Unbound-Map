@@ -231,7 +231,13 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   if (topLevel.length > safeLimit) topLevel.slice(safeLimit - 1).forEach((module) => regionIdForModule.set(module.id, 'region:other'));
   const moduleByNodeId = new Map<string, string>();
   snapshot.modules.forEach((module) => (module.node_ids ?? []).forEach((nodeId) => moduleByNodeId.set(nodeId, module.id)));
-  snapshot.nodes.forEach((node) => { if (node.module) moduleByNodeId.set(node.id, node.module); });
+  const moduleAliases = new Map<string, string>();
+  snapshot.modules.forEach((module) => {
+    moduleAliases.set(module.id, module.id);
+    moduleAliases.set(module.name, module.id);
+    if (module.path) moduleAliases.set(module.path, module.id);
+  });
+  snapshot.nodes.forEach((node) => { if (node.module) moduleByNodeId.set(node.id, moduleAliases.get(node.module) ?? node.module); });
   const topLevelByModule = new Map(snapshot.modules.map((module) => [module.id, module.parent_id ? undefined : module.id]));
   const findTopLevel = (moduleId: string | undefined) => {
     let current = moduleId;

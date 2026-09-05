@@ -56,6 +56,12 @@ const mesh = projectTopLevelRegions(topologySnapshot(4, meshPairs), 9);
 if (mesh.some((region) => region.upstream?.length !== 3 || region.downstream?.length !== 3)) throw new Error('flat mesh topology was not preserved');
 console.log('ok pipeline, fan-out, and flat-mesh topology fixtures');
 
+const aliasBase = snapshot(2);
+const aliasSnapshot = { ...aliasBase, modules: aliasBase.modules.map(({ node_ids: _nodeIds, ...module }) => module), nodes: aliasBase.nodes.map((node, index) => ({ ...node, module: `Module ${String(index).padStart(3, '0')}` })), relationships: [{ source: 'node-0', target: 'node-1' }] };
+const aliasRegions = projectTopLevelRegions(aliasSnapshot, 9);
+if (!aliasRegions[0]?.downstream?.includes('module-1')) throw new Error('module name aliases did not resolve node relationships');
+console.log('ok module name aliases resolve relationships');
+
 const validBundle = {
   format: 'lachesis-explorer-bundle',
   schema_version: '2.0',
