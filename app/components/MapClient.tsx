@@ -154,7 +154,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     params.set('level', '1');
     params.delete('anchor');
     if (window.matchMedia('(max-width: 820px)').matches) {
-      const mobileDestination = route === '/architecture' ? `/architecture/${regionPath(region.id)}?${params.toString()}` : `${route}?${params.toString()}`;
+      const mobileDestination = route === '/architecture' && snapshot.provenance === 'illustrative' ? `/architecture/${regionPath(region.id)}?${params.toString()}` : `${route}?${params.toString()}`;
       window.location.assign(mobileDestination);
       return;
     }
