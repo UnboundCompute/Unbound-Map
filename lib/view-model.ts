@@ -70,6 +70,10 @@ export type LachesisHandoff = {
   regionLabel: string;
   anchor: string;
   bundleId?: string;
+  /** Optional route context carried when the anchor was reached through another reading surface. */
+  flowId?: string;
+  stepId?: string;
+  trustDomainId?: string;
 };
 
 export function snapshotWithContext(snapshot: RepositorySnapshotView, context: SharedSnapshotContext): RepositorySnapshotView {
