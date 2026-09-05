@@ -47,6 +47,17 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
           {snapshot.repository} turns network traffic into protocol state, detection, and alerts. This guide gives you the design-level orientation first.
         </PageIntro>
 
+        <section className="start-actions" aria-labelledby="start-actions-title">
+          <div>
+            <h2 id="start-actions-title">Follow one packet first.</h2>
+            <p>The canonical packet path is the clearest introduction. Open Architecture instead when you already know the subsystem you need.</p>
+          </div>
+          <div className="start-action-links">
+            <Link className="primary-button" href={contextual('/flows/packet-decode')}>Follow a packet <span aria-hidden="true">→</span></Link>
+            <Link className="start-action-secondary" href={architectureHref()}>Open Architecture <span aria-hidden="true">→</span></Link>
+          </div>
+        </section>
+
         <section className="thesis-block" aria-labelledby="thesis-title">
           <h2 id="thesis-title">A long packet-processing path with a broad detection stage in the middle.</h2>
           <p>Start at the wire and follow the handoffs. The map names responsibilities; Lachesis opens the exact implementation.</p>
@@ -70,17 +81,6 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
             ].map(([label, region], index) => <Link key={label} href={architectureHref(region)} className={index === 4 ? 'path-emphasis' : ''}>{label}</Link>)}
           </nav>
           <p className="map-caption">Detection is intentionally wider: protocol-aware rules, prefilters, and matchers meet the normalized stream here.</p>
-        </section>
-
-        <section className="start-actions" aria-labelledby="start-actions-title">
-          <div>
-            <h2 id="start-actions-title">Follow one packet first.</h2>
-            <p>The canonical packet path is the clearest introduction. Open Architecture instead when you already know the subsystem you need.</p>
-          </div>
-          <div className="start-action-links">
-            <Link className="primary-button" href={contextual('/flows/packet-decode')}>Follow a packet <span aria-hidden="true">→</span></Link>
-            <Link className="start-action-secondary" href={architectureHref()}>Open Architecture <span aria-hidden="true">→</span></Link>
-          </div>
         </section>
 
         <EvidenceNote>Illustrative prototype: repository facts and {snapshot.repository} wording here are a content fixture until a graph-backed snapshot is connected. Structural claims should carry the loaded revision and coverage when published.</EvidenceNote>
