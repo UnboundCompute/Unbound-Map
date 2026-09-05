@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { loadHostedBundle } from '../../lib/hosted';
 import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../../lib/design-map';
-import { illustrativeSnapshot, snapshotFromProjection, toHandoff, type RepositorySnapshotView, type SystemRegion } from '../../lib/view-model';
+import { illustrativeSnapshot, snapshotFromProjection, snapshotWithContext, toHandoff, type RepositorySnapshotView, type SystemRegion } from '../../lib/view-model';
 
 type Position = { x: number; y: number; tone: 'gold' | 'blue' | 'violet' | 'green' };
 function normalizeLevel(value: string | null | undefined) { return value === '1' || value === '2' ? value : '0'; }
@@ -36,6 +36,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   }, [searchParams]);
 
   useEffect(() => {
+    const publishSnapshot = (next: RepositorySnapshotView) => window.dispatchEvent(new CustomEvent('design-map:snapshot-ready', { detail: { provenance: next.provenance, coverageState: next.coverageState, limitations: next.limitations, regionCount: next.regions.length, repository: next.repository, revision: next.revision, generatedAt: next.generatedAt, coverageScope: next.coverageScope, indexedNodes: next.indexedNodes } }));
     const restoreFocus = () => {
       const next = new URLSearchParams(window.location.search);
       setSelected(next.get('region') ?? 'decode');
@@ -46,9 +47,13 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       setRequestedBundle('');
       setBundleState('idle');
       setSnapshot(illustrativeSnapshot);
+      publishSnapshot(illustrativeSnapshot);
       return () => window.removeEventListener('popstate', restoreFocus);
     }
     setRequestedBundle(bundleFromUrl);
+    const pendingSnapshot = snapshotWithContext(illustrativeSnapshot, { repository: searchParams.get('repository') ?? undefined, revision: searchParams.get('revision') ?? undefined, bundle: bundleFromUrl });
+    setSnapshot(pendingSnapshot);
+    publishSnapshot(pendingSnapshot);
     const controller = new AbortController();
     setBundleState('loading');
     loadHostedBundle(bundleFromUrl, controller.signal).then((bundle) => {
@@ -56,7 +61,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       const raw = toDesignMapSnapshot(bundle);
       const next = snapshotFromProjection(raw, projectTopLevelRegions(raw));
       setSnapshot(next);
-      window.dispatchEvent(new CustomEvent('design-map:snapshot-ready', { detail: { provenance: next.provenance, coverageState: next.coverageState, limitations: next.limitations, regionCount: next.regions.length, repository: next.repository, revision: next.revision, generatedAt: next.generatedAt, coverageScope: next.coverageScope, indexedNodes: next.indexedNodes } }));
+      publishSnapshot(next);
       setSelected((current) => next.regions.some((region) => region.id === current) ? current : next.regions[0]?.id ?? '');
       setBundleState('ready');
     }).catch((error) => {
