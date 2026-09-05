@@ -75,6 +75,11 @@ For production sharing, set `NEXT_PUBLIC_SITE_URL` to the public Design Map orig
 the sitemap and social-image metadata; `VERCEL_URL` is detected automatically on Vercel, while
 local development falls back to `http://localhost:3000`.
 
+For local cross-product testing, set `NEXT_PUBLIC_LACHESIS_URL` before building Design Map (for
+example `http://localhost:3210`). Invalid values or values with credentials/query strings safely
+fall back to `https://lachesis.unboundcompute.com`; production deployments should leave the
+default unless the public Explorer origin is intentionally changed.
+
 Suggested maintainer-share framing:
 
 - **README / issue:** “Start with the [architecture map](https://<your-design-map-host>/architecture) to see the repository’s major responsibilities before reading source.”
