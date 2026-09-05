@@ -64,20 +64,30 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   const validShape = candidate.format === 'lachesis-explorer-bundle'
     && candidate.schema_version === '2.0'
     && !!meta && typeof meta === 'object'
-    && typeof meta.repository === 'string' && typeof meta.language === 'string' && typeof meta.revision === 'string'
+    && typeof meta.repository === 'string' && meta.repository.trim().length > 0 && typeof meta.language === 'string' && meta.language.trim().length > 0 && typeof meta.revision === 'string' && meta.revision.trim().length > 0
     && typeof meta.lines === 'number' && Number.isInteger(meta.lines) && meta.lines >= 0
     && typeof meta.indexed_nodes === 'number' && Number.isInteger(meta.indexed_nodes) && meta.indexed_nodes >= 0
     && (meta.generated_at === undefined || typeof meta.generated_at === 'string')
     && (meta.description === undefined || typeof meta.description === 'string')
     && (meta.source_url_template === undefined || typeof meta.source_url_template === 'string')
     && !!graph && typeof graph === 'object'
-    && Array.isArray(graph.nodes)
-    && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.kind === 'string' && typeof node.file === 'string' && typeof node.line === 'number' && Number.isInteger(node.line) && node.line >= 0 && (node.module === undefined || typeof node.module === 'string') && (node.documentation === undefined || typeof node.documentation === 'string'))
+    && Array.isArray(graph.nodes) && graph.nodes.length > 0
     && (graph.modules === undefined || Array.isArray(graph.modules))
-    && (graph.modules === undefined || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (module.path === undefined || typeof module.path === 'string') && (module.parent_id === undefined || typeof module.parent_id === 'string') && (module.node_ids === undefined || (Array.isArray(module.node_ids) && module.node_ids.every((id) => typeof id === 'string')))))
-    && (graph.edges === undefined || (Array.isArray(graph.edges) && graph.edges.every((edge) => !!edge && typeof edge === 'object' && typeof edge.source === 'string' && typeof edge.target === 'string' && (edge.kind === undefined || typeof edge.kind === 'string'))))
+    && (graph.edges === undefined || Array.isArray(graph.edges))
     && (graph.coverage === undefined || (!!graph.coverage && typeof graph.coverage === 'object' && (graph.coverage.scope === undefined || typeof graph.coverage.scope === 'string') && (graph.coverage.included_nodes === undefined || (typeof graph.coverage.included_nodes === 'number' && Number.isInteger(graph.coverage.included_nodes) && graph.coverage.included_nodes >= 0)) && (graph.coverage.indexed_nodes === undefined || (typeof graph.coverage.indexed_nodes === 'number' && Number.isInteger(graph.coverage.indexed_nodes) && graph.coverage.indexed_nodes >= 0)) && (graph.coverage.limitations === undefined || (Array.isArray(graph.coverage.limitations) && graph.coverage.limitations.every((item) => typeof item === 'string'))) && (graph.coverage.capabilities === undefined || (Array.isArray(graph.coverage.capabilities) && graph.coverage.capabilities.every((item) => typeof item === 'string')))));
   if (!validShape) return false;
+
+  if (graph!.nodes.some((node) => !node || typeof node !== 'object' || typeof node.id !== 'string' || !node.id.trim()
+    || typeof node.label !== 'string' || !node.label.trim() || typeof node.kind !== 'string' || !node.kind.trim()
+    || typeof node.file !== 'string' || !node.file.trim() || typeof node.line !== 'number' || !Number.isInteger(node.line) || node.line < 0
+    || (node.module !== undefined && (typeof node.module !== 'string' || !node.module.trim()))
+    || (node.documentation !== undefined && typeof node.documentation !== 'string'))) return false;
+  if ((graph!.modules ?? []).some((module) => !module || typeof module.id !== 'string' || !module.id.trim()
+    || typeof module.name !== 'string' || !module.name.trim() || (module.path !== undefined && typeof module.path !== 'string')
+    || (module.parent_id !== undefined && (typeof module.parent_id !== 'string' || !module.parent_id.trim()))
+    || (module.node_ids !== undefined && (!Array.isArray(module.node_ids) || module.node_ids.some((id) => typeof id !== 'string' || !id.trim()))))) return false;
+  if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || typeof edge.source !== 'string' || !edge.source.trim()
+    || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string'))) return false;
 
   const nodeIds = new Set(graph!.nodes.map((node) => node.id));
   if (nodeIds.size !== graph!.nodes.length) return false;
@@ -85,8 +95,19 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   const modules = graph!.modules ?? [];
   const moduleIds = new Set(modules.map((module) => module.id));
   if (moduleIds.size !== modules.length) return false;
-  return modules.every((module) => (!module.parent_id || moduleIds.has(module.parent_id))
-    && (module.node_ids ?? []).every((nodeId) => nodeIds.has(nodeId)));
+  const assignedNodes = new Set<string>();
+  if (modules.some((module) => (module.node_ids ?? []).some((nodeId) => assignedNodes.has(nodeId) || (assignedNodes.add(nodeId), !nodeIds.has(nodeId))))) return false;
+  return modules.every((module) => {
+    if (module.parent_id && !moduleIds.has(module.parent_id)) return false;
+    const seen = new Set<string>([module.id]);
+    let parent = module.parent_id;
+    while (parent) {
+      if (seen.has(parent)) return false;
+      seen.add(parent);
+      parent = modules.find((candidate) => candidate.id === parent)?.parent_id;
+    }
+    return true;
+  });
 }
 
 export type DesignMapSnapshot = {

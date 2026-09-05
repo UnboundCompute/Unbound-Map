@@ -60,9 +60,13 @@ if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: 
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], documentation: null }] } })) throw new Error('null node documentation accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { included_nodes: null } } })) throw new Error('null coverage count accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: null } })) throw new Error('null coverage object accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { nodes: [] } })) throw new Error('empty graph accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], label: '' }] } })) throw new Error('blank node label accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, edges: [{ source: 'node-0', target: 'missing-node' }] } })) throw new Error('dangling graph edge accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [validBundle.graph.nodes[0], validBundle.graph.nodes[0]] } })) throw new Error('duplicate node IDs accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', node_ids: ['missing-node'] }] } })) throw new Error('dangling module node reference accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', parent_id: 'missing-module' }] } })) throw new Error('dangling module parent reference accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module' }, { id: 'module-0', name: 'Duplicate' }] } })) throw new Error('duplicate module IDs accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', node_ids: ['node-0'] }, { id: 'module-1', name: 'Duplicate membership', node_ids: ['node-0'] }] } })) throw new Error('duplicate module node membership accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Cycle A', parent_id: 'module-1' }, { id: 'module-1', name: 'Cycle B', parent_id: 'module-0' }] } })) throw new Error('cyclic module hierarchy accepted by the schema guard');
 console.log('ok malformed metadata rejected by bundle guard');
