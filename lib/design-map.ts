@@ -31,6 +31,7 @@ export type BundleEdge = {
   source: string;
   target: string;
   kind?: string;
+  relation?: string;
 };
 
 export type LachesisBundle = {
@@ -110,7 +111,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || (module.parent_id !== undefined && (typeof module.parent_id !== 'string' || !module.parent_id.trim()))
     || (module.node_ids !== undefined && (!Array.isArray(module.node_ids) || module.node_ids.some((id) => typeof id !== 'string' || !id.trim()))))) return false;
   if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || (edge.id !== undefined && (typeof edge.id !== 'string' || !edge.id.trim())) || typeof edge.source !== 'string' || !edge.source.trim()
-    || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string'))) return false;
+    || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string') || (edge.relation !== undefined && typeof edge.relation !== 'string'))) return false;
   if (meta!.source_url_template !== undefined && !/^https?:\/\//i.test(meta!.source_url_template)) return false;
   const edgeIds = (graph!.edges ?? []).map((edge) => edge.id).filter((id): id is string => id !== undefined);
   if (new Set(edgeIds).size !== edgeIds.length) return false;
@@ -351,13 +352,14 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     if (!incoming.has(to)) incoming.set(to, new Set());
     outgoing.get(from)!.add(to);
     incoming.get(to)!.add(from);
-    if (edge.kind) {
+    const relationKind = edge.kind ?? edge.relation;
+    if (relationKind) {
       if (!relationshipKinds.has(from)) relationshipKinds.set(from, new Map());
       if (!relationshipKinds.get(from)!.has(to)) relationshipKinds.get(from)!.set(to, new Set());
-      relationshipKinds.get(from)!.get(to)!.add(edge.kind);
+      relationshipKinds.get(from)!.get(to)!.add(relationKind);
       if (!incomingRelationshipKinds.has(to)) incomingRelationshipKinds.set(to, new Map());
       if (!incomingRelationshipKinds.get(to)!.has(from)) incomingRelationshipKinds.get(to)!.set(from, new Set());
-      incomingRelationshipKinds.get(to)!.get(from)!.add(edge.kind);
+      incomingRelationshipKinds.get(to)!.get(from)!.add(relationKind);
     }
   });
   const withRelationships = (regions: HLDRegion[]) => regions.map((region) => ({

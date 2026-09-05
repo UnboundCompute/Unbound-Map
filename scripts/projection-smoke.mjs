@@ -38,7 +38,7 @@ const macroBound = projectTopLevelRegions(snapshot(10), 9);
 if (macroBound.length !== 9 || !macroBound.at(-1)?.rolledUp || !macroBound.at(-1)?.label.startsWith('Other ')) throw new Error('nine-region macro bound did not emit an explicit Other remainder');
 console.log('ok 10 top-level modules → 9 macro regions with remainder');
 
-const relationshipSnapshot = { ...snapshot(2), relationships: [{ source: 'node-0', target: 'node-1', kind: 'call' }] };
+const relationshipSnapshot = { ...snapshot(2), relationships: [{ source: 'node-0', target: 'node-1', relation: 'call' }] };
 const relationshipRegions = projectTopLevelRegions(relationshipSnapshot, 9);
 if (!relationshipRegions[0]?.downstream?.includes('module-1') || !relationshipRegions[1]?.upstream?.includes('module-0')) throw new Error('node relationships did not project to top-level regions');
 if (relationshipRegions[0]?.relationshipKinds?.['module-1'] !== 'call') throw new Error('relationship kind did not project to top-level regions');
@@ -110,6 +110,7 @@ if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, source_url_template: 'javascript:alert(1)' } })) throw new Error('non-HTTP source URL template accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, indexed_nodes: 1.5 } })) throw new Error('non-integer indexed_nodes accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], kind: 42 }] } })) throw new Error('non-string node kind accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, edges: [{ source: 'node-0', target: 'node-0', relation: 42 }] } })) throw new Error('non-string edge relation accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', node_ids: [42] }] } })) throw new Error('non-string module node ID accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { limitations: 'not-an-array' } } })) throw new Error('non-array coverage limitations accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, capabilities: 'not-an-array' } })) throw new Error('non-array graph capabilities accepted by the schema guard');
