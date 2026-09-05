@@ -51,7 +51,6 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
         <section className="start-actions" aria-labelledby="start-actions-title">
           <div>
             <h2 id="start-actions-title">Follow one packet first.</h2>
-            <p>The canonical packet path is the clearest introduction. Open Architecture instead when you already know the subsystem you need.</p>
           </div>
           <div className="start-action-links">
             <Link className="primary-button" href={contextual('/flows/packet-decode')}>Follow a packet <span aria-hidden="true">→</span></Link>
@@ -62,8 +61,8 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
         <section className="start-map-preview" aria-labelledby="preview-title">
           <div className="section-heading-row">
             <div>
-              <h2 id="preview-title">The bounded shape of the repository</h2>
-              <p>Select a region to open its architecture chapter; the map stays at design altitude.</p>
+              <h2 id="preview-title">Repository shape</h2>
+              <p>Select a region for its architecture chapter.</p>
             </div>
           </div>
           <MapClient compact regionIds={['input', 'decode', 'core', 'protocols', 'detect', 'output']} route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
