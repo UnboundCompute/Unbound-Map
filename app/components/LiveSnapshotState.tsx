@@ -27,7 +27,7 @@ export function LiveSnapshotState(initial: BadgeState) {
     return () => window.removeEventListener('design-map:snapshot-ready', update);
   }, []);
   const badge = labelFor(state);
-  return <span className={badge.className}><i aria-hidden="true" />{badge.label}</span>;
+  return <><span className={badge.className}><i aria-hidden="true" />{badge.label}</span><span className="source-scope">Coverage: {state.coverageScope}</span></>;
 }
 
 export function LiveSnapshotDetails(initial: BadgeState) {
