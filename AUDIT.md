@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `b132c0d` | Clarify Design Map / Lachesis / Trace boundaries | The Lachesis handoff now names Trace as the destination for reviewed, adjudicated findings, keeping raw suspicion and source evidence out of Design Map; the boundary is protected by route smoke alongside the existing two product descriptions. `npm run check`, `npm run smoke`, `npm run build`, and `git diff --check` passed. |
 | `bf1f3cb` | Compact mobile Start path | At 375px the six-stage ordered path now uses a readable two-row grid (118px tall instead of 290px), preserving DOM order, individual deep links, and zero horizontal overflow while bringing the map surface 180px closer to the first viewport; `npm run smoke`, `npm run build`, and `git diff --check` passed. |
 | `f3055c6` | Label intro coverage scope | Page-intro provenance rows now prefix the raw scope with `Coverage:`, removing the ambiguous repeated scope text while retaining the snapshot state label; `npm run check`, `npm run smoke`, `npm run build`, and `git diff --check` passed. |
 | `178c28a` | Put the single primary journey in the first mobile viewport | The only `Follow a packet` primary action now follows the repository introduction instead of sitting below the architecture preview. Playwright at 375×812 placed it from 724–772px, counted one primary journey action, and reported zero horizontal overflow. |
