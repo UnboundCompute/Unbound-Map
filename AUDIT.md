@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `9880dbd` | Require readable graph-node source representations | The Lachesis boundary now requires each node to provide non-empty `snippet` or `source_window` content, matching the 2.0 contract while keeping source bodies out of the HLD UI; projection smoke covers both valid forms and missing/empty representations, with `npm run check`, `npm run projection-smoke`, `npm run hosted-smoke`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `a853ed2` | Restrict source URL templates to HTTP(S) | Optional Lachesis `meta.source_url_template` values now reject non-web schemes before entering the validated snapshot boundary; projection smoke covers a `javascript:` regression, with `npm run check`, `npm run projection-smoke`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `3fcc24c` | Cover hosted network failures | Hosted transport smoke now asserts a pre-response network exception becomes the reader-facing “could not be reached” error, completing the unavailable-state branch alongside read, JSON, expiry, and size failures; `npm run hosted-smoke`, `npm run check`, `npm run build`, `npm run smoke`, and `git diff --check` passed. |
 | `ff6461e` | Publish the hosted transport gate | README’s pre-share verification sequence now includes `npm run hosted-smoke`, making the transport boundary test discoverable alongside projection, build, and route checks; `git diff --check` passed. |
