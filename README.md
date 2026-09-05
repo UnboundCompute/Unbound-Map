@@ -20,12 +20,15 @@ npm run check
 npm run build
 npm run projection-smoke
 npm run hosted-smoke
+npm run explorer-smoke # with Lachesis Explorer running on port 3200
 npm run smoke # with `npm run dev` running on port 3000
 ```
 
 `projection-smoke` exercises the bounded adapter with 0, 1, 8, 30, and 500 communities plus a
 child roll-up. `smoke` checks contextual routes, social previews, malformed-link recovery, loading
 states, landmarks, and legacy redirects.
+`explorer-smoke` verifies the opaque bundle endpoint and the real Lachesis-to-Design Map projection
+boundary, including relationship and demo-fixture provenance.
 
 The current UI is a focused Suricata prototype with fixture data and these documentation routes:
 
