@@ -38,6 +38,11 @@ const macroBound = projectTopLevelRegions(snapshot(10), 9);
 if (macroBound.length !== 9 || !macroBound.at(-1)?.rolledUp) throw new Error('nine-region macro bound did not emit an explicit remainder');
 console.log('ok 10 top-level modules → 9 macro regions with remainder');
 
+const relationshipSnapshot = { ...snapshot(2), relationships: [{ source: 'node-0', target: 'node-1', kind: 'call' }] };
+const relationshipRegions = projectTopLevelRegions(relationshipSnapshot, 9);
+if (!relationshipRegions[0]?.downstream?.includes('module-1') || !relationshipRegions[1]?.upstream?.includes('module-0')) throw new Error('node relationships did not project to top-level regions');
+console.log('ok node relationships → top-level region relationships');
+
 const validBundle = {
   format: 'lachesis-explorer-bundle',
   schema_version: '2.0',
@@ -55,6 +60,7 @@ if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: 
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], documentation: null }] } })) throw new Error('null node documentation accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { included_nodes: null } } })) throw new Error('null coverage count accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: null } })) throw new Error('null coverage object accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, edges: [{ source: 'node-0', target: 'missing-node' }] } })) throw new Error('dangling graph edge accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [validBundle.graph.nodes[0], validBundle.graph.nodes[0]] } })) throw new Error('duplicate node IDs accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', node_ids: ['missing-node'] }] } })) throw new Error('dangling module node reference accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', parent_id: 'missing-module' }] } })) throw new Error('dangling module parent reference accepted by the schema guard');

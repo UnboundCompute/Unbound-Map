@@ -23,6 +23,12 @@ export type BundleModule = {
   node_ids?: string[];
 };
 
+export type BundleEdge = {
+  source: string;
+  target: string;
+  kind?: string;
+};
+
 export type LachesisBundle = {
   format: 'lachesis-explorer-bundle';
   schema_version: '2.0';
@@ -39,6 +45,7 @@ export type LachesisBundle = {
   graph: {
     nodes: BundleNode[];
     modules?: BundleModule[];
+    edges?: BundleEdge[];
     coverage?: {
       scope?: string;
       included_nodes?: number;
@@ -68,11 +75,13 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && graph.nodes.every((node) => !!node && typeof node === 'object' && typeof node.id === 'string' && typeof node.label === 'string' && typeof node.kind === 'string' && typeof node.file === 'string' && typeof node.line === 'number' && Number.isInteger(node.line) && node.line >= 0 && (node.module === undefined || typeof node.module === 'string') && (node.documentation === undefined || typeof node.documentation === 'string'))
     && (graph.modules === undefined || Array.isArray(graph.modules))
     && (graph.modules === undefined || graph.modules.every((module) => !!module && typeof module.id === 'string' && typeof module.name === 'string' && (module.path === undefined || typeof module.path === 'string') && (module.parent_id === undefined || typeof module.parent_id === 'string') && (module.node_ids === undefined || (Array.isArray(module.node_ids) && module.node_ids.every((id) => typeof id === 'string')))))
+    && (graph.edges === undefined || (Array.isArray(graph.edges) && graph.edges.every((edge) => !!edge && typeof edge === 'object' && typeof edge.source === 'string' && typeof edge.target === 'string' && (edge.kind === undefined || typeof edge.kind === 'string'))))
     && (graph.coverage === undefined || (!!graph.coverage && typeof graph.coverage === 'object' && (graph.coverage.scope === undefined || typeof graph.coverage.scope === 'string') && (graph.coverage.included_nodes === undefined || (typeof graph.coverage.included_nodes === 'number' && Number.isInteger(graph.coverage.included_nodes) && graph.coverage.included_nodes >= 0)) && (graph.coverage.indexed_nodes === undefined || (typeof graph.coverage.indexed_nodes === 'number' && Number.isInteger(graph.coverage.indexed_nodes) && graph.coverage.indexed_nodes >= 0)) && (graph.coverage.limitations === undefined || (Array.isArray(graph.coverage.limitations) && graph.coverage.limitations.every((item) => typeof item === 'string'))) && (graph.coverage.capabilities === undefined || (Array.isArray(graph.coverage.capabilities) && graph.coverage.capabilities.every((item) => typeof item === 'string')))));
   if (!validShape) return false;
 
   const nodeIds = new Set(graph!.nodes.map((node) => node.id));
   if (nodeIds.size !== graph!.nodes.length) return false;
+  if ((graph!.edges ?? []).some((edge) => !nodeIds.has(edge.source) || !nodeIds.has(edge.target))) return false;
   const modules = graph!.modules ?? [];
   const moduleIds = new Set(modules.map((module) => module.id));
   if (moduleIds.size !== modules.length) return false;
@@ -91,6 +100,7 @@ export type DesignMapSnapshot = {
   coverageScope: string;
   limitations: string[];
   modules: BundleModule[];
+  relationships: BundleEdge[];
   nodes: BundleNode[];
 };
 
@@ -132,6 +142,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     coverageScope: bundle.graph.coverage?.scope ?? 'repository',
     limitations,
     modules: bundle.graph.modules ?? [],
+    relationships: bundle.graph.edges ?? [],
     nodes: bundle.graph.nodes,
   };
 }
@@ -174,13 +185,48 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     }))
     .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
 
-  if (topLevel.length <= safeLimit) return topLevel;
+  const regionIdForModule = new Map<string, string>();
+  topLevel.slice(0, safeLimit).forEach((module) => regionIdForModule.set(module.id, module.id));
+  if (topLevel.length > safeLimit) topLevel.slice(safeLimit - 1).forEach((module) => regionIdForModule.set(module.id, 'region:other'));
+  const moduleByNodeId = new Map<string, string>();
+  snapshot.modules.forEach((module) => (module.node_ids ?? []).forEach((nodeId) => moduleByNodeId.set(nodeId, module.id)));
+  snapshot.nodes.forEach((node) => { if (node.module) moduleByNodeId.set(node.id, node.module); });
+  const topLevelByModule = new Map(snapshot.modules.map((module) => [module.id, module.parent_id ? undefined : module.id]));
+  const findTopLevel = (moduleId: string | undefined) => {
+    let current = moduleId;
+    const seen = new Set<string>();
+    while (current && !seen.has(current)) {
+      seen.add(current);
+      const top = topLevelByModule.get(current);
+      if (top) return top;
+      current = snapshot.modules.find((module) => module.id === current)?.parent_id;
+    }
+    return undefined;
+  };
+  const outgoing = new Map<string, Set<string>>();
+  const incoming = new Map<string, Set<string>>();
+  (snapshot.relationships ?? []).forEach((edge) => {
+    const from = regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.source)) ?? '');
+    const to = regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.target)) ?? '');
+    if (!from || !to || from === to) return;
+    if (!outgoing.has(from)) outgoing.set(from, new Set());
+    if (!incoming.has(to)) incoming.set(to, new Set());
+    outgoing.get(from)!.add(to);
+    incoming.get(to)!.add(from);
+  });
+  const withRelationships = (regions: HLDRegion[]) => regions.map((region) => ({
+    ...region,
+    upstream: [...(incoming.get(region.id) ?? [])].sort(),
+    downstream: [...(outgoing.get(region.id) ?? [])].sort(),
+  }));
+
+  if (topLevel.length <= safeLimit) return withRelationships(topLevel);
   const visible = topLevel.slice(0, safeLimit - 1);
   const remainder = topLevel.slice(safeLimit - 1);
-  return [...visible, {
+  return withRelationships([...visible, {
     id: 'region:other',
     label: `${remainder.length} more regions`,
     nodeCount: remainder.reduce((total, region) => total + region.nodeCount, 0),
     rolledUp: true,
-  }];
+  }]);
 }
