@@ -91,6 +91,7 @@ const validBundle = {
 if (!isLachesisBundle(validBundle)) throw new Error('valid bundle rejected by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: { invalid: true } } })) throw new Error('non-string generated_at accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: null } })) throw new Error('null generated_at accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, source_url_template: 'javascript:alert(1)' } })) throw new Error('non-HTTP source URL template accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, indexed_nodes: 1.5 } })) throw new Error('non-integer indexed_nodes accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], kind: 42 }] } })) throw new Error('non-string node kind accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', node_ids: [42] }] } })) throw new Error('non-string module node ID accepted by the schema guard');
