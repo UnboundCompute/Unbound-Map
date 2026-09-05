@@ -61,6 +61,10 @@ const aliasSnapshot = { ...aliasBase, modules: aliasBase.modules.map(({ node_ids
 const aliasRegions = projectTopLevelRegions(aliasSnapshot, 9);
 if (!aliasRegions[0]?.downstream?.includes('module-1')) throw new Error('module name aliases did not resolve node relationships');
 console.log('ok module name aliases resolve relationships');
+const collisionSnapshot = { ...aliasSnapshot, modules: aliasSnapshot.modules.map((module) => ({ ...module, name: 'Shared module' })), nodes: aliasSnapshot.nodes.map((node) => ({ ...node, module: 'Shared module' })) };
+const collisionRegions = projectTopLevelRegions(collisionSnapshot, 9);
+if (collisionRegions.some((region) => region.upstream?.length || region.downstream?.length)) throw new Error('ambiguous module aliases inferred a relationship');
+console.log('ok ambiguous module aliases remain unprojected');
 
 const validBundle = {
   format: 'lachesis-explorer-bundle',

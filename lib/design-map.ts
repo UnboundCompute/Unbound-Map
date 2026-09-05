@@ -232,10 +232,21 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   const moduleByNodeId = new Map<string, string>();
   snapshot.modules.forEach((module) => (module.node_ids ?? []).forEach((nodeId) => moduleByNodeId.set(nodeId, module.id)));
   const moduleAliases = new Map<string, string>();
+  const ambiguousAliases = new Set<string>();
+  const addModuleAlias = (alias: string, moduleId: string) => {
+    if (ambiguousAliases.has(alias)) return;
+    const previous = moduleAliases.get(alias);
+    if (previous && previous !== moduleId) {
+      moduleAliases.delete(alias);
+      ambiguousAliases.add(alias);
+      return;
+    }
+    moduleAliases.set(alias, moduleId);
+  };
   snapshot.modules.forEach((module) => {
-    moduleAliases.set(module.id, module.id);
-    moduleAliases.set(module.name, module.id);
-    if (module.path) moduleAliases.set(module.path, module.id);
+    addModuleAlias(module.id, module.id);
+    addModuleAlias(module.name, module.id);
+    if (module.path) addModuleAlias(module.path, module.id);
   });
   snapshot.nodes.forEach((node) => { if (node.module) moduleByNodeId.set(node.id, moduleAliases.get(node.module) ?? node.module); });
   const topLevelByModule = new Map(snapshot.modules.map((module) => [module.id, module.parent_id ? undefined : module.id]));
