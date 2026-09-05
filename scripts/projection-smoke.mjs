@@ -65,6 +65,10 @@ const collisionSnapshot = { ...aliasSnapshot, modules: aliasSnapshot.modules.map
 const collisionRegions = projectTopLevelRegions(collisionSnapshot, 9);
 if (collisionRegions.some((region) => region.upstream?.length || region.downstream?.length)) throw new Error('ambiguous module aliases inferred a relationship');
 console.log('ok ambiguous module aliases remain unprojected');
+const idPrecedenceSnapshot = { ...aliasSnapshot, modules: [{ ...aliasSnapshot.modules[0], id: 'shared', name: 'Alpha' }, { ...aliasSnapshot.modules[1], id: 'module-1', name: 'shared' }], nodes: aliasSnapshot.nodes.map((node, index) => ({ ...node, module: index === 0 ? 'shared' : 'module-1' })) };
+const idPrecedenceRegions = projectTopLevelRegions(idPrecedenceSnapshot, 9);
+if (!idPrecedenceRegions[0]?.downstream?.includes('module-1')) throw new Error('canonical module ID did not take precedence over a colliding name alias');
+console.log('ok canonical module IDs take precedence over aliases');
 
 const validBundle = {
   format: 'lachesis-explorer-bundle',
