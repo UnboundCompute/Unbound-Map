@@ -15,6 +15,8 @@ export type RepositorySnapshotView = {
   coverageScope: string;
   indexedNodes: number;
   includedNodes: number;
+  /** Number of graph relationships in the source snapshot, including intra-region edges. */
+  relationshipCount?: number;
   limitations: string[];
   regions: SystemRegion[];
 };
@@ -118,6 +120,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     coverageScope: snapshot.coverageScope,
     indexedNodes: snapshot.indexedNodes,
     includedNodes: snapshot.includedNodes,
+    relationshipCount: snapshot.relationships.length,
     limitations: snapshot.limitations,
     regions: regions.map((region) => ({
       id: region.id,
