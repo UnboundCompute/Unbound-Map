@@ -34,6 +34,10 @@ if (children[0]?.children?.length !== 12) throw new Error(`20 child modules proj
 if (!children[0]?.children?.at(-1)?.label.startsWith('Other ')) throw new Error('child projection is missing its explicit remainder roll-up');
 console.log('ok 20 child modules → 12 bounded children');
 
+const macroBound = projectTopLevelRegions(snapshot(10), 9);
+if (macroBound.length !== 9 || !macroBound.at(-1)?.rolledUp) throw new Error('nine-region macro bound did not emit an explicit remainder');
+console.log('ok 10 top-level modules → 9 macro regions with remainder');
+
 const validBundle = {
   format: 'lachesis-explorer-bundle',
   schema_version: '2.0',

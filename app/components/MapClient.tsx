@@ -59,7 +59,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     loadHostedBundle(bundleFromUrl, controller.signal).then((bundle) => {
       if (!isLachesisBundle(bundle)) throw new Error('This hosted map is malformed. Ask for a fresh bundle link from the repository owner.');
       const raw = toDesignMapSnapshot(bundle);
-      const next = snapshotFromProjection(raw, projectTopLevelRegions(raw));
+      const next = snapshotFromProjection(raw, projectTopLevelRegions(raw, 9));
       setSnapshot(next);
       publishSnapshot(next);
       setSelected((current) => next.regions.some((region) => region.id === current) ? current : next.regions[0]?.id ?? '');
