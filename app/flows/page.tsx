@@ -12,7 +12,8 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const query = await searchParams;
   const repository = one(query.repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} architectural flows · Design Map`, `Follow a canonical packet journey through ${label}, one design boundary at a time.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
+  const bundle = one(query.bundle);
+  return documentMetadata(bundle ? `${label} architectural flow snapshot · Design Map` : `${label} architectural flows · Design Map`, bundle ? `Review ${label}'s validated graph-backed architectural flow snapshot before opening the source.` : `Follow a canonical packet journey through ${label}, one design boundary at a time.`, { repository, revision: one(query.revision), bundle });
 }
 
 export default async function FlowsPage({ searchParams }: { searchParams: SearchParams }) {

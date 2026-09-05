@@ -18,8 +18,11 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const repository = one(metadataQuery.repository) ?? illustrativeSnapshot.repository;
   const entry = flows[flow as keyof typeof flows];
   const label = `${repository} · `;
+  const bundle = one(metadataQuery.bundle);
   const imageContext = { repository, revision: one(metadataQuery.revision), bundle: one(metadataQuery.bundle) };
-  return entry ? documentMetadata(`${label}${entry.title} · Design Map`, `${entry.intro} Read the architectural handoffs before the source.`, imageContext) : documentMetadata(`${label}Architectural flow · Design Map`, 'Read the architectural handoffs before the source.', imageContext);
+  return bundle
+    ? documentMetadata(`${label}Architectural flow snapshot · Design Map`, `Review ${repository}'s validated graph-backed architectural flow snapshot before opening the source.`, imageContext)
+    : entry ? documentMetadata(`${label}${entry.title} · Design Map`, `${entry.intro} Read the architectural handoffs before the source.`, imageContext) : documentMetadata(`${label}Architectural flow · Design Map`, 'Read the architectural handoffs before the source.', imageContext);
 }
 
 export default async function FlowPage({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }) {
