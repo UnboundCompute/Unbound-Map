@@ -353,6 +353,7 @@ Static and live route checks performed against the local dev server:
 - Latest mobile Architecture check at 375×812 confirmed the map reflows into a readable region list, the redundant adjacent inspector stays hidden because selection navigates to a region chapter, and the optional text projection starts closed with zero document overflow.
 - Production-preview verification was repeated after rebuilding `.next`: the earlier 18–21px target readings came from a stale Next server, not the current stylesheet. The rebuilt 375px Architecture surface reports 44px quiet links/share controls, 58px relationship disclosure, 68px map nodes, and a 48px compact primary-nav target; route smoke, typecheck, and diff checks remain clean.
 - End-to-end newcomer/maintainer journey was replayed against the rebuilt production preview at 375px: Start → `Follow a packet` → `validated IPv4 payload` → Lachesis preserved repository, revision, region, flow, step, and anchor; Trust search updated `q=memory`; mobile Architecture selection opened the matching region chapter with snapshot context intact.
+- Narrow-width regression sweep after the compact path change covered Start, Architecture, Flows, Trust, and Explore at 320, 360, 375, and 414px: every route kept one `h1`/`main`, zero document overflow, and all visible Start interactive targets remained at least 44px.
 
 ## Acceptance checklist (current)
 
