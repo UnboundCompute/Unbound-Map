@@ -35,7 +35,7 @@ if (!children[0]?.children?.at(-1)?.label.startsWith('Other ')) throw new Error(
 console.log('ok 20 child modules → 12 bounded children');
 
 const macroBound = projectTopLevelRegions(snapshot(10), 9);
-if (macroBound.length !== 9 || !macroBound.at(-1)?.rolledUp) throw new Error('nine-region macro bound did not emit an explicit remainder');
+if (macroBound.length !== 9 || !macroBound.at(-1)?.rolledUp || !macroBound.at(-1)?.label.startsWith('Other ')) throw new Error('nine-region macro bound did not emit an explicit Other remainder');
 console.log('ok 10 top-level modules → 9 macro regions with remainder');
 
 const relationshipSnapshot = { ...snapshot(2), relationships: [{ source: 'node-0', target: 'node-1', kind: 'call' }] };

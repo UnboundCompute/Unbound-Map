@@ -342,7 +342,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   const remainder = topLevel.slice(safeLimit - 1);
   return withRelationships([...visible, {
     id: 'region:other',
-    label: `${remainder.length} more regions`,
+    label: `Other ${remainder.length} regions`,
     nodeCount: remainder.reduce((total, region) => total + region.nodeCount, 0),
     rolledUp: true,
   }]);
