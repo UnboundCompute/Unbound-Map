@@ -7,7 +7,7 @@ export function EmbedSnippet({ context = {} }: { context?: SharedSnapshotContext
   const [origin, setOrigin] = useState('https://<your-design-map-host>');
   const [state, setState] = useState<'idle' | 'copied' | 'unavailable'>('idle');
   useEffect(() => setOrigin(window.location.origin), []);
-  const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
+  const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.region ? { region: context.region } : {}), ...(context.region ? { level: context.anchor ? '2' : '1' } : {}), ...(context.anchor ? { anchor: context.anchor } : {}) }).toString();
   const safeRepository = (context.repository ?? 'Repository').replace(/[^\w ./@:-]/g, '').trim().slice(0, 80) || 'Repository';
   const snippet = `<iframe src="${origin}/embed${contextQuery ? `?${contextQuery}` : ''}" title="${safeRepository} architecture map" width="100%" height="620" loading="lazy"></iframe>`;
   const copy = async () => {
