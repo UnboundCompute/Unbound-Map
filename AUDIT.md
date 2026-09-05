@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `461f4b5` | Prioritize canonical module IDs over aliases | Relationship projection now resolves exact module IDs before display-name/path aliases, so a colliding name cannot shadow an authoritative exporter ID; projection smoke covers canonical-ID precedence, with `npm run check`, `npm run projection-smoke`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `c5c7fbf` | Keep integration documentation current | README now describes the adapter’s validated module-level relationship projection alongside identity, coverage, and limitations, matching the shipped Lachesis boundary. `git diff --check` passed. |
 | `f46676e` | Validate graph capability metadata | The Lachesis 2.0 adapter now validates optional `graph.capabilities` as a string array instead of silently accepting malformed capability declarations; projection smoke covers invalid shapes, with `npm run check`, `npm run projection-smoke`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
 | `b183cf5` | Keep ambiguous module aliases out of relationships | Alias resolution now records collisions across module IDs, names, or paths and declines to infer a relationship when a node’s module reference is ambiguous; projection smoke covers the collision case, with `npm run check`, `npm run projection-smoke`, `npm run build`, `npm run smoke`, and `git diff --check` passing. |
