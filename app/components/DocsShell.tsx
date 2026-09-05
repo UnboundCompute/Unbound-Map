@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { illustrativeSnapshot, type RepositorySnapshotView, type SharedSnapshotContext } from '../../lib/view-model';
 import { ShareButton } from './ShareButton';
+import { LiveSnapshotState } from './LiveSnapshotState';
 
 export const navItems = [
   { href: '/', label: 'Start here', note: 'Get oriented' },
@@ -54,7 +55,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         <span className="bar-divider" aria-hidden="true" />
         <span className="bar-repo">{snapshot.repository}</span>
         <details className="revision-detail"><summary aria-label={`Revision ${snapshot.revision}`}><code className="bar-revision">{shortRevision}</code></summary><div className="revision-popover"><span>full revision</span><code>{snapshot.revision}</code></div></details>
-        <SnapshotState snapshot={snapshot} />
+        <LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} />
         {hasHandoffContext && <a className="bar-lachesis" href={lachesisHref(context, snapshot)} target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>}
       </header>
       <div className="docs-layout">
@@ -76,7 +77,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
 }
 
 export function PageIntro({ eyebrow, title, children, snapshot = illustrativeSnapshot }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView }) {
-  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><SnapshotState snapshot={snapshot} /><span>{snapshot.coverageScope}</span><ShareButton /></div></header>;
+  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} /><span>{snapshot.coverageScope}</span><ShareButton /></div></header>;
 }
 
 export function EvidenceNote({ children }: { children: ReactNode }) { return <aside className="evidence-note"><span className="evidence-label">How to read the evidence</span><p>{children}</p></aside>; }
