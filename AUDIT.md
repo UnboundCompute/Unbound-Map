@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `audit-2026-09-05` | Recheck the public Lachesis transport boundary | Fresh read-only probes return 200 for the public Explorer root and downloadable demo artifact, but 404 for `GET /api/bundles/b_demo1234`; local opaque transport remains available and the frontend continues to expose an explicit unavailable state rather than substituting fixture facts. |
 | `a04760b` | Remove superseded Start order overrides | The Start DOM already matches its map-first composition, so redundant flex `order` rules were removed instead of leaving a CSS-only focus/visual dependency. Typecheck, production build, and diff check passed. |
 | `audit-2026-09-05` | Re-run the projection, hosted-state, and Explorer handoff gates after focus-order fix | `npm run projection-smoke`, `npm run hosted-smoke`, and the local `npm run explorer-smoke` all passed; the live integration projected 1 bounded region and 7 graph relationships without changing the mobile focus-order fix. |
 | `5c8da0a` | Align Start visual and keyboard order | Start now keeps the DOM order identical to the map-first visual order: heading → map → ordered reading path → caption. Typecheck, diff check, and Playwright probes at 375px/1440px passed with zero horizontal overflow. |
