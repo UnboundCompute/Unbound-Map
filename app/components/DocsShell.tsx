@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { illustrativeSnapshot, type RepositorySnapshotView, type SharedSnapshotContext } from '../../lib/view-model';
 import { ShareButton } from './ShareButton';
 import { LiveSnapshotDetails, LiveSnapshotIdentity, LiveSnapshotState } from './LiveSnapshotState';
+import { lachesisOrigin } from '../../lib/links';
 
 export const navItems = [
   { href: '/', label: 'Start here', note: 'Get oriented' },
@@ -29,9 +30,10 @@ function contextualHandoffHref(context?: SharedSnapshotContext) {
 
 function lachesisHref(context: SharedSnapshotContext | undefined, snapshot: RepositorySnapshotView) {
   const hasSelection = Boolean(context && (context.region || context.label || context.anchor || context.flow || context.step || context.domain));
-  if (!context || (!context.repository && !context.revision && !context.bundle && !hasSelection)) return 'https://lachesis.unboundcompute.com/';
+  const origin = lachesisOrigin();
+  if (!context || (!context.repository && !context.revision && !context.bundle && !hasSelection)) return `${origin}/`;
   const query = new URLSearchParams({ repository: context.repository ?? snapshot.repository, revision: context.revision ?? snapshot.revision, ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.region ? { region: context.region } : {}), ...(context.label ? { label: context.label } : {}), ...(context.anchor ? { anchor: context.anchor } : {}), ...(context.flow ? { flow: context.flow } : {}), ...(context.step ? { step: context.step } : {}), ...(context.domain ? { domain: context.domain } : {}) }).toString();
-  return `https://lachesis.unboundcompute.com/?${query}`;
+  return `${origin}/?${query}`;
 }
 
 export function DocsShell({ children, active, snapshot = illustrativeSnapshot, context }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {

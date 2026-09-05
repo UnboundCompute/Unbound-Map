@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 const origin = (process.env.DESIGN_MAP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const lachesis = (process.env.NEXT_PUBLIC_LACHESIS_URL ?? 'https://lachesis.unboundcompute.com').replace(/\/$/, '');
 
 async function page(path, expected) {
   const response = await fetch(`${origin}${path}`);
@@ -58,7 +59,7 @@ await pageWithout('/', ['class="bar-lachesis"']);
 const shellSource = await readFile(new URL('../app/components/DocsShell.tsx', import.meta.url), 'utf8');
 if (shellSource.includes('export function SnapshotState')) throw new Error('superseded SnapshotState implementation remains in the shell');
 await image('/opengraph-image?repository=Zeek&revision=main');
-await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main', 'href="https://lachesis.unboundcompute.com/?repository=Zeek&amp;revision=main&amp;region=decode&amp;anchor=DecodeEthernet%28%29', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
+await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main', `href="${lachesis}/?repository=Zeek&amp;revision=main&amp;region=decode&amp;anchor=DecodeEthernet%28%29`, '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['&lt;iframe src=&quot;https://&lt;your-design-map-host&gt;/embed?repository=Zeek&amp;revision=main&amp;region=decode&amp;level=2&amp;anchor=DecodeEthernet%28%29']);
 await page('/architecture', ['receives from', 'hands off to', 'The projection, in words', 'Text view: wire input enters Packet input']);
 await page('/architecture?repository=Zeek&revision=main&bundle=b_demo1234', ['A graph-backed bundle was requested', 'Preparing the architecture map', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234']);
@@ -75,13 +76,13 @@ await page('/trust?repository=Zeek&revision=main&domain=memory-safety', ['id="me
 await page('/trust?repository=Zeek&revision=main&bundle=b_demo1234', ['Graph-backed bundle requested', 'Open Architecture loader', 'Open Lachesis context', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234']);
 await pageWithout('/trust?repository=Zeek&revision=main&bundle=b_demo1234', ['Memory safety', 'Illustrative taxonomy']);
 await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo1234', ['Context ready', 'DecodeIPV4()', 'b_demo1234', 'Trace', 'Reviewed findings and adjudicated evidence', 'aria-label="Open DecodeIPV4() in Lachesis in a new tab"', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234&amp;region=decode&amp;anchor=DecodeIPV4%28%29"']);
-await page('/explore?region=decode&anchor=DecodeIPV4%28%29', ['href="https://lachesis.unboundcompute.com/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;anchor=DecodeIPV4%28%29"']);
+await page('/explore?region=decode&anchor=DecodeIPV4%28%29', [`href="${lachesis}/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;anchor=DecodeIPV4%28%29"`]);
 await page('/embed?repository=Zeek&revision=main&bundle=b_demo1234', ['Zeek architecture', 'Graph-backed bundle requested', 'Preparing the architecture map', 'Skip to map', 'id="embed-content"']);
 await page('/embed?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Zeek architecture', 'Design anchors', 'DecodeEthernet()', 'id="embed-content"']);
 await page('/architecture?region=unknown&level=1', ['requested region is not present']);
 await page('/architecture/not-a-region', ['Region context unavailable', 'aria-atomic="true"']);
 await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
-await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state', 'href="/architecture?region=decode&amp;level=1"', 'href="https://lachesis.unboundcompute.com/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;label=Packet+decode&amp;anchor=DecodeEthernet%28%29"']);
+await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state', 'href="/architecture?region=decode&amp;level=1"', `href="${lachesis}/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;label=Packet+decode&amp;anchor=DecodeEthernet%28%29"`]);
 await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo1234', ['Graph-backed chapter unavailable', 'will not substitute an illustrative chapter', '<meta property="og:title" content="Architecture region · Zeek"']);
 await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_demo1234', ['What this region owns', 'Validated payload window']);
 await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
