@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `82ca373` | Include boot and matcher in the Start projection | The compact Start map now shows eight bounded Suricata regions, including separate Initialization and Pattern matching stages; this preserves the boot/runtime distinction and detection fan-out without exceeding the nine-region limit. Desktop/mobile node probes found no overlap or horizontal overflow; route smoke passed. |
 | `f6f3f7f` | Lead Start with the repository map | Start now follows the brief’s orientation order: repository thesis → bounded map → ordered macro path → first-flow/Architecture actions → provenance note. At 375px the map begins at `632px` with zero overflow; at 1440px it begins at `676px`. Typecheck, production build, contextual route smoke, and diff checks passed. |
 | `audit-2026-09-05` | Recheck the public Lachesis transport boundary | Fresh read-only probes return 200 for the public Explorer root and downloadable demo artifact, but 404 for `GET /api/bundles/b_demo1234`; local opaque transport remains available and the frontend continues to expose an explicit unavailable state rather than substituting fixture facts. |
 | `a04760b` | Remove superseded Start order overrides | The Start DOM already matches its map-first composition, so redundant flex `order` rules were removed instead of leaving a CSS-only focus/visual dependency. Typecheck, production build, and diff check passed. |
