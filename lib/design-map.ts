@@ -175,7 +175,7 @@ function positiveInteger(value: unknown, fallback: number) {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : fallback;
 }
 
-function deriveModules(nodes: BundleNode[]): BundleModule[] {
+function deriveModules(nodes: BundleNode[], idPrefix = 'derived:module'): BundleModule[] {
   const groups = new Map<string, string[]>();
   nodes.forEach((node) => {
     const key = node.module?.trim() || node.file.split('/').slice(0, -1).join('/') || 'root';
@@ -184,7 +184,7 @@ function deriveModules(nodes: BundleNode[]): BundleModule[] {
     groups.set(key, ids);
   });
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([name, node_ids], index) => ({
-    id: `derived:module:${index}:${name.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'root'}`,
+    id: `${idPrefix}:${index}:${name.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'root'}`,
     name,
     path: name === 'root' ? undefined : name,
     node_ids,
@@ -196,8 +196,37 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
   const includedNodes = positiveInteger(bundle.graph.coverage?.included_nodes, bundle.graph.nodes.length);
   const indexedNodes = positiveInteger(bundle.graph.coverage?.indexed_nodes, bundle.meta.indexed_nodes);
   const limitations = [...(bundle.graph.coverage?.limitations ?? [])];
-  const modules = bundle.graph.modules?.length ? bundle.graph.modules : deriveModules(bundle.graph.nodes);
-  if (!bundle.graph.modules?.length) limitations.push('Top-level regions were conservatively derived from node module/file metadata because this bundle did not declare graph modules.');
+  const declaredModules = bundle.graph.modules ?? [];
+  let modules = declaredModules.length ? declaredModules : deriveModules(bundle.graph.nodes);
+  if (!declaredModules.length) limitations.push('Top-level regions were conservatively derived from node module/file metadata because this bundle did not declare graph modules.');
+  else {
+    const assigned = new Set(declaredModules.flatMap((module) => module.node_ids ?? []));
+    const aliases = new Map<string, string | undefined>();
+    declaredModules.forEach((module) => {
+      for (const value of [module.id, module.name, module.path]) {
+        if (!value) continue;
+        const key = value.trim().toLowerCase();
+        aliases.set(key, aliases.has(key) && aliases.get(key) !== module.id ? undefined : module.id);
+      }
+    });
+    const additions = new Map<string, string[]>();
+    const unassigned = bundle.graph.nodes.filter((node) => {
+      if (assigned.has(node.id)) return false;
+      const moduleId = node.module ? aliases.get(node.module.trim().toLowerCase()) : undefined;
+      if (moduleId) {
+        additions.set(moduleId, [...(additions.get(moduleId) ?? []), node.id]);
+        return false;
+      }
+      return true;
+    });
+    if (additions.size) {
+      modules = modules.map((module) => additions.has(module.id) ? { ...module, node_ids: [...(module.node_ids ?? []), ...additions.get(module.id)!] } : module);
+    }
+    if (unassigned.length) {
+      modules = [...modules, ...deriveModules(unassigned, 'derived:unassigned')];
+      limitations.push(`${unassigned.length.toLocaleString()} graph nodes were not assigned to a declared module; they are shown in conservative derived regions.`);
+    }
+  }
 
   if (bundle.meta.fixture === true && !limitations.some((item) => /demo fixture/i.test(item))) {
     limitations.unshift('Demo fixture: graph shape is transport-valid but is not verified repository evidence.');
@@ -283,11 +312,13 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   snapshot.modules.forEach((module) => {
     moduleIds.set(module.id, module.id);
     addModuleAlias(module.name, module.id);
+    addModuleAlias(module.name.toLowerCase(), module.id);
     if (module.path) addModuleAlias(module.path, module.id);
+    if (module.path) addModuleAlias(module.path.toLowerCase(), module.id);
   });
   snapshot.nodes.forEach((node) => {
     if (!node.module) return;
-    const declared = moduleIds.get(node.module) ?? moduleAliases.get(node.module) ?? node.module;
+    const declared = moduleIds.get(node.module) ?? moduleAliases.get(node.module) ?? moduleAliases.get(node.module.toLowerCase()) ?? node.module;
     const existing = moduleByNodeId.get(node.id);
     if (existing && existing !== declared) {
       moduleByNodeId.delete(node.id);
