@@ -42,6 +42,7 @@ const relationshipSnapshot = { ...snapshot(2), relationships: [{ source: 'node-0
 const relationshipRegions = projectTopLevelRegions(relationshipSnapshot, 9);
 if (!relationshipRegions[0]?.downstream?.includes('module-1') || !relationshipRegions[1]?.upstream?.includes('module-0')) throw new Error('node relationships did not project to top-level regions');
 if (relationshipRegions[0]?.relationshipKinds?.['module-1'] !== 'call') throw new Error('relationship kind did not project to top-level regions');
+if (relationshipRegions[1]?.incomingRelationshipKinds?.['module-0'] !== 'call') throw new Error('incoming relationship kind did not project to top-level regions');
 console.log('ok node relationships → top-level region relationships');
 
 function topologySnapshot(count, pairs) {

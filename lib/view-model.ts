@@ -31,6 +31,7 @@ export type SystemRegion = {
   upstream?: string[];
   downstream?: string[];
   relationshipKinds?: Record<string, string>;
+  incomingRelationshipKinds?: Record<string, string>;
   children?: { label: string; summary: string; anchor?: string }[];
   inputs?: string[];
   outputs?: string[];
@@ -130,6 +131,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       upstream: region.upstream,
       downstream: region.downstream,
       relationshipKinds: region.relationshipKinds,
+      incomingRelationshipKinds: region.incomingRelationshipKinds,
     })),
   };
 }
