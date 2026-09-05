@@ -79,6 +79,8 @@ if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, indexed_node
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], kind: 42 }] } })) throw new Error('non-string node kind accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, modules: [{ id: 'module-0', name: 'Module', node_ids: [42] }] } })) throw new Error('non-string module node ID accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { limitations: 'not-an-array' } } })) throw new Error('non-array coverage limitations accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, capabilities: 'not-an-array' } })) throw new Error('non-array graph capabilities accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, capabilities: ['relationships', 42] } })) throw new Error('non-string graph capability accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { indexed_nodes: 2.5 } } })) throw new Error('non-integer coverage count accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { included_nodes: 0 } } })) throw new Error('coverage included_nodes mismatch accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: { included_nodes: 1, indexed_nodes: 0 } } })) throw new Error('coverage indexed_nodes below included_nodes accepted by the schema guard');

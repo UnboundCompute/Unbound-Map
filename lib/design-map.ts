@@ -48,6 +48,7 @@ export type LachesisBundle = {
     nodes: BundleNode[];
     modules?: BundleModule[];
     edges?: BundleEdge[];
+    capabilities?: string[];
     coverage?: {
       scope?: string;
       included_nodes?: number;
@@ -76,6 +77,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && Array.isArray(graph.nodes) && graph.nodes.length > 0
     && (graph.modules === undefined || Array.isArray(graph.modules))
     && (graph.edges === undefined || Array.isArray(graph.edges))
+    && (graph.capabilities === undefined || (Array.isArray(graph.capabilities) && graph.capabilities.every((item) => typeof item === 'string')))
     && (graph.coverage === undefined || (!!graph.coverage && typeof graph.coverage === 'object' && (graph.coverage.scope === undefined || typeof graph.coverage.scope === 'string') && (graph.coverage.included_nodes === undefined || (typeof graph.coverage.included_nodes === 'number' && Number.isInteger(graph.coverage.included_nodes) && graph.coverage.included_nodes >= 0)) && (graph.coverage.indexed_nodes === undefined || (typeof graph.coverage.indexed_nodes === 'number' && Number.isInteger(graph.coverage.indexed_nodes) && graph.coverage.indexed_nodes >= 0)) && (graph.coverage.limitations === undefined || (Array.isArray(graph.coverage.limitations) && graph.coverage.limitations.every((item) => typeof item === 'string'))) && (graph.coverage.capabilities === undefined || (Array.isArray(graph.coverage.capabilities) && graph.coverage.capabilities.every((item) => typeof item === 'string')))));
   if (!validShape) return false;
 
