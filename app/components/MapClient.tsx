@@ -15,6 +15,34 @@ const positions: Position[] = [
   { x: 88, y: 44, tone: 'green' }, { x: 40, y: 17, tone: 'violet' }, { x: 88, y: 17, tone: 'green' },
 ];
 
+type Layout = { positions: Position[]; label: 'pipeline' | 'hub' | 'mesh' };
+
+function layoutFor(regions: SystemRegion[], pairs: Array<{ from: string; to: string }>): Layout {
+  const count = regions.length;
+  if (count <= 1) return { positions: [{ x: 50, y: 50, tone: 'gold' }], label: 'pipeline' };
+  const degree = new Map(regions.map((region) => [region.id, 0]));
+  pairs.forEach(({ from, to }) => {
+    degree.set(from, (degree.get(from) ?? 0) + 1);
+    degree.set(to, (degree.get(to) ?? 0) + 1);
+  });
+  const maxDegree = Math.max(...degree.values());
+  const dense = pairs.length >= count * (count - 1) * 0.35;
+  const hub = maxDegree >= Math.max(3, Math.ceil(count * 0.55));
+  const toneFor = (index: number): Position['tone'] => ['gold', 'blue', 'violet', 'green'][index % 4] as Position['tone'];
+  const ring = (centerIndex?: number): Position[] => regions.map((_, index) => {
+    if (centerIndex === index) return { x: 50, y: 50, tone: 'gold' };
+    const ringIndex = centerIndex === undefined ? index : index > centerIndex ? index - 1 : index;
+    const angle = -Math.PI / 2 + (ringIndex / (centerIndex === undefined ? count : count - 1)) * Math.PI * 2;
+    return { x: 50 + Math.cos(angle) * 34, y: 50 + Math.sin(angle) * 34, tone: toneFor(index) };
+  });
+  if (dense) return { positions: ring(), label: 'mesh' };
+  if (hub) {
+    const centerIndex = regions.findIndex((region) => degree.get(region.id) === maxDegree);
+    return { positions: ring(centerIndex), label: 'hub' };
+  }
+  return { positions, label: 'pipeline' };
+}
+
 function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anchor = region.anchor?.label ?? region.label, bundleId?: string) {
   const handoff = toHandoff(snapshot, region, anchor, bundleId);
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
@@ -88,7 +116,9 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   if (!current) {
     return <section className="map-state-panel" role="status" aria-live="polite" aria-atomic="true"><span className="map-state-label">No regions in snapshot</span><h2>There is no architecture to draw yet.</h2><p>This snapshot is valid but contains no displayable top-level regions. Return to the repository start page or open the source explorer for coverage details.</p><div className="map-state-actions"><Link className="quiet-link" href={startHref}>Return to Start here <span aria-hidden="true">→</span></Link><Link className="quiet-link" href={recoveryHref}>Open Lachesis context <span aria-hidden="true">↗</span></Link></div></section>;
   }
-  const positionFor = (index: number) => positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
+  const boundedPairs = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target })));
+  const layout = layoutFor(regions, boundedPairs);
+  const positionFor = (index: number) => layout.positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const renderParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
   const requestedRegion = renderParams.get('region');
   const regionIsUnknown = Boolean(requestedRegion && !allRegions.some((region) => region.id === requestedRegion));
@@ -130,7 +160,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     window.history.pushState(null, '', `${route}?${params.toString()}`);
   };
   const regionPosition = new Map(regions.map((region, index) => [region.id, positionFor(index)]));
-  const allEdges = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target }))).filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
+  const allEdges = boundedPairs.filter((edge) => regionPosition.has(edge.from) && regionPosition.has(edge.to));
   const edges = allEdges.slice(0, 12);
   const requestedAnchor = renderParams.get('anchor');
   const focusAnchors = [
@@ -149,7 +179,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
     <section className={`map-workbench${compact ? ' is-compact' : ''}`} aria-labelledby="architecture-map-title">
       <h2 id="architecture-map-title" className="sr-only">Architecture map</h2>
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {level === '0' ? `${regions.length} regions placed` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
+        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">{snapshot.provenance === 'illustrative' ? 'illustrative' : 'graph-backed'} · {level === '0' ? `${regions.length} regions placed · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">{snapshot.limitations.some((item) => /demo fixture/i.test(item)) ? 'Demo graph fixture loaded. Shape is transport-valid; verify claims in Lachesis.' : 'Graph-backed snapshot loaded. Placement is a bounded reading projection.'}</div>}
         {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
         {anchorIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested anchor is not present in this region projection. Showing the available design anchors instead.</div>}
