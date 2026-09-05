@@ -86,9 +86,11 @@ const validBundle = {
   format: 'lachesis-explorer-bundle',
   schema_version: '2.0',
   meta: { repository: 'fixture', language: 'C', revision: 'test', lines: 1, indexed_nodes: 1 },
-  graph: { nodes: [{ id: 'node-0', label: 'Anchor', kind: 'function', file: 'src/main.c', line: 1 }] },
+  graph: { nodes: [{ id: 'node-0', label: 'Anchor', kind: 'function', file: 'src/main.c', line: 1, snippet: 'int main(void) {}' }] },
 };
 if (!isLachesisBundle(validBundle)) throw new Error('valid bundle rejected by the schema guard');
+const windowBundle = { ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined, source_window: { start_line: 1, lines: ['int main(void) {}'] } }] } };
+if (!isLachesisBundle(windowBundle)) throw new Error('valid source_window bundle rejected by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: { invalid: true } } })) throw new Error('non-string generated_at accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: null } })) throw new Error('null generated_at accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, source_url_template: 'javascript:alert(1)' } })) throw new Error('non-HTTP source URL template accepted by the schema guard');
@@ -106,6 +108,8 @@ if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: 
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, coverage: null } })) throw new Error('null coverage object accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [] } })) throw new Error('empty graph accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], label: '' }] } })) throw new Error('blank node label accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined }] } })) throw new Error('node without snippet or source_window accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined, source_window: { lines: [] } }] } })) throw new Error('empty source_window accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], parent_id: 'missing-node' }] } })) throw new Error('dangling node parent reference accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], parent_id: 'node-0' }] } })) throw new Error('self-referential node parent accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ id: 'node-0', label: 'A', kind: 'function', file: 'a.c', line: 1, parent_id: 'node-1' }, { id: 'node-1', label: 'B', kind: 'function', file: 'b.c', line: 1, parent_id: 'node-0' }] } })) throw new Error('cyclic node hierarchy accepted by the schema guard');
