@@ -108,6 +108,9 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
 
   const nodeIds = new Set(graph!.nodes.map((node) => node.id));
   if (nodeIds.size !== graph!.nodes.length) return false;
+  const includedNodes = graph!.coverage?.included_nodes ?? graph!.nodes.length;
+  const indexedNodes = graph!.coverage?.indexed_nodes ?? meta!.indexed_nodes;
+  if (includedNodes !== graph!.nodes.length || indexedNodes < includedNodes) return false;
   if ((graph!.edges ?? []).some((edge) => !nodeIds.has(edge.source) || !nodeIds.has(edge.target))) return false;
   const modules = graph!.modules ?? [];
   const moduleIds = new Set(modules.map((module) => module.id));
