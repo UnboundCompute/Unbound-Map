@@ -55,7 +55,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       const raw = toDesignMapSnapshot(bundle);
       const next = snapshotFromProjection(raw, projectTopLevelRegions(raw));
       setSnapshot(next);
-      window.dispatchEvent(new CustomEvent('design-map:snapshot-ready', { detail: { provenance: next.provenance, coverageState: next.coverageState, limitations: next.limitations, regionCount: next.regions.length, revision: next.revision, generatedAt: next.generatedAt, coverageScope: next.coverageScope, indexedNodes: next.indexedNodes } }));
+      window.dispatchEvent(new CustomEvent('design-map:snapshot-ready', { detail: { provenance: next.provenance, coverageState: next.coverageState, limitations: next.limitations, regionCount: next.regions.length, repository: next.repository, revision: next.revision, generatedAt: next.generatedAt, coverageScope: next.coverageScope, indexedNodes: next.indexedNodes } }));
       setSelected((current) => next.regions.some((region) => region.id === current) ? current : next.regions[0]?.id ?? '');
       setBundleState('ready');
     }).catch((error) => {
