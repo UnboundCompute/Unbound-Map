@@ -232,6 +232,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   topLevel.slice(0, safeLimit).forEach((module) => regionIdForModule.set(module.id, module.id));
   if (topLevel.length > safeLimit) topLevel.slice(safeLimit - 1).forEach((module) => regionIdForModule.set(module.id, 'region:other'));
   const moduleByNodeId = new Map<string, string>();
+  const ambiguousNodeModules = new Set<string>();
   snapshot.modules.forEach((module) => (module.node_ids ?? []).forEach((nodeId) => moduleByNodeId.set(nodeId, module.id)));
   const moduleIds = new Map<string, string>();
   const moduleAliases = new Map<string, string>();
@@ -251,7 +252,17 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     addModuleAlias(module.name, module.id);
     if (module.path) addModuleAlias(module.path, module.id);
   });
-  snapshot.nodes.forEach((node) => { if (node.module) moduleByNodeId.set(node.id, moduleIds.get(node.module) ?? moduleAliases.get(node.module) ?? node.module); });
+  snapshot.nodes.forEach((node) => {
+    if (!node.module) return;
+    const declared = moduleIds.get(node.module) ?? moduleAliases.get(node.module) ?? node.module;
+    const existing = moduleByNodeId.get(node.id);
+    if (existing && existing !== declared) {
+      moduleByNodeId.delete(node.id);
+      ambiguousNodeModules.add(node.id);
+      return;
+    }
+    moduleByNodeId.set(node.id, declared);
+  });
   const topLevelByModule = new Map(snapshot.modules.map((module) => [module.id, module.parent_id ? undefined : module.id]));
   const findTopLevel = (moduleId: string | undefined) => {
     let current = moduleId;
@@ -267,8 +278,8 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   const outgoing = new Map<string, Set<string>>();
   const incoming = new Map<string, Set<string>>();
   (snapshot.relationships ?? []).forEach((edge) => {
-    const from = regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.source)) ?? '');
-    const to = regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.target)) ?? '');
+    const from = ambiguousNodeModules.has(edge.source) ? undefined : regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.source)) ?? '');
+    const to = ambiguousNodeModules.has(edge.target) ? undefined : regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.target)) ?? '');
     if (!from || !to || from === to) return;
     if (!outgoing.has(from)) outgoing.set(from, new Set());
     if (!incoming.has(to)) incoming.set(to, new Set());

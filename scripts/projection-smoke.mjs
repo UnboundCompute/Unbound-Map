@@ -77,6 +77,10 @@ const idPrecedenceSnapshot = { ...aliasSnapshot, modules: [{ ...aliasSnapshot.mo
 const idPrecedenceRegions = projectTopLevelRegions(idPrecedenceSnapshot, 9);
 if (!idPrecedenceRegions[0]?.downstream?.includes('module-1')) throw new Error('canonical module ID did not take precedence over a colliding name alias');
 console.log('ok canonical module IDs take precedence over aliases');
+const membershipConflictSnapshot = { ...snapshot(2), modules: [{ ...snapshot(2).modules[0], node_ids: ['node-0'] }, { ...snapshot(2).modules[1], node_ids: ['node-1'] }], nodes: snapshot(2).nodes.map((node, index) => ({ ...node, module: index === 0 ? 'module-1' : 'module-1' })), relationships: [{ source: 'node-0', target: 'node-1' }] };
+const membershipConflictRegions = projectTopLevelRegions(membershipConflictSnapshot, 9);
+if (membershipConflictRegions.some((region) => region.upstream?.length || region.downstream?.length)) throw new Error('conflicting node module membership inferred a relationship');
+console.log('ok conflicting node membership remains unprojected');
 
 const validBundle = {
   format: 'lachesis-explorer-bundle',
