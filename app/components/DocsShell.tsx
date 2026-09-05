@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { illustrativeSnapshot, type RepositorySnapshotView, type SharedSnapshotContext } from '../../lib/view-model';
 import { ShareButton } from './ShareButton';
-import { LiveSnapshotState } from './LiveSnapshotState';
+import { LiveSnapshotDetails, LiveSnapshotState } from './LiveSnapshotState';
 
 export const navItems = [
   { href: '/', label: 'Start here', note: 'Get oriented' },
@@ -55,7 +55,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
         <span className="bar-divider" aria-hidden="true" />
         <span className="bar-repo">{snapshot.repository}</span>
         <details className="revision-detail"><summary aria-label={`Revision ${snapshot.revision}`}><code className="bar-revision">{shortRevision}</code></summary><div className="revision-popover"><span>full revision</span><code>{snapshot.revision}</code></div></details>
-        <LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} />
+        <LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} />
         {hasHandoffContext && <a className="bar-lachesis" href={lachesisHref(context, snapshot)} target="_blank" rel="noreferrer" aria-label="Open Lachesis in a new tab">Lachesis <span aria-hidden="true">↗</span></a>}
       </header>
       <div className="docs-layout">
@@ -66,8 +66,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
           </nav>
           <div className="rail-rule" />
           <div className="rail-heading">Snapshot</div>
-          <dl className="snapshot-list"><div><dt>revision</dt><dd><code>{snapshot.revision}</code></dd></div><div><dt>generated</dt><dd>{snapshot.generatedAt ? <time dateTime={snapshot.generatedAt}><code>{snapshot.generatedAt}</code></time> : 'Not supplied by snapshot'}</dd></div><div><dt>coverage</dt><dd>{snapshot.coverageScope}</dd></div><div><dt>indexed</dt><dd>{snapshot.indexedNodes.toLocaleString()} nodes</dd></div></dl>
-          <p className="rail-note">{snapshot.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item)) ? 'A graph-backed bundle is requested. The map will replace the fixture only after validation succeeds.' : isFixture ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : snapshot.regions.length <= 1 ? 'Generated from the Lachesis graph, but only one top-level region is available. Treat this as a sparse projection until coverage expands.' : snapshot.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item)) ? 'Generated from the Lachesis graph, but this snapshot is marked stale. Confirm the revision before relying on it.' : snapshot.coverageState === 'limited' ? 'Generated from the Lachesis graph, but this view covers only part of the indexed repository.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p>
+          <LiveSnapshotDetails provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} />
         </aside>
         <main id="main-content" className="docs-main" tabIndex={-1}>{children}</main>
       </div>
@@ -77,7 +76,7 @@ export function DocsShell({ children, active, snapshot = illustrativeSnapshot, c
 }
 
 export function PageIntro({ eyebrow, title, children, snapshot = illustrativeSnapshot }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView }) {
-  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} /><span>{snapshot.coverageScope}</span><ShareButton /></div></header>;
+  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} /><span>{snapshot.coverageScope}</span><ShareButton /></div></header>;
 }
 
 export function EvidenceNote({ children }: { children: ReactNode }) { return <aside className="evidence-note"><span className="evidence-label">How to read the evidence</span><p>{children}</p></aside>; }
