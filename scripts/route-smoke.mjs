@@ -38,6 +38,7 @@ async function redirect(path, target) {
 
 await page('/?repository=Zeek&revision=main&bundle=b_demo123', ['Zeek architecture snapshot', 'Graph-backed bundle requested', 'Awaiting a verified repository map.', 'Open Architecture loader', 'Open Lachesis context', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo123', 'full revision', 'Not supplied by snapshot', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo123"']);
 await pageWithout('/?repository=Zeek&revision=main&bundle=b_demo123', ['Suricata turns network traffic', 'The structural idea', 'A long packet-processing path']);
+await page('/', ['Suricata, before the source.', 'Follow a packet', 'Open Architecture']);
 await pageWithout('/', ['class="bar-lachesis"']);
 await image('/opengraph-image?repository=Zeek&revision=main');
 await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main', 'href="https://lachesis.unboundcompute.com/?repository=Zeek&amp;revision=main&amp;region=decode&amp;anchor=DecodeEthernet%28%29', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
