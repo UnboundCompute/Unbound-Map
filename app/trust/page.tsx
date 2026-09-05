@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const query = await searchParams;
   const repository = one(query.repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} trust surfaces · Design Map`, `Use a searchable glossary to understand security and correctness obligations in ${label} without mistaking presence for a finding.`, { repository, revision: one(query.revision) });
+  return documentMetadata(`${label} trust surfaces · Design Map`, `Use a searchable glossary to understand security and correctness obligations in ${label} without mistaking presence for a finding.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function TrustPage({ searchParams }: { searchParams: SearchParams }) {

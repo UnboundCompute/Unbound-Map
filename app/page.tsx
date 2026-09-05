@@ -11,7 +11,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const query = await searchParams;
   const repository = one(query.repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} · Design Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`, { repository, revision: one(query.revision) });
+  return documentMetadata(`${label} · Design Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function HomePage({ searchParams }: { searchParams: SearchParams }) {

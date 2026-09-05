@@ -13,7 +13,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const repository = one((await searchParams).repository);
   const label = repository ?? illustrativeSnapshot.repository;
   const query = await searchParams;
-  return documentMetadata(`${label} architecture · Design Map`, `Explore ${label}'s bounded responsibilities, relationships, and region chapters before opening the source.`, { repository, revision: one(query.revision) });
+  return documentMetadata(`${label} architecture · Design Map`, `Explore ${label}'s bounded responsibilities, relationships, and region chapters before opening the source.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function ArchitecturePage({ searchParams }: { searchParams: SearchParams }) {

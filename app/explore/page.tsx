@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
   const repository = one(query.repository);
   const anchor = one(query.anchor);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${anchor ? `${anchor} · ` : ''}${label} handoff · Lachesis`, `Open ${anchor ?? 'the selected architecture context'} in Lachesis for ${label}, tied to the shared repository revision.`, { repository, revision: one(query.revision) });
+  return documentMetadata(`${anchor ? `${anchor} · ` : ''}${label} handoff · Lachesis`, `Open ${anchor ?? 'the selected architecture context'} in Lachesis for ${label}, tied to the shared repository revision.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function ExplorePage({ searchParams }: { searchParams?: Promise<SearchParams> }) {

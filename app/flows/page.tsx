@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const query = await searchParams;
   const repository = one(query.repository);
   const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} architectural flows · Design Map`, `Follow a canonical packet journey through ${label}, one design boundary at a time.`, { repository, revision: one(query.revision) });
+  return documentMetadata(`${label} architectural flows · Design Map`, `Follow a canonical packet journey through ${label}, one design boundary at a time.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function FlowsPage({ searchParams }: { searchParams: SearchParams }) {

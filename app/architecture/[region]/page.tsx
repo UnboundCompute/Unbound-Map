@@ -17,7 +17,7 @@ export async function generateMetadata({ params, searchParams }: { params: Promi
   const metadataQuery = await searchParams;
   const repository = one(metadataQuery.repository);
   const bundle = one(metadataQuery.bundle);
-  const imageContext = { repository, revision: one(metadataQuery.revision) };
+  const imageContext = { repository, revision: one(metadataQuery.revision), bundle };
   const region = bundle ? undefined : illustrativeSnapshot.regions.find((item) => item.id === regionId);
   const label = repository ?? illustrativeSnapshot.repository;
   return region ? documentMetadata(`${region.label} · ${label} architecture`, `${region.summary} Read the ${region.label} chapter in Design Map before opening the source.`, imageContext) : documentMetadata(`Architecture region · ${label}`, bundle ? `A graph-backed architecture region for ${label}. Verify the selected snapshot before relying on its claims.` : `This architecture region is not present in the current projection. Open the matching snapshot or continue to Lachesis.`, imageContext);
