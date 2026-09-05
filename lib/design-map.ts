@@ -44,6 +44,7 @@ export type LachesisBundle = {
     description?: string;
     lines: number;
     indexed_nodes: number;
+    fixture?: boolean;
     source_url_template?: string;
   };
   graph: {
@@ -73,6 +74,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && typeof meta.lines === 'number' && Number.isInteger(meta.lines) && meta.lines >= 0
     && typeof meta.indexed_nodes === 'number' && Number.isInteger(meta.indexed_nodes) && meta.indexed_nodes >= 0
     && (meta.generated_at === undefined || typeof meta.generated_at === 'string')
+    && (meta.fixture === undefined || typeof meta.fixture === 'boolean')
     && (meta.description === undefined || typeof meta.description === 'string')
     && (meta.source_url_template === undefined || typeof meta.source_url_template === 'string')
     && !!graph && typeof graph === 'object'
@@ -179,6 +181,10 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
   const includedNodes = positiveInteger(bundle.graph.coverage?.included_nodes, bundle.graph.nodes.length);
   const indexedNodes = positiveInteger(bundle.graph.coverage?.indexed_nodes, bundle.meta.indexed_nodes);
   const limitations = [...(bundle.graph.coverage?.limitations ?? [])];
+
+  if (bundle.meta.fixture === true && !limitations.some((item) => /demo fixture/i.test(item))) {
+    limitations.unshift('Demo fixture: graph shape is transport-valid but is not verified repository evidence.');
+  }
 
   if (indexedNodes > includedNodes && !limitations.some((item) => /projected subset|indexed nodes/i.test(item))) {
     limitations.push(`This map includes ${includedNodes.toLocaleString()} of ${indexedNodes.toLocaleString()} indexed nodes.`);

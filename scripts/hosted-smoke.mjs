@@ -16,6 +16,14 @@ assert.deepEqual(success, { ok: true });
 assert.equal(calls[0].options.redirect, 'error');
 assert.equal(calls[0].options.headers.Accept, 'application/json');
 
+const previousApiUrl = process.env.NEXT_PUBLIC_BUNDLE_API_URL;
+process.env.NEXT_PUBLIC_BUNDLE_API_URL = 'https://api.example.test/';
+calls.length = 0;
+await loadHostedBundle('b_demo1234');
+assert.equal(calls[0].url, 'https://api.example.test/api/bundles/b_demo1234', 'configured API origins must not create a double slash');
+if (previousApiUrl === undefined) delete process.env.NEXT_PUBLIC_BUNDLE_API_URL;
+else process.env.NEXT_PUBLIC_BUNDLE_API_URL = previousApiUrl;
+
 globalThis.fetch = async () => { throw new TypeError('network down'); };
 await assert.rejects(() => loadHostedBundle('b_demo1234'), /hosted map could not be reached/);
 

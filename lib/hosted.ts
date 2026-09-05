@@ -7,7 +7,7 @@ function serviceUrl(path: string) {
   const base = new URL(configured);
   if (base.username || base.password || base.search || base.hash) throw new Error('Bundle API must be an origin and path only.');
   if (base.protocol !== 'https:' && process.env.NODE_ENV === 'production') throw new Error('Bundle API must use HTTPS in production.');
-  return `${base}${path}`;
+  return `${base.toString().replace(/\/$/, '')}${path}`;
 }
 
 function requestSignal(signal?: AbortSignal) {
