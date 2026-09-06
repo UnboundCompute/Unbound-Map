@@ -12,12 +12,18 @@ export const dynamic = 'force-dynamic';
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
 
-export async function generateMetadata({ searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }): Promise<Metadata> {
+function flowLabel(flow: string) {
+  return decodeURIComponent(flow).replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim() || 'Selected flow';
+}
+
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }): Promise<Metadata> {
+  const { flow } = await params;
   const metadataQuery = await searchParams;
   const repository = one(metadataQuery.repository) ?? 'Repository';
   const bundle = one(metadataQuery.bundle);
-  const imageContext = { repository, revision: one(metadataQuery.revision), bundle };
-  return documentMetadata(`${repository} · Architectural flow snapshot · Unbound Map`, `Review ${repository}'s validated graph-backed architectural flow snapshot before opening the source.`, imageContext);
+  const label = flowLabel(flow);
+  const imageContext = { repository, revision: one(metadataQuery.revision), bundle, flow: label };
+  return documentMetadata(`${label} · ${repository} · Unbound Map`, `Review the ${label} graph-backed path in ${repository}, tied to its validated repository revision.`, imageContext);
 }
 
 export default async function FlowPage({ params, searchParams }: { params: Promise<{ flow: string }>; searchParams: SearchParams }) {
