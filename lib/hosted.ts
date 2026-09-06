@@ -1,6 +1,7 @@
 import { bundleApiOrigin } from './links';
 
 const MAX_BUNDLE_BYTES = 25 * 1024 * 1024;
+const MAX_METADATA_BYTES = 2 * 1024 * 1024;
 const BUNDLE_ID = /^b_[A-Za-z0-9_-]{8,128}$/;
 const REPOSITORY_PART = /^[A-Za-z0-9._-]{1,100}$/;
 const REPOSITORY_HOSTS = new Set(['github.com', 'gitlab.com', 'bitbucket.org']);
@@ -77,7 +78,7 @@ export async function loadHostedRepository(host: string, owner: string, repo: st
   const suffix = revision ? `?revision=${encodeURIComponent(revision)}` : '';
   const response = await fetch(`${bundleApiOrigin()}${route}${suffix}`, { redirect: 'error', signal: requestSignal(), headers: { Accept: 'application/json' } });
   if (!response.ok) throw new Error(`The repository index could not be loaded (HTTP ${response.status}).`);
-  const body = await response.json().catch(() => null) as Record<string, unknown> | null;
+  const body = await readMetadata(response);
   if (!body || typeof body.bundle_id !== 'string' || !BUNDLE_ID.test(body.bundle_id)) throw new Error('The repository index returned an invalid bundle link.');
   return body as HostedRepositoryIndex;
 }
@@ -86,7 +87,20 @@ export async function loadHostedRepositories(): Promise<HostedRepositoryIndex[]>
   if (!process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim()) return [];
   const response = await fetch(`${bundleApiOrigin()}/api/repos`, { redirect: 'error', signal: requestSignal(), headers: { Accept: 'application/json' } });
   if (!response.ok) throw new Error(`The repository index could not be loaded (HTTP ${response.status}).`);
-  const body = await response.json().catch(() => null) as { repositories?: unknown } | null;
+  const body = await readMetadata(response) as { repositories?: unknown } | null;
   if (!body || !Array.isArray(body.repositories)) throw new Error('The repository index returned an invalid catalog.');
   return body.repositories.filter((item): item is HostedRepositoryIndex => Boolean(item && typeof item === 'object' && typeof (item as Record<string, unknown>).bundle_id === 'string' && BUNDLE_ID.test((item as Record<string, unknown>).bundle_id as string)));
+}
+
+async function readMetadata(response: Response): Promise<Record<string, unknown> | null> {
+  const declared = Number(response.headers.get('content-length'));
+  if (Number.isFinite(declared) && declared > MAX_METADATA_BYTES) return null;
+  try {
+    const text = await response.text();
+    if (new TextEncoder().encode(text).byteLength > MAX_METADATA_BYTES) return null;
+    const body: unknown = JSON.parse(text);
+    return body && typeof body === 'object' && !Array.isArray(body) ? body as Record<string, unknown> : null;
+  } catch {
+    return null;
+  }
 }
