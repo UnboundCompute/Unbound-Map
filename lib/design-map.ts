@@ -347,12 +347,12 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   const safeLimit = Math.max(1, Math.floor(limit));
   const nodeById = new Map(snapshot.nodes.map((node) => [node.id, node]));
   const concepts = snapshot.concepts ?? [];
-  const conceptNodeIds = concepts.flatMap((concept) => concept.node_ids);
-  const conceptsArePartitioned = new Set(conceptNodeIds).size === conceptNodeIds.length;
-  // A single catch-all concept is not an architecture. Prefer a multi-concept,
-  // non-overlapping projection when the exporter supplies one; otherwise retain
-  // the conservative module table of contents.
-  const modules: BundleModule[] = concepts.length >= 2 && conceptsArePartitioned
+  // Concepts are semantic reading regions and may intentionally overlap (for
+  // example, a request lifecycle and a query pipeline share their parsing nodes).
+  // A single catch-all concept is not an architecture; with two or more concepts,
+  // preserve the authored regions and resolve shared-node relationships by the
+  // deterministic concept order supplied by the exporter.
+  const modules: BundleModule[] = concepts.length >= 2
     ? concepts.map((concept) => ({ id: concept.id, name: concept.label, description: concept.description, node_ids: concept.node_ids }))
     : snapshot.modules;
   const childProjection = (parentId: string) => {
@@ -431,7 +431,10 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     if (module.path) addModuleAlias(module.path, module.id);
     if (module.path) addModuleAlias(module.path.toLowerCase(), module.id);
   });
-  snapshot.nodes.forEach((node) => {
+  // Concept membership is the authoritative semantic assignment when concepts
+  // are being projected; raw node.module values describe implementation modules
+  // and would incorrectly mark every overlapping concept as ambiguous.
+  if (modules === snapshot.modules) snapshot.nodes.forEach((node) => {
     if (!node.module) return;
     const declared = moduleIds.get(node.module) ?? moduleAliases.get(node.module) ?? moduleAliases.get(node.module.toLowerCase()) ?? node.module;
     const existing = moduleByNodeId.get(node.id);

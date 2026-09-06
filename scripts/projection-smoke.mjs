@@ -131,7 +131,7 @@ if (conceptRegions.length !== 2 || conceptRegions[0]?.label !== 'Dispatch' || !c
 if (!conceptRegions.find((region) => region.id === 'concept.entry')?.downstream?.includes('concept.dispatch')) throw new Error('graph relationships were not projected across architecture concepts');
 const coarseConceptSnapshot = { ...conceptSnapshot, concepts: [conceptSnapshot.concepts[0]] };
 if (projectTopLevelRegions(coarseConceptSnapshot, 9)[0]?.id !== 'module.main') throw new Error('one catch-all concept replaced the more useful module projection');
-console.log('ok architectural concepts preferred only when they form a useful partition');
+console.log('ok architectural concepts preferred while preserving authored overlap');
 const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: '', line: 0 }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
 if (!isLachesisBundle(noModuleBundle)) throw new Error('valid bundle without modules rejected by the schema guard');
 const noModuleSnapshot = toDesignMapSnapshot(noModuleBundle);
