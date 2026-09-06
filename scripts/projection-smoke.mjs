@@ -103,6 +103,9 @@ if (!isLachesisBundle(partialModuleBundle)) throw new Error('valid bundle with p
 const partialSnapshot = toDesignMapSnapshot(partialModuleBundle);
 if (partialSnapshot.modules.length !== 2 || partialSnapshot.modules[0]?.node_ids?.length !== 1 || !partialSnapshot.limitations.some((item) => /not assigned to a declared module/i.test(item))) throw new Error('unassigned graph nodes were dropped instead of conservatively projected');
 console.log('ok partial module membership remains visible');
+const representativeNodes = projectTopLevelRegions(snapshot(1));
+if (representativeNodes[0]?.children?.[0]?.label !== 'Anchor Module 000' || !representativeNodes[0]?.children?.[0]?.summary.includes('function')) throw new Error('top-level module nodes were not exposed as bounded representative children');
+console.log('ok module focus exposes bounded representative nodes');
 const windowBundle = { ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], snippet: undefined, source_window: { start_line: 1, lines: ['int main(void) {}'] } }] } };
 if (!isLachesisBundle(windowBundle)) throw new Error('valid source_window bundle rejected by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: { invalid: true } } })) throw new Error('non-string generated_at accepted by the schema guard');

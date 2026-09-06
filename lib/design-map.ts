@@ -273,10 +273,31 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
         nodeCount: module.node_ids?.length ?? 0,
       }))
       .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
-    if (children.length <= 12) return children.map(({ nodeCount: _nodeCount, ...child }) => child);
-    const visible = children.slice(0, 11).map(({ nodeCount: _nodeCount, ...child }) => child);
-    const remainder = children.slice(11);
-    return [...visible, { label: `Other ${remainder.length} regions`, summary: `${remainder.reduce((total, child) => total + child.nodeCount, 0)} indexed nodes across the bounded remainder.` }];
+    if (children.length) {
+      if (children.length <= 12) return children.map(({ nodeCount: _nodeCount, ...child }) => child);
+      const visible = children.slice(0, 11).map(({ nodeCount: _nodeCount, ...child }) => child);
+      const remainder = children.slice(11);
+      return [...visible, { label: `Other ${remainder.length} regions`, summary: `${remainder.reduce((total, child) => total + child.nodeCount, 0)} indexed nodes across the bounded remainder.` }];
+    }
+
+    // Some graph bundles declare top-level modules but not nested communities.
+    // Keep region focus useful by exposing a bounded representative node list;
+    // exact source reading still belongs to Lachesis at level 2.
+    const ownModule = snapshot.modules.find((module) => module.id === parentId);
+    const nodes = (ownModule?.node_ids ?? [])
+      .map((id) => nodeById.get(id))
+      .filter((node): node is BundleNode => Boolean(node))
+      .sort((a, b) => a.line - b.line || a.label.localeCompare(b.label));
+    const nodeChildren = nodes.map((node) => ({
+      label: node.label,
+      summary: `${node.kind} · ${node.file}:${node.line}`,
+      anchor: node.label,
+      nodeCount: 1,
+    }));
+    if (nodeChildren.length <= 12) return nodeChildren.map(({ nodeCount: _nodeCount, ...child }) => child);
+    const visible = nodeChildren.slice(0, 11).map(({ nodeCount: _nodeCount, ...child }) => child);
+    const remainder = nodeChildren.slice(11);
+    return [...visible, { label: `Other ${remainder.length} nodes`, summary: `${remainder.length} indexed nodes across the bounded remainder.` }];
   };
   const topLevel = snapshot.modules
     .filter((module) => !module.parent_id)
