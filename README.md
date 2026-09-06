@@ -73,6 +73,11 @@ Prefer a normal link when the reader needs the explanation, region chapters, flo
 accessible text relationship summary; use the embed for a visual orientation inside an existing
 document.
 
+When a bundle exports `meta.source_url_template`, Architecture anchors, flow steps, entrypoints,
+and Trust evidence expose direct links to the revision-pinned file and line. If that metadata is
+absent, Design Map keeps the location as plain text and sends code-level reading to Lachesis
+without fabricating a source URL.
+
 For production sharing, set `NEXT_PUBLIC_SITE_URL` to the public Design Map origin. It is used by
 the sitemap and social-image metadata; `VERCEL_URL` is detected automatically on Vercel, while
 local development falls back to `http://localhost:3000`.
