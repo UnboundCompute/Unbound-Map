@@ -204,6 +204,14 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || (path.source_node !== undefined && !nodeIds.has(path.source_node)) || (path.sink_node !== undefined && !nodeIds.has(path.sink_node))
     || (path.confidence !== undefined && typeof path.confidence !== 'string')
     || (path.limitations !== undefined && (!Array.isArray(path.limitations) || path.limitations.some((item) => typeof item !== 'string'))))) return false;
+  if (candidate.analysis_projection === 'code-understanding') {
+    const entrypoints = graph!.entrypoints ?? [];
+    const hasSourceBackedPath = requests.some((path) => path.hops.length >= 3 && path.hops.every((hop) => {
+      const node = nodesById.get(hop.node_id);
+      return Boolean(node?.file && node.line > 0);
+    }));
+    if (!entrypoints.length || !hasSourceBackedPath) return false;
+  }
   if (candidate.security !== undefined && (!candidate.security || typeof candidate.security !== 'object'
     || (candidate.security.findings !== undefined && !Array.isArray(candidate.security.findings)))) return false;
   const findings = candidate.security?.findings ?? [];
