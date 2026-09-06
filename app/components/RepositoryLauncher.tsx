@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { repositoryRefError, repositoryUrlError } from '../../lib/repository-intake';
+import { pollDelayMilliseconds, retryAfterMilliseconds } from '../../lib/build-polling';
 
 type CachedRepo = { repository?: string; git_url?: string; ref?: string; revision?: string; bundle_id?: string };
 type BuildStatus = { status?: string; bundle_id?: string; sha?: string; error?: { message?: string } };
@@ -25,7 +26,24 @@ const BUILD_STAGE_ALIASES: Record<string, number> = {
 function api(path: string) { return path; }
 function repoLabel(repo: CachedRepo) { return (repo.repository || repo.git_url || 'Repository').replace(/^https?:\/\//, '').replace(/\.git$/, ''); }
 function openSnapshot(repo: CachedRepo) { window.location.href = `/?${new URLSearchParams({ repository: repoLabel(repo), revision: repo.revision || repo.ref || 'main', bundle: repo.bundle_id! }).toString()}`; }
-function wait(milliseconds: number) { return new Promise((resolve) => window.setTimeout(resolve, milliseconds)); }
+function wait(milliseconds: number, signal: AbortSignal) {
+  return new Promise<void>((resolve, reject) => {
+    const timer = window.setTimeout(() => { signal.removeEventListener('abort', onAbort); resolve(); }, milliseconds);
+    function onAbort() { window.clearTimeout(timer); reject(new DOMException('Polling cancelled', 'AbortError')); }
+    if (signal.aborted) onAbort();
+    else signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+async function waitUntilVisible(signal: AbortSignal) {
+  while (document.visibilityState === 'hidden') {
+    await new Promise<void>((resolve, reject) => {
+      function onVisibility() { document.removeEventListener('visibilitychange', onVisibility); signal.removeEventListener('abort', onAbort); resolve(); }
+      function onAbort() { document.removeEventListener('visibilitychange', onVisibility); reject(new DOMException('Polling cancelled', 'AbortError')); }
+      if (signal.aborted) onAbort();
+      else { document.addEventListener('visibilitychange', onVisibility, { once: true }); signal.addEventListener('abort', onAbort, { once: true }); }
+    });
+  }
+}
 
 export function RepositoryLauncher({ initialRepository, initialRef }: { initialRepository?: string; initialRef?: string } = {}) {
   const [repos, setRepos] = useState<CachedRepo[]>([]); const [catalogState, setCatalogState] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading');
@@ -63,9 +81,21 @@ export function RepositoryLauncher({ initialRepository, initialRef }: { initialR
       const response = await fetch(api('/api/build'), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ git_url: url.trim(), ref: ref.trim() || 'main' }), signal: controller.signal });
       const body = await response.json();
       if (!response.ok || !body?.job_id) throw new Error(body?.error?.message || 'The hosted build could not be started.');
-      for (let attempt = 0; attempt < 300; attempt += 1) {
-        await wait(2_000);
+      const pollingDeadline = Date.now() + 15 * 60 * 1000;
+      for (let attempt = 0; attempt < 180; attempt += 1) {
+        const remaining = pollingDeadline - Date.now();
+        if (remaining <= 0) throw new Error('The build is still running. Try the cached repository list in a few minutes.');
+        await waitUntilVisible(controller.signal);
+        await wait(Math.min(pollDelayMilliseconds(attempt, undefined, Math.floor(Math.random() * 251)), remaining), controller.signal);
         const statusResponse = await fetch(api(`/api/build/${encodeURIComponent(body.job_id)}`), { headers: { Accept: 'application/json' }, signal: controller.signal });
+        if (!statusResponse.ok && [429, 500, 502, 503, 504].includes(statusResponse.status)) {
+          const retryAfter = retryAfterMilliseconds(statusResponse.headers.get('retry-after'));
+          if (retryAfter != null) {
+            await waitUntilVisible(controller.signal);
+            await wait(Math.min(pollDelayMilliseconds(attempt, retryAfter), pollingDeadline - Date.now()), controller.signal);
+            continue;
+          }
+        }
         const status = await statusResponse.json() as BuildStatus;
         if (!statusResponse.ok) throw new Error(status?.error?.message || 'The build status could not be read.');
         if (status.status === 'ready' && status.bundle_id) { openSnapshot({ repository: url.trim(), revision: status.sha || ref.trim() || 'main', bundle_id: status.bundle_id }); return; }
