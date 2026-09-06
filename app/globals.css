@@ -139,6 +139,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .map-status i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal-light); }
 .map-scale { display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 10px; color: var(--muted); }
 .map-level-reset { min-height: 44px; display: inline-flex; align-items: center; color: var(--signal); font: 600 10px var(--sans); text-decoration: underline; text-underline-offset: 3px; }
+.map-export-button { min-height: 44px; padding: 0 10px; border: 1px solid var(--map-rule); border-radius: 999px; background: var(--paper); color: var(--signal); cursor: pointer; font: 600 10px var(--sans); }
+.map-export-button:hover { border-color: var(--signal); background: var(--wash); }
 .map-banner { padding: 11px 17px; color: var(--body); background: #e3d8c9; font: 11px/1.5 var(--mono); }
 .map-banner-caution { color: var(--body); background: #e6d6c4; }
 .map-thesis { max-width: 760px; margin: 0; padding: 18px 17px 17px; border-bottom: 1px solid var(--map-rule); color: var(--map-ink); font: 400 20px/1.35 var(--serif); }

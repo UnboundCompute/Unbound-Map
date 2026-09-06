@@ -17,6 +17,14 @@ const positions: Position[] = [
 
 type Layout = { positions: Position[]; label: 'pipeline' | 'hub' | 'mesh' };
 
+function mermaidLabel(value: string) {
+  return value.replace(/["`\\]/g, '').replace(/[\r\n]+/g, ' ').trim() || 'Unnamed region';
+}
+
+function mermaidId(index: number) {
+  return `region_${index + 1}`;
+}
+
 function layoutFor(regions: SystemRegion[], pairs: Array<{ from: string; to: string }>): Layout {
   const count = regions.length;
   if (count <= 1) return { positions: [{ x: 50, y: 50, tone: 'gold' }], label: 'pipeline' };
@@ -61,6 +69,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
+  const [mermaidState, setMermaidState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   useEffect(() => {
     setSelected(searchParams.get('region') ?? '');
@@ -192,11 +201,41 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const totalAreas = allRegions.filter((region) => !region.rolledUp).length + (rolledRegion?.children?.length ?? 0);
   const placedSummary = regions.length < totalAreas ? `showing top ${regions.length} of ${totalAreas} areas` : `${regions.length} area${regions.length === 1 ? '' : 's'} placed`;
   const thesis = snapshot.purpose ?? snapshot.description;
+  const mermaid = [
+    'flowchart LR',
+    `  %% ${mermaidLabel(linkSnapshot.repository)} @ ${mermaidLabel(linkSnapshot.revision)}`,
+    ...regions.map((region, index) => `  ${mermaidId(index)}["${mermaidLabel(region.label)}"]`),
+    ...allEdges.flatMap((edge) => {
+      const from = regions.findIndex((region) => region.id === edge.from);
+      const to = regions.findIndex((region) => region.id === edge.to);
+      return from >= 0 && to >= 0 ? [`  ${mermaidId(from)} --> ${mermaidId(to)}`] : [];
+    }),
+  ].join('\n');
+  async function copyMermaid() {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(mermaid);
+      else {
+        const textarea = document.createElement('textarea');
+        textarea.value = mermaid;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        if (!document.execCommand('copy')) throw new Error('Clipboard unavailable');
+        textarea.remove();
+      }
+      setMermaidState('copied');
+      window.setTimeout(() => setMermaidState('idle'), 2200);
+    } catch {
+      setMermaidState('failed');
+    }
+  }
   return <>
     <section className={`map-workbench${compact ? ' is-compact' : ''}`} aria-labelledby="architecture-map-title">
       <h2 id="architecture-map-title" className="sr-only">Architecture map</h2>
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">graph-backed · {level === '0' ? `${placedSummary} · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
+        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">graph-backed · {level === '0' ? `${placedSummary} · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {!compact && <button type="button" className="map-export-button" onClick={() => void copyMermaid()}>{mermaidState === 'copied' ? 'Mermaid copied' : mermaidState === 'failed' ? 'Copy failed' : 'Copy Mermaid'}</button>} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">{snapshot.limitations.some((item) => /demo fixture/i.test(item)) ? 'Demo graph fixture loaded. Shape is transport-valid; verify claims in Lachesis.' : 'Graph-backed snapshot loaded. Placement is a bounded reading projection — the small, readable subset of areas drawn from the full graph.'}</div>}
         {bundleState === 'ready' && thesis && <p className="map-thesis">{thesis}</p>}
         {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
