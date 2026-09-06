@@ -30,7 +30,9 @@ function flowTitle(path: BundleRequestPath) {
 }
 
 function regionForNode(bundle: LachesisBundle, nodeId: string) {
-  const concept = bundle.graph.concepts?.find((item) => item.node_ids.includes(nodeId));
+  // Projection ownership follows the adapter's deterministic last-authored
+  // concept assignment for intentionally overlapping concepts.
+  const concept = bundle.graph.concepts?.filter((item) => item.node_ids.includes(nodeId)).at(-1);
   if (concept) return concept.id;
   return bundle.graph.modules?.find((item) => item.node_ids?.includes(nodeId))?.id;
 }
