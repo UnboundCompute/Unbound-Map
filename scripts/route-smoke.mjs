@@ -87,6 +87,7 @@ await page(`/architecture?${ctx}`, ['What are the major responsibilities', 'A gr
 await pageWithout(`/architecture?${ctx}`, ['Suricata', 'Packet input', 'wire input', 'runtime spine', 'Illustrative']);
 await page(`/flows?${ctx}`, ['Which path explains this repository?']);
 await pageWithout(`/flows?${ctx}`, ['Suricata', 'packet-decode', 'validated IPv4 payload', 'Illustrative']);
+await page(`/f/${bundle}/main-path`, ['Bundle-pinned flow card', 'A path worth reading.', `bundle=${enc}`]);
 await page(`/trust?${ctx}`, ['What evidence needs a closer read?']);
 await pageWithout(`/trust?${ctx}`, ['Memory safety', 'Illustrative taxonomy', 'Suricata']);
 await page(`/embed?${ctx}`, ['Flask architecture', 'Skip to map', 'id="embed-content"', 'Graph-backed bundle requested']);
