@@ -148,7 +148,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
 }
 
 /** Build an exact source link when the exporter provides a revision-pinned template. */
-export function sourceHref(snapshot: RepositorySnapshotView, file?: string, line?: number, endLine?: number) {
+export function sourceHref(snapshot: Pick<RepositorySnapshotView, 'sourceUrlTemplate' | 'revision'>, file?: string, line?: number, endLine?: number) {
   if (!snapshot.sourceUrlTemplate || !file || !line || line < 1) return undefined;
   return snapshot.sourceUrlTemplate
     .replaceAll('{revision}', encodeURIComponent(snapshot.revision))

@@ -68,7 +68,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   const activeIndex = Math.max(0, flow?.hops.findIndex((hop) => (hop.id ?? hop.node_id) === stepId) ?? 0);
   const activeHop = flow?.hops[activeIndex];
   const activeNode = activeHop ? nodeById.get(activeHop.node_id) : undefined;
-  const sourceLink = activeNode ? sourceHref(snapshotFromProjection(toDesignMapSnapshot(bundle!), projectTopLevelRegions(toDesignMapSnapshot(bundle!), 9)), activeNode.file, activeNode.line) : undefined;
+  const sourceLink = activeNode && bundle ? sourceHref({ sourceUrlTemplate: bundle.meta.source_url_template, revision: bundle.meta.revision }, activeNode.file, activeNode.line) : undefined;
 
   const updateUrl = (nextFlow: string, nextStep?: string) => {
     const params = new URLSearchParams(window.location.search);
