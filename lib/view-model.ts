@@ -10,6 +10,7 @@ export type RepositorySnapshotView = {
   coverageState: CoverageState;
   repository: string;
   revision: string;
+  description?: string;
   generatedAt?: string;
   language: string;
   coverageScope: string;
@@ -115,6 +116,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     coverageState: snapshot.includedNodes < snapshot.indexedNodes || snapshot.limitations.length > 0 ? 'limited' : 'verified',
     repository: snapshot.repository,
     revision: snapshot.revision,
+    description: snapshot.description,
     generatedAt: snapshot.generatedAt,
     language: snapshot.language,
     coverageScope: snapshot.coverageScope,

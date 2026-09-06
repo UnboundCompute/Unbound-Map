@@ -250,6 +250,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
 export type DesignMapSnapshot = {
   repository: string;
   revision: string;
+  description?: string;
   generatedAt?: string;
   language: string;
   lines: number;
@@ -351,6 +352,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
   return {
     repository: bundle.meta.repository,
     revision: bundle.meta.revision,
+    description: bundle.meta.description,
     generatedAt: bundle.meta.generated_at,
     language: bundle.meta.language,
     lines: positiveInteger(bundle.meta.lines, 0),

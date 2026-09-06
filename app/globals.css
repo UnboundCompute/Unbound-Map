@@ -132,6 +132,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .map-level-reset { min-height: 44px; display: inline-flex; align-items: center; color: var(--signal); font: 600 10px var(--sans); text-decoration: underline; text-underline-offset: 3px; }
 .map-banner { padding: 11px 17px; color: var(--body); background: #e3d8c9; font: 11px/1.5 var(--mono); }
 .map-banner-caution { color: var(--body); background: #e6d6c4; }
+.map-thesis { max-width: 760px; margin: 0; padding: 18px 17px 17px; border-bottom: 1px solid var(--map-rule); color: var(--map-ink); font: 400 20px/1.35 var(--serif); }
 .map-state-panel { max-width: 830px; margin-top: 35px; padding: 28px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
 .map-state-label { color: var(--muted); font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 .map-state-panel h2 { max-width: 560px; margin: 13px 0 10px; font: 400 clamp(28px, 3.5vw, 40px)/1.08 var(--serif); }

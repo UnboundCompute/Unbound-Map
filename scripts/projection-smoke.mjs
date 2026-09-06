@@ -105,11 +105,11 @@ const comprehensionBundle = {
   },
   paths: { requests: [{ id: 'request.main', kind: 'call-path', description: 'Main lifecycle', entry_node: 'node-0', source_node: 'node-0', sink_node: 'node-2', hops: [{ node_id: 'node-0', caption: 'receives' }, { node_id: 'node-1', caption: 'dispatches', edge_label: 'calls' }, { node_id: 'node-2', caption: 'responds', edge_label: 'calls' }] }], values: [] },
   security: { findings: [] },
-  meta: { ...validBundle.meta, indexed_nodes: 3 },
+  meta: { ...validBundle.meta, indexed_nodes: 3, description: 'A bounded request path through the system.' },
 };
 if (!isLachesisBundle(comprehensionBundle)) throw new Error('valid comprehension projection rejected by the schema guard');
 const comprehensionSnapshot = toDesignMapSnapshot(comprehensionBundle);
-if (comprehensionSnapshot.entrypoints.length !== 1 || comprehensionSnapshot.requestPaths[0]?.hops.length !== 3) throw new Error('comprehension entrypoints or request paths were dropped by the adapter');
+if (comprehensionSnapshot.description !== 'A bounded request path through the system.' || comprehensionSnapshot.entrypoints.length !== 1 || comprehensionSnapshot.requestPaths[0]?.hops.length !== 3) throw new Error('comprehension metadata, entrypoints, or request paths were dropped by the adapter');
 if (isLachesisBundle({ ...comprehensionBundle, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.slice(0, 2) }] } })) throw new Error('underspecified comprehension path accepted by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, graph: { ...comprehensionBundle.graph, entrypoints: [] } })) throw new Error('code-understanding bundle without an entrypoint accepted by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, graph: { ...comprehensionBundle.graph, nodes: comprehensionBundle.graph.nodes.map((node) => node.id === 'node-2' ? { ...node, file: '', line: 0 } : node) }, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.map((hop) => hop.node_id === 'node-2' ? { ...hop, node_id: 'node-2' } : hop) }] } })) throw new Error('code-understanding bundle without a source-backed multi-hop path accepted by the schema guard');
