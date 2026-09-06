@@ -17,6 +17,7 @@
     "hosted-smoke": "node --experimental-strip-types scripts/hosted-smoke.mjs",
     "explorer-smoke": "node --experimental-strip-types scripts/explorer-integration-smoke.mjs",
     "projection-smoke": "node --experimental-strip-types scripts/projection-smoke.mjs",
+    "verify:repository-intake": "node --experimental-strip-types scripts/verify-repository-intake.mjs",
     "verify:sitemap": "node --experimental-strip-types scripts/verify-sitemap.mjs",
     "check": "tsc --noEmit"
   },
