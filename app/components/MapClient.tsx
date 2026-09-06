@@ -63,7 +63,8 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anc
 function regionForSource(snapshot: RepositorySnapshotView, file?: string, line?: number) {
   if (!file) return undefined;
   return snapshot.regions.find((region) => region.anchor?.file === file && (line === undefined || region.anchor.line === line))
-    ?? snapshot.regions.find((region) => region.anchor?.file === file);
+    ?? snapshot.regions.find((region) => region.anchor?.file === file)
+    ?? snapshot.regions.find((region) => region.sourcePaths?.some((prefix) => file === prefix || file.startsWith(`${prefix}/`)));
 }
 
 export function MapClient({ route = '/architecture', initialBundle, initialSnapshot, initialLevel = '0', initialRegion = '', initialQuery = '', compact = false, maxRegions = 9, regionIds }: { route?: string; initialBundle?: string; initialSnapshot?: RepositorySnapshotView; initialLevel?: string; initialRegion?: string; initialQuery?: string; compact?: boolean; maxRegions?: number; regionIds?: string[] }) {

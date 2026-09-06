@@ -35,6 +35,7 @@ for (const count of [0, 1, 8, 30, 500]) {
 const children = projectTopLevelRegions(snapshot(1, 20));
 if (children[0]?.children?.length !== 12) throw new Error(`20 child modules projected to ${children[0]?.children?.length ?? 0}; expected 12 including remainder`);
 if (!children[0]?.children?.at(-1)?.label.startsWith('Other ')) throw new Error('child projection is missing its explicit remainder roll-up');
+if (!children[0]?.sourcePaths?.includes('src/module-0')) throw new Error('region did not retain its bounded source path for reverse handoff focus');
 console.log('ok 20 child modules → 12 bounded children');
 
 const macroBound = projectTopLevelRegions(snapshot(10), 9);

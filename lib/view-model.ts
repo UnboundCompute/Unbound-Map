@@ -41,6 +41,7 @@ export type SystemRegion = {
   /** Secondary "all projected nodes" label (never "symbols"). */
   projectedLabel: string;
   rolledUp?: boolean;
+  sourcePaths?: string[];
   role?: 'entry' | 'runtime' | 'fanout' | 'output' | 'boot';
   upstream?: string[];
   downstream?: string[];
@@ -117,6 +118,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       metricLabel: `${region.definitionCount.toLocaleString()} definition${region.definitionCount === 1 ? '' : 's'}`,
       projectedLabel: `${region.nodeCount.toLocaleString()} projected node${region.nodeCount === 1 ? '' : 's'}`,
       rolledUp: region.rolledUp,
+      sourcePaths: region.sourcePaths,
       anchor: region.anchor,
       children: region.children,
       inputs: region.inputs,

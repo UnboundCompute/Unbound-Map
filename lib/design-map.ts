@@ -304,6 +304,8 @@ export type HLDRegion = {
   definitionCount: number;
   rolledUp: boolean;
   summary?: string;
+  /** Bounded module/path prefixes used to focus a source-location handoff. */
+  sourcePaths?: string[];
   anchor?: Pick<BundleNode, 'id' | 'label' | 'file' | 'line'>;
   children?: { label: string; summary: string; anchor?: string }[];
   inputs?: string[];
@@ -481,6 +483,23 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
     const remainder = nodeChildren.slice(11);
     return [...visible, { label: `Other ${remainder.length} nodes`, summary: `${remainder.length} projected nodes across the bounded remainder.` }];
   };
+  const sourcePathsFor = (rootId: string) => {
+    const included = new Set([rootId]);
+    let expanded = true;
+    while (expanded) {
+      expanded = false;
+      modules.forEach((module) => {
+        if (module.parent_id && included.has(module.parent_id) && !included.has(module.id)) {
+          included.add(module.id);
+          expanded = true;
+        }
+      });
+    }
+    return [...new Set(modules
+      .filter((module) => included.has(module.id))
+      .map((module) => module.path ?? module.name)
+      .filter((value) => value.includes('/')))].sort();
+  };
   const topLevel = modules
     .filter((module) => !module.parent_id)
     .map((module) => ({
@@ -491,6 +510,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
       definitionCount: moduleDefCount(module),
       rolledUp: false,
       summary: module.description,
+      sourcePaths: sourcePathsFor(module.id),
       anchor: (module.anchor_node_id ? nodeById.get(module.anchor_node_id) : undefined) ?? module.node_ids?.map((id) => nodeById.get(id)).find(Boolean),
       children: childProjection(module.id),
     }))
@@ -603,6 +623,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
     nodeCount: remainder.reduce((total, region) => total + region.nodeCount, 0),
     definitionCount: remainder.reduce((total, region) => total + region.definitionCount, 0),
     rolledUp: true,
+    sourcePaths: [...new Set(remainder.flatMap((region) => region.sourcePaths ?? []))].sort(),
     children: remainder.map((region) => ({ label: region.label, summary: `${region.definitionCount.toLocaleString()} definitions${region.path ? ` · ${region.path}` : ''}.`, anchor: region.anchor?.label })),
   }]);
 }
