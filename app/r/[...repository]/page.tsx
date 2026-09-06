@@ -12,9 +12,15 @@ type Params = { repository?: string[] };
 
 function routeContext(parts: string[]) {
   if (parts.length !== 2 && parts.length !== 3) return undefined;
-  const host = parts.length === 2 ? 'github.com' : parts[0];
-  const owner = parts.length === 2 ? parts[0] : parts[1];
-  const revisionPart = parts.length === 2 ? parts[1] : parts[2];
+  let decoded: string[];
+  try {
+    decoded = parts.map((part) => decodeURIComponent(part));
+  } catch {
+    return undefined;
+  }
+  const host = decoded.length === 2 ? 'github.com' : decoded[0];
+  const owner = decoded.length === 2 ? decoded[0] : decoded[1];
+  const revisionPart = decoded.length === 2 ? decoded[1] : decoded[2];
   const separator = revisionPart.indexOf('@');
   const repo = separator >= 0 ? revisionPart.slice(0, separator) : revisionPart;
   const revision = separator >= 0 ? revisionPart.slice(separator + 1) : undefined;
@@ -32,7 +38,7 @@ function canonicalPath(parts: string[]) {
 }
 
 function latestPathParts(parts: string[]) {
-  if (parts.length === 2) return parts;
+  if (parts.length === 2) return [parts[0], parts[1].split('@', 1)[0]];
   return [parts[0], parts[1], parts[2].split('@', 1)[0]];
 }
 
@@ -82,7 +88,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function PublishedRepositoryPage({ params }: { params: Promise<Params> }) {
   const parts = (await params).repository ?? [];
-  const publication = await loadPublication(parts);
+  let publication: Awaited<ReturnType<typeof loadPublication>>;
+  try {
+    publication = await loadPublication(parts);
+  } catch {
+    notFound();
+  }
   if (!publication) notFound();
   const { context: route, index, snapshot, bundleId } = publication;
   const repository = index.repository?.replace(`${route.host}/`, '') || `${route.owner}/${route.repo}`;
