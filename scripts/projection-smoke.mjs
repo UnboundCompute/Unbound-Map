@@ -38,6 +38,11 @@ if (!children[0]?.children?.at(-1)?.label.startsWith('Other ')) throw new Error(
 if (!children[0]?.sourcePaths?.includes('src/module-0')) throw new Error('region did not retain its bounded source path for reverse handoff focus');
 console.log('ok 20 child modules → 12 bounded children');
 
+const rootPathSnapshot = snapshot(1);
+rootPathSnapshot.modules[0].path = 'src';
+if (!projectTopLevelRegions(rootPathSnapshot)[0]?.sourcePaths?.includes('src')) throw new Error('root-level source directory was omitted from reverse handoff paths');
+console.log('ok root-level source directory remains handoff-addressable');
+
 const macroBound = projectTopLevelRegions(snapshot(10), 9);
 if (macroBound.length !== 9 || !macroBound.at(-1)?.rolledUp || !macroBound.at(-1)?.label.startsWith('Other ')) throw new Error('nine-region macro bound did not emit an explicit Other remainder');
 console.log('ok 10 top-level modules → 9 macro regions with remainder');

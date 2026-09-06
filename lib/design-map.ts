@@ -483,22 +483,23 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
     const remainder = nodeChildren.slice(11);
     return [...visible, { label: `Other ${remainder.length} nodes`, summary: `${remainder.length} projected nodes across the bounded remainder.` }];
   };
+  const moduleById = new Map(modules.map((module) => [module.id, module]));
+  const childrenByParent = new Map<string, string[]>();
+  modules.forEach((module) => {
+    if (!module.parent_id) return;
+    childrenByParent.set(module.parent_id, [...(childrenByParent.get(module.parent_id) ?? []), module.id]);
+  });
   const sourcePathsFor = (rootId: string) => {
-    const included = new Set([rootId]);
-    let expanded = true;
-    while (expanded) {
-      expanded = false;
-      modules.forEach((module) => {
-        if (module.parent_id && included.has(module.parent_id) && !included.has(module.id)) {
-          included.add(module.id);
-          expanded = true;
-        }
-      });
+    const stack = [rootId];
+    const paths = new Set<string>();
+    while (stack.length) {
+      const module = moduleById.get(stack.pop()!);
+      if (!module) continue;
+      const path = module.path ?? module.name;
+      if (path && path !== 'root' && path !== '.') paths.add(path);
+      stack.push(...(childrenByParent.get(module.id) ?? []));
     }
-    return [...new Set(modules
-      .filter((module) => included.has(module.id))
-      .map((module) => module.path ?? module.name)
-      .filter((value) => value.includes('/')))].sort();
+    return [...paths].sort();
   };
   const topLevel = modules
     .filter((module) => !module.parent_id)
