@@ -34,9 +34,38 @@ export type BundleEdge = {
   relation?: string;
 };
 
+export type BundleEntrypoint = {
+  id: string;
+  label: string;
+  kind: string;
+  node_id: string;
+  file: string;
+  line?: number;
+};
+
+export type BundlePathHop = {
+  id?: string;
+  node_id: string;
+  caption: string;
+  edge_label?: string;
+};
+
+export type BundleRequestPath = {
+  id: string;
+  kind: string;
+  description: string;
+  entry_node: string;
+  source_node?: string;
+  sink_node?: string;
+  confidence?: string;
+  limitations?: string[];
+  hops: BundlePathHop[];
+};
+
 export type LachesisBundle = {
   format: 'lachesis-explorer-bundle';
   schema_version: '2.0';
+  analysis_projection?: string;
   meta: {
     repository: string;
     language: string;
@@ -52,6 +81,7 @@ export type LachesisBundle = {
     nodes: BundleNode[];
     modules?: BundleModule[];
     edges?: BundleEdge[];
+    entrypoints?: BundleEntrypoint[];
     capabilities?: string[];
     coverage?: {
       scope?: string;
@@ -61,6 +91,11 @@ export type LachesisBundle = {
       capabilities?: string[];
     };
   };
+  paths?: {
+    requests?: BundleRequestPath[];
+    values?: unknown[];
+  };
+  security?: { findings?: unknown[] };
 };
 
 export function isLachesisBundle(value: unknown): value is LachesisBundle {
@@ -82,6 +117,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && Array.isArray(graph.nodes) && graph.nodes.length > 0
     && (graph.modules === undefined || Array.isArray(graph.modules))
     && (graph.edges === undefined || Array.isArray(graph.edges))
+    && (graph.entrypoints === undefined || Array.isArray(graph.entrypoints))
     && (graph.capabilities === undefined || (Array.isArray(graph.capabilities) && graph.capabilities.every((item) => typeof item === 'string')))
     && (graph.coverage === undefined || (!!graph.coverage && typeof graph.coverage === 'object' && (graph.coverage.scope === undefined || typeof graph.coverage.scope === 'string') && (graph.coverage.included_nodes === undefined || (typeof graph.coverage.included_nodes === 'number' && Number.isInteger(graph.coverage.included_nodes) && graph.coverage.included_nodes >= 0)) && (graph.coverage.indexed_nodes === undefined || (typeof graph.coverage.indexed_nodes === 'number' && Number.isInteger(graph.coverage.indexed_nodes) && graph.coverage.indexed_nodes >= 0)) && (graph.coverage.limitations === undefined || (Array.isArray(graph.coverage.limitations) && graph.coverage.limitations.every((item) => typeof item === 'string'))) && (graph.coverage.capabilities === undefined || (Array.isArray(graph.coverage.capabilities) && graph.coverage.capabilities.every((item) => typeof item === 'string')))));
   if (!validShape) return false;
@@ -113,6 +149,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || (edge.id !== undefined && (typeof edge.id !== 'string' || !edge.id.trim())) || typeof edge.source !== 'string' || !edge.source.trim()
     || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string') || (edge.relation !== undefined && typeof edge.relation !== 'string'))) return false;
   if (meta!.source_url_template !== undefined && !/^https?:\/\//i.test(meta!.source_url_template)) return false;
+  if (candidate.analysis_projection !== undefined && (typeof candidate.analysis_projection !== 'string' || !candidate.analysis_projection.trim())) return false;
   const edgeIds = (graph!.edges ?? []).map((edge) => edge.id).filter((id): id is string => id !== undefined);
   if (new Set(edgeIds).size !== edgeIds.length) return false;
 
@@ -122,6 +159,26 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   const indexedNodes = graph!.coverage?.indexed_nodes ?? meta!.indexed_nodes;
   if (includedNodes !== graph!.nodes.length || indexedNodes < includedNodes) return false;
   if ((graph!.edges ?? []).some((edge) => !nodeIds.has(edge.source) || !nodeIds.has(edge.target))) return false;
+  if ((graph!.entrypoints ?? []).some((entry) => !entry || typeof entry !== 'object'
+    || typeof entry.id !== 'string' || !entry.id.trim() || typeof entry.label !== 'string' || !entry.label.trim()
+    || typeof entry.kind !== 'string' || !entry.kind.trim() || typeof entry.node_id !== 'string' || !nodeIds.has(entry.node_id)
+    || typeof entry.file !== 'string' || !entry.file.trim()
+    || (entry.line !== undefined && (typeof entry.line !== 'number' || !Number.isInteger(entry.line) || entry.line < 1)))) return false;
+  const requests = candidate.paths?.requests ?? [];
+  if (candidate.paths !== undefined && (!candidate.paths || typeof candidate.paths !== 'object'
+    || (candidate.paths.requests !== undefined && !Array.isArray(candidate.paths.requests))
+    || (candidate.paths.values !== undefined && !Array.isArray(candidate.paths.values)))) return false;
+  if (requests.some((path) => !path || typeof path !== 'object'
+    || typeof path.id !== 'string' || !path.id.trim() || typeof path.kind !== 'string' || !path.kind.trim()
+    || typeof path.description !== 'string' || typeof path.entry_node !== 'string' || !nodeIds.has(path.entry_node)
+    || !Array.isArray(path.hops) || path.hops.length < 3
+    || path.hops.some((hop) => !hop || typeof hop !== 'object' || typeof hop.node_id !== 'string' || !nodeIds.has(hop.node_id) || typeof hop.caption !== 'string' || !hop.caption.trim()
+      || (hop.id !== undefined && (typeof hop.id !== 'string' || !hop.id.trim())) || (hop.edge_label !== undefined && typeof hop.edge_label !== 'string'))
+    || (path.source_node !== undefined && !nodeIds.has(path.source_node)) || (path.sink_node !== undefined && !nodeIds.has(path.sink_node))
+    || (path.confidence !== undefined && typeof path.confidence !== 'string')
+    || (path.limitations !== undefined && (!Array.isArray(path.limitations) || path.limitations.some((item) => typeof item !== 'string'))))) return false;
+  if (candidate.security !== undefined && (!candidate.security || typeof candidate.security !== 'object'
+    || (candidate.security.findings !== undefined && !Array.isArray(candidate.security.findings)))) return false;
   const modules = graph!.modules ?? [];
   const moduleIds = new Set(modules.map((module) => module.id));
   if (moduleIds.size !== modules.length) return false;
@@ -153,6 +210,8 @@ export type DesignMapSnapshot = {
   modules: BundleModule[];
   relationships: BundleEdge[];
   nodes: BundleNode[];
+  entrypoints: BundleEntrypoint[];
+  requestPaths: BundleRequestPath[];
 };
 
 export type HLDRegion = {
@@ -250,6 +309,8 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     modules,
     relationships: bundle.graph.edges ?? [],
     nodes: bundle.graph.nodes,
+    entrypoints: bundle.graph.entrypoints ?? [],
+    requestPaths: bundle.paths?.requests ?? [],
   };
 }
 

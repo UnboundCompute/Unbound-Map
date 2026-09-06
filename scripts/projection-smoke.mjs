@@ -91,6 +91,27 @@ const validBundle = {
   graph: { nodes: [{ id: 'node-0', label: 'Anchor', kind: 'function', file: 'src/main.c', line: 1, snippet: 'int main(void) {}' }] },
 };
 if (!isLachesisBundle(validBundle)) throw new Error('valid bundle rejected by the schema guard');
+const comprehensionBundle = {
+  ...validBundle,
+  analysis_projection: 'code-understanding',
+  graph: {
+    ...validBundle.graph,
+    nodes: [
+      validBundle.graph.nodes[0],
+      { id: 'node-1', label: 'Dispatch', kind: 'function', file: 'src/main.c', line: 4 },
+      { id: 'node-2', label: 'Respond', kind: 'function', file: 'src/main.c', line: 8 },
+    ],
+    entrypoints: [{ id: 'entry.main', label: 'main', kind: 'cli-entry', node_id: 'node-0', file: 'src/main.c', line: 1 }],
+  },
+  paths: { requests: [{ id: 'request.main', kind: 'call-path', description: 'Main lifecycle', entry_node: 'node-0', source_node: 'node-0', sink_node: 'node-2', hops: [{ node_id: 'node-0', caption: 'receives' }, { node_id: 'node-1', caption: 'dispatches', edge_label: 'calls' }, { node_id: 'node-2', caption: 'responds', edge_label: 'calls' }] }], values: [] },
+  security: { findings: [] },
+  meta: { ...validBundle.meta, indexed_nodes: 3 },
+};
+if (!isLachesisBundle(comprehensionBundle)) throw new Error('valid comprehension projection rejected by the schema guard');
+const comprehensionSnapshot = toDesignMapSnapshot(comprehensionBundle);
+if (comprehensionSnapshot.entrypoints.length !== 1 || comprehensionSnapshot.requestPaths[0]?.hops.length !== 3) throw new Error('comprehension entrypoints or request paths were dropped by the adapter');
+if (isLachesisBundle({ ...comprehensionBundle, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.slice(0, 2) }] } })) throw new Error('underspecified comprehension path accepted by the schema guard');
+console.log('ok comprehension entrypoints and guided paths retained');
 const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: '', line: 0 }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
 if (!isLachesisBundle(noModuleBundle)) throw new Error('valid bundle without modules rejected by the schema guard');
 const noModuleSnapshot = toDesignMapSnapshot(noModuleBundle);
