@@ -19,9 +19,10 @@
     "projection-smoke": "node --experimental-strip-types scripts/projection-smoke.mjs",
     "verify:build-polling": "node --experimental-strip-types scripts/verify-build-polling.mjs",
     "verify:response-bounds": "node --experimental-strip-types scripts/verify-response-bounds.mjs",
+    "verify:casefile-links": "node --experimental-strip-types scripts/verify-casefile-links.mjs",
     "verify:repository-intake": "node --experimental-strip-types scripts/verify-repository-intake.mjs",
     "verify:sitemap": "node --experimental-strip-types scripts/verify-sitemap.mjs",
-    "check": "tsc --noEmit && npm run verify:response-bounds"
+    "check": "tsc --noEmit && npm run verify:response-bounds && npm run verify:casefile-links"
   },
   "dependencies": {
     "@vercel/analytics": "1.6.1",
