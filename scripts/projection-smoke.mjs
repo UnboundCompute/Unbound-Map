@@ -112,6 +112,26 @@ const comprehensionSnapshot = toDesignMapSnapshot(comprehensionBundle);
 if (comprehensionSnapshot.entrypoints.length !== 1 || comprehensionSnapshot.requestPaths[0]?.hops.length !== 3) throw new Error('comprehension entrypoints or request paths were dropped by the adapter');
 if (isLachesisBundle({ ...comprehensionBundle, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.slice(0, 2) }] } })) throw new Error('underspecified comprehension path accepted by the schema guard');
 console.log('ok comprehension entrypoints and guided paths retained');
+const conceptBundle = {
+  ...comprehensionBundle,
+  graph: {
+    ...comprehensionBundle.graph,
+    modules: [{ id: 'module.main', name: 'src.main', path: 'src/main.c', node_ids: ['node-0', 'node-1', 'node-2'] }],
+    concepts: [
+      { id: 'concept.entry', label: 'Request entry', description: 'Receives work at the public boundary.', node_ids: ['node-0'] },
+      { id: 'concept.dispatch', label: 'Dispatch', description: 'Selects and invokes the responsible handler.', node_ids: ['node-1', 'node-2'] },
+    ],
+    edges: [{ source: 'node-0', target: 'node-1', kind: 'calls' }],
+  },
+};
+if (!isLachesisBundle(conceptBundle)) throw new Error('valid architecture concepts rejected by the schema guard');
+const conceptSnapshot = toDesignMapSnapshot(conceptBundle);
+const conceptRegions = projectTopLevelRegions(conceptSnapshot, 9);
+if (conceptRegions.length !== 2 || conceptRegions[0]?.label !== 'Dispatch' || !conceptRegions.some((region) => region.summary?.includes('public boundary'))) throw new Error('multi-concept architecture did not replace the file-module projection');
+if (!conceptRegions.find((region) => region.id === 'concept.entry')?.downstream?.includes('concept.dispatch')) throw new Error('graph relationships were not projected across architecture concepts');
+const coarseConceptSnapshot = { ...conceptSnapshot, concepts: [conceptSnapshot.concepts[0]] };
+if (projectTopLevelRegions(coarseConceptSnapshot, 9)[0]?.id !== 'module.main') throw new Error('one catch-all concept replaced the more useful module projection');
+console.log('ok architectural concepts preferred only when they form a useful partition');
 const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: '', line: 0 }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
 if (!isLachesisBundle(noModuleBundle)) throw new Error('valid bundle without modules rejected by the schema guard');
 const noModuleSnapshot = toDesignMapSnapshot(noModuleBundle);

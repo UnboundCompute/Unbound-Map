@@ -24,6 +24,14 @@ export type BundleModule = {
   path?: string;
   parent_id?: string;
   node_ids?: string[];
+  description?: string;
+};
+
+export type BundleConcept = {
+  id: string;
+  label: string;
+  description?: string;
+  node_ids: string[];
 };
 
 export type BundleEdge = {
@@ -82,6 +90,8 @@ export type LachesisBundle = {
     modules?: BundleModule[];
     edges?: BundleEdge[];
     entrypoints?: BundleEntrypoint[];
+    concepts?: BundleConcept[];
+    core?: { node_id: string; label?: string; degree?: number }[];
     capabilities?: string[];
     coverage?: {
       scope?: string;
@@ -118,6 +128,8 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && (graph.modules === undefined || Array.isArray(graph.modules))
     && (graph.edges === undefined || Array.isArray(graph.edges))
     && (graph.entrypoints === undefined || Array.isArray(graph.entrypoints))
+    && (graph.concepts === undefined || Array.isArray(graph.concepts))
+    && (graph.core === undefined || Array.isArray(graph.core))
     && (graph.capabilities === undefined || (Array.isArray(graph.capabilities) && graph.capabilities.every((item) => typeof item === 'string')))
     && (graph.coverage === undefined || (!!graph.coverage && typeof graph.coverage === 'object' && (graph.coverage.scope === undefined || typeof graph.coverage.scope === 'string') && (graph.coverage.included_nodes === undefined || (typeof graph.coverage.included_nodes === 'number' && Number.isInteger(graph.coverage.included_nodes) && graph.coverage.included_nodes >= 0)) && (graph.coverage.indexed_nodes === undefined || (typeof graph.coverage.indexed_nodes === 'number' && Number.isInteger(graph.coverage.indexed_nodes) && graph.coverage.indexed_nodes >= 0)) && (graph.coverage.limitations === undefined || (Array.isArray(graph.coverage.limitations) && graph.coverage.limitations.every((item) => typeof item === 'string'))) && (graph.coverage.capabilities === undefined || (Array.isArray(graph.coverage.capabilities) && graph.coverage.capabilities.every((item) => typeof item === 'string')))));
   if (!validShape) return false;
@@ -144,6 +156,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   })) return false;
   if ((graph!.modules ?? []).some((module) => !module || typeof module.id !== 'string' || !module.id.trim()
     || typeof module.name !== 'string' || !module.name.trim() || (module.path !== undefined && typeof module.path !== 'string')
+    || (module.description !== undefined && typeof module.description !== 'string')
     || (module.parent_id !== undefined && (typeof module.parent_id !== 'string' || !module.parent_id.trim()))
     || (module.node_ids !== undefined && (!Array.isArray(module.node_ids) || module.node_ids.some((id) => typeof id !== 'string' || !id.trim()))))) return false;
   if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || (edge.id !== undefined && (typeof edge.id !== 'string' || !edge.id.trim())) || typeof edge.source !== 'string' || !edge.source.trim()
@@ -164,6 +177,12 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || typeof entry.kind !== 'string' || !entry.kind.trim() || typeof entry.node_id !== 'string' || !nodeIds.has(entry.node_id)
     || typeof entry.file !== 'string' || !entry.file.trim()
     || (entry.line !== undefined && (typeof entry.line !== 'number' || !Number.isInteger(entry.line) || entry.line < 1)))) return false;
+  if ((graph!.concepts ?? []).some((concept) => !concept || typeof concept !== 'object'
+    || typeof concept.id !== 'string' || !concept.id.trim() || typeof concept.label !== 'string' || !concept.label.trim()
+    || (concept.description !== undefined && typeof concept.description !== 'string')
+    || !Array.isArray(concept.node_ids) || !concept.node_ids.length || concept.node_ids.some((id) => typeof id !== 'string' || !nodeIds.has(id)))) return false;
+  if ((graph!.core ?? []).some((item) => !item || typeof item !== 'object' || typeof item.node_id !== 'string' || !nodeIds.has(item.node_id)
+    || (item.label !== undefined && typeof item.label !== 'string') || (item.degree !== undefined && (typeof item.degree !== 'number' || !Number.isFinite(item.degree) || item.degree < 0)))) return false;
   const requests = candidate.paths?.requests ?? [];
   if (candidate.paths !== undefined && (!candidate.paths || typeof candidate.paths !== 'object'
     || (candidate.paths.requests !== undefined && !Array.isArray(candidate.paths.requests))
@@ -212,6 +231,7 @@ export type DesignMapSnapshot = {
   nodes: BundleNode[];
   entrypoints: BundleEntrypoint[];
   requestPaths: BundleRequestPath[];
+  concepts: BundleConcept[];
 };
 
 export type HLDRegion = {
@@ -220,6 +240,7 @@ export type HLDRegion = {
   path?: string;
   nodeCount: number;
   rolledUp: boolean;
+  summary?: string;
   anchor?: Pick<BundleNode, 'id' | 'label' | 'file' | 'line'>;
   children?: { label: string; summary: string; anchor?: string }[];
   inputs?: string[];
@@ -311,6 +332,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     nodes: bundle.graph.nodes,
     entrypoints: bundle.graph.entrypoints ?? [],
     requestPaths: bundle.paths?.requests ?? [],
+    concepts: bundle.graph.concepts ?? [],
   };
 }
 
@@ -324,8 +346,17 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
 export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12): HLDRegion[] {
   const safeLimit = Math.max(1, Math.floor(limit));
   const nodeById = new Map(snapshot.nodes.map((node) => [node.id, node]));
+  const concepts = snapshot.concepts ?? [];
+  const conceptNodeIds = concepts.flatMap((concept) => concept.node_ids);
+  const conceptsArePartitioned = new Set(conceptNodeIds).size === conceptNodeIds.length;
+  // A single catch-all concept is not an architecture. Prefer a multi-concept,
+  // non-overlapping projection when the exporter supplies one; otherwise retain
+  // the conservative module table of contents.
+  const modules: BundleModule[] = concepts.length >= 2 && conceptsArePartitioned
+    ? concepts.map((concept) => ({ id: concept.id, name: concept.label, description: concept.description, node_ids: concept.node_ids }))
+    : snapshot.modules;
   const childProjection = (parentId: string) => {
-    const children = snapshot.modules
+    const children = modules
       .filter((module) => module.parent_id === parentId)
       .map((module) => ({
         label: module.name,
@@ -344,7 +375,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     // Some graph bundles declare top-level modules but not nested communities.
     // Keep region focus useful by exposing a bounded representative node list;
     // exact source reading still belongs to Lachesis at level 2.
-    const ownModule = snapshot.modules.find((module) => module.id === parentId);
+    const ownModule = modules.find((module) => module.id === parentId);
     const nodes = (ownModule?.node_ids ?? [])
       .map((id) => nodeById.get(id))
       .filter((node): node is BundleNode => Boolean(node))
@@ -360,7 +391,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     const remainder = nodeChildren.slice(11);
     return [...visible, { label: `Other ${remainder.length} nodes`, summary: `${remainder.length} indexed nodes across the bounded remainder.` }];
   };
-  const topLevel = snapshot.modules
+  const topLevel = modules
     .filter((module) => !module.parent_id)
     .map((module) => ({
       id: module.id,
@@ -368,6 +399,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       path: module.path,
       nodeCount: module.node_ids?.length ?? 0,
       rolledUp: false,
+      summary: module.description,
       anchor: module.node_ids?.map((id) => nodeById.get(id)).find(Boolean),
       children: childProjection(module.id),
     }))
@@ -378,7 +410,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   if (topLevel.length > safeLimit) topLevel.slice(safeLimit - 1).forEach((module) => regionIdForModule.set(module.id, 'region:other'));
   const moduleByNodeId = new Map<string, string>();
   const ambiguousNodeModules = new Set<string>();
-  snapshot.modules.forEach((module) => (module.node_ids ?? []).forEach((nodeId) => moduleByNodeId.set(nodeId, module.id)));
+  modules.forEach((module) => (module.node_ids ?? []).forEach((nodeId) => moduleByNodeId.set(nodeId, module.id)));
   const moduleIds = new Map<string, string>();
   const moduleAliases = new Map<string, string>();
   const ambiguousAliases = new Set<string>();
@@ -392,7 +424,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     }
     moduleAliases.set(alias, moduleId);
   };
-  snapshot.modules.forEach((module) => {
+  modules.forEach((module) => {
     moduleIds.set(module.id, module.id);
     addModuleAlias(module.name, module.id);
     addModuleAlias(module.name.toLowerCase(), module.id);
@@ -410,7 +442,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     }
     moduleByNodeId.set(node.id, declared);
   });
-  const topLevelByModule = new Map(snapshot.modules.map((module) => [module.id, module.parent_id ? undefined : module.id]));
+  const topLevelByModule = new Map(modules.map((module) => [module.id, module.parent_id ? undefined : module.id]));
   const findTopLevel = (moduleId: string | undefined) => {
     let current = moduleId;
     const seen = new Set<string>();
@@ -418,7 +450,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       seen.add(current);
       const top = topLevelByModule.get(current);
       if (top) return top;
-      current = snapshot.modules.find((module) => module.id === current)?.parent_id;
+      current = modules.find((module) => module.id === current)?.parent_id;
     }
     return undefined;
   };
