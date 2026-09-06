@@ -73,6 +73,16 @@ Prefer a normal link when the reader needs the explanation, region chapters, flo
 accessible text relationship summary; use the embed for a visual orientation inside an existing
 document.
 
+For a maintainer review, share a focused chapter or guided path instead of a generic home link:
+
+```text
+https://<your-design-map-host>/flows/request-id?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…
+https://<your-design-map-host>/architecture/region-id?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…
+```
+
+These URLs keep the opaque snapshot and revision attached, so a reader lands on the same exported
+evidence rather than an unscoped or potentially stale fixture.
+
 When a bundle exports `meta.source_url_template`, Architecture anchors, flow steps, entrypoints,
 and Trust evidence expose direct links to the revision-pinned file and line. If that metadata is
 absent, Design Map keeps the location as plain text and sends code-level reading to Lachesis
