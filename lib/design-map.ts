@@ -169,7 +169,8 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || (module.node_ids !== undefined && (!Array.isArray(module.node_ids) || module.node_ids.some((id) => typeof id !== 'string' || !id.trim()))))) return false;
   if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || (edge.id !== undefined && (typeof edge.id !== 'string' || !edge.id.trim())) || typeof edge.source !== 'string' || !edge.source.trim()
     || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string') || (edge.relation !== undefined && typeof edge.relation !== 'string'))) return false;
-  if (meta!.source_url_template !== undefined && !/^https?:\/\//i.test(meta!.source_url_template)) return false;
+  if (meta!.source_url_template !== undefined && (!/^https?:\/\//i.test(meta!.source_url_template)
+    || !['{revision}', '{file}', '{line}'].every((token) => meta!.source_url_template!.includes(token)))) return false;
   if (candidate.analysis_projection !== undefined && (typeof candidate.analysis_projection !== 'string' || !candidate.analysis_projection.trim())) return false;
   const edgeIds = (graph!.edges ?? []).map((edge) => edge.id).filter((id): id is string => id !== undefined);
   if (new Set(edgeIds).size !== edgeIds.length) return false;

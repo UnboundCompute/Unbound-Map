@@ -155,6 +155,7 @@ if (!isLachesisBundle(windowBundle)) throw new Error('valid source_window bundle
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: { invalid: true } } })) throw new Error('non-string generated_at accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, generated_at: null } })) throw new Error('null generated_at accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, source_url_template: 'javascript:alert(1)' } })) throw new Error('non-HTTP source URL template accepted by the schema guard');
+if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, source_url_template: 'https://github.com/example/repo/blob/main/src/file.c' } })) throw new Error('source URL template without required placeholders accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, meta: { ...validBundle.meta, indexed_nodes: 1.5 } })) throw new Error('non-integer indexed_nodes accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { nodes: [{ ...validBundle.graph.nodes[0], kind: 42 }] } })) throw new Error('non-string node kind accepted by the schema guard');
 if (isLachesisBundle({ ...validBundle, graph: { ...validBundle.graph, edges: [{ source: 'node-0', target: 'node-0', relation: 42 }] } })) throw new Error('non-string edge relation accepted by the schema guard');
