@@ -5,7 +5,8 @@ import type { CoverageState, SnapshotProvenance } from '../../lib/view-model';
 
 export type BadgeState = { provenance: SnapshotProvenance; coverageState: CoverageState; limitations: string[]; regionCount: number; repository: string; revision: string; generatedAt?: string; coverageScope: string; indexedNodes: number };
 
-function labelFor({ provenance, coverageState, limitations, regionCount }: BadgeState) {
+function labelFor({ provenance, coverageState, limitations, regionCount, repository }: BadgeState) {
+  if (repository === 'No repository selected') return { label: 'No snapshot selected', className: 'snapshot-state snapshot-empty' };
   const bundlePending = provenance === 'illustrative' && limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item));
   const demoFixture = provenance === 'graph-backed' && limitations.some((item) => /demo fixture/i.test(item));
   const stale = provenance === 'graph-backed' && limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
@@ -15,6 +16,7 @@ function labelFor({ provenance, coverageState, limitations, regionCount }: Badge
     className: `snapshot-state snapshot-${provenance}${stale ? ' snapshot-stale' : ''}${bundlePending ? ' snapshot-pending' : ''}${sparse ? ' snapshot-sparse' : ''}${demoFixture ? ' snapshot-fixture' : ''}`,
   };
 }
+
 
 export function LiveSnapshotState({ showCoverage = false, ...initial }: BadgeState & { showCoverage?: boolean }) {
   const [state, setState] = useState(initial);

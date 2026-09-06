@@ -252,6 +252,37 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .share-button, .map-status, .map-level-reset, .map-state-label, .snapshot-list dt { font-size: 12px; }
 .handoff-boundary { max-width: 790px; margin-top: 68px; } .boundary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; padding-top: 19px; border-top: 1px solid var(--rule); } .boundary-grid strong { font: 600 13px var(--mono); } .boundary-grid p { margin: 10px 0 0; color: var(--body); font-size: 14px; line-height: 1.6; }
 .trust-meta .quiet-link { min-height: 44px; }
+
+.launcher { max-width: 930px; margin-top: 64px; }
+.launcher-heading { max-width: 640px; padding-bottom: 24px; border-bottom: 2px solid var(--ink); }
+.launcher-heading h2 { margin: 10px 0 10px; font: 400 clamp(30px, 4vw, 48px)/1.05 var(--serif); letter-spacing: -.025em; }
+.launcher-heading p, .launcher-card > p { color: var(--body); font-size: 15px; line-height: 1.6; }
+.launcher-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; margin-top: 26px; }
+.launcher-card { padding: 26px; background: var(--paper-deep); border: 1px solid var(--rule); }
+.launcher-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.launcher-index { color: var(--signal); font: 12px var(--mono); }
+.launcher-tag { color: var(--muted); font: 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.launcher-card h3 { margin: 0 0 10px; font: 400 30px/1.05 var(--serif); }
+.launcher-form { display: grid; align-content: start; gap: 9px; }
+.launcher-form > p { margin: 0 0 13px; }
+.launcher-form label { margin-top: 8px; color: var(--muted); font: 12px var(--mono); }
+.launcher-form label span { color: var(--muted); font-family: var(--sans); }
+.launcher-form input { min-height: 48px; padding: 0 13px; border: 1px solid var(--rule); border-radius: 0; color: var(--ink); background: var(--paper); font: 14px var(--sans); }
+.launcher-form input:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+.launcher-submit { margin-top: 13px; border: 0; cursor: pointer; }
+.launcher-submit:disabled { opacity: .65; cursor: wait; }
+.launcher-message, .launcher-status { margin: 13px 0 0; color: var(--signal); font-size: 13px; line-height: 1.5; }
+.cached-list { margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+.cached-list li { border-bottom: 1px solid var(--rule); }
+.cached-list a { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 60px; color: var(--ink); text-decoration: none; }
+.cached-list a:hover span { color: var(--signal); }
+.cached-list small { color: var(--muted); font: 12px var(--mono); white-space: nowrap; }
+.cached-list b { color: var(--signal); font-size: 16px; font-weight: 400; }
+.landing-note { max-width: 700px; margin-top: 96px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.landing-note h2 { margin: 12px 0 10px; font: 400 30px/1.05 var(--serif); }
+.landing-note p { max-width: 620px; margin: 0; color: var(--body); font-size: 15px; line-height: 1.65; }
+
+@media (max-width: 820px) { .launcher { margin-top: 48px; } .launcher-grid { grid-template-columns: 1fr; gap: 18px; } .launcher-card { padding: 22px 18px; } .launcher-card h3 { font-size: 28px; } .landing-note { margin-top: 68px; } }
 .map-entrypoint-note { max-width: 830px; margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; } .map-entrypoint-note a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .map-entrypoint-list { max-width: 830px; margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--rule); } .map-entrypoint-list h2 { margin: 0 0 10px; font: 600 20px/1.2 var(--serif); } .map-entrypoint-list ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 0; padding: 0; list-style: none; } .map-entrypoint-list li { min-width: 0; padding: 11px 0; border-top: 1px solid var(--rule); } .map-entrypoint-list span, .map-entrypoint-list small { display: block; } .map-entrypoint-list small { margin-top: 4px; color: var(--muted); font: 12px/1.4 var(--mono); overflow-wrap: anywhere; }
 .map-entrypoint-list a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; } .map-entrypoint-list a span { display: inline; }
