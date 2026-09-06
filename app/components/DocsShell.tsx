@@ -44,9 +44,18 @@ function lachesisHref(context: SharedSnapshotContext | undefined, snapshot: Repo
   return `${origin}/?${query}`;
 }
 
+function publicationMailto(action: string, context: SharedSnapshotContext, snapshot: RepositorySnapshotView) {
+  const repository = context.repository ?? snapshot.repository;
+  const revision = context.revision ?? snapshot.revision;
+  const subject = `${action}: ${repository} @ ${revision}`;
+  const body = `Repository: ${repository}\nRevision: ${revision}\nBundle: ${context.bundle ?? 'not supplied'}\n\nPlease include the map URL and the specific claim or refresh context.`;
+  return `mailto:riyan@unboundcompute.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 export function DocsShell({ children, active, snapshot = emptySnapshot, context }: { children: ReactNode; active?: string; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
   const activeRoute = active ?? '/';
   const hasHandoffContext = Boolean(context && (context.region || context.label || context.anchor || context.flow || context.step || context.domain));
+  const hasPublicSnapshot = Boolean(context?.repository && context?.revision && context?.bundle);
   return (
     <div className="docs-shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
@@ -74,7 +83,7 @@ export function DocsShell({ children, active, snapshot = emptySnapshot, context 
           <div className="rail-heading">Snapshot</div>
           <LiveSnapshotDetails provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} repository={snapshot.repository} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} includedNodes={snapshot.includedNodes} />
         </aside>
-        <main id="main-content" className="docs-main" tabIndex={-1}>{children}</main>
+        <main id="main-content" className="docs-main" tabIndex={-1}>{children}{hasPublicSnapshot && <aside className="publication-note" aria-label="Publication and correction controls"><p><strong>Independent analysis.</strong> Generated from public source at the pinned revision. This map is not affiliated with or endorsed by the repository maintainers unless explicitly marked verified.</p><div className="publication-actions"><a href={publicationMailto('Suggest a correction', context!, snapshot)}>Suggest a correction</a><a href={publicationMailto('Request a refresh', context!, snapshot)}>Request a refresh</a><a href={publicationMailto('Report a misleading claim', context!, snapshot)}>Report a misleading claim</a></div></aside>}</main>
       </div>
       <footer className="docs-footer"><span>Unbound Map · read this before the source</span><Link href={contextualHandoffHref(context)}>Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
     </div>
