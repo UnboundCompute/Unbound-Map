@@ -12,6 +12,14 @@ export const navItems = [
   { href: '/trust', label: 'Trust', note: 'Name obligations' },
 ];
 
+const ecosystemLinks = [
+  ['Map', 'https://map.unboundcompute.com/', 'overview'],
+  ['Atropos', 'https://atropos.unboundcompute.com/', 'semantics'],
+  ['Lachesis', 'https://lachesis.unboundcompute.com/', 'investigate'],
+  ['Casefiles', 'https://trace.unboundcompute.com/', 'evidence'],
+  ['Researcher', 'https://unboundcompute.com/', 'prove'],
+] as const;
+
 function isActive(href: string, active?: string) {
   return href === '/' ? active === '/' || !active : active === href || Boolean(active?.startsWith(`${href}/`));
 }
@@ -42,6 +50,13 @@ export function DocsShell({ children, active, snapshot = emptySnapshot, context 
   return (
     <div className="docs-shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
+      <nav className="ecosystem-rail" aria-label="UnboundCompute products">
+        <a className="ecosystem-wordmark" href="https://unboundcompute.com/" target="_blank" rel="noreferrer">UNBOUNDCOMPUTE</a>
+        <span className="ecosystem-divider" aria-hidden="true" />
+        <div className="ecosystem-links">
+          {ecosystemLinks.map(([label, href, detail]) => <a key={label} className={label === 'Map' ? 'active' : undefined} href={href} target="_blank" rel="noreferrer" aria-current={label === 'Map' ? 'page' : undefined}><b>{label}</b><small>{detail}</small></a>)}
+        </div>
+      </nav>
       <header className="repo-bar" role="banner">
         <Link href={contextualHref('/', context)} className="wordmark" aria-label="Unbound Map start here"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Unbound Map</span></Link>
         <span className="bar-divider" aria-hidden="true" />
