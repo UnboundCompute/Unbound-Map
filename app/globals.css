@@ -252,6 +252,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .share-button, .map-status, .map-level-reset, .map-state-label, .snapshot-list dt { font-size: 12px; }
 .handoff-boundary { max-width: 790px; margin-top: 68px; } .boundary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; padding-top: 19px; border-top: 1px solid var(--rule); } .boundary-grid strong { font: 600 13px var(--mono); } .boundary-grid p { margin: 10px 0 0; color: var(--body); font-size: 14px; line-height: 1.6; }
 .trust-meta .quiet-link { min-height: 44px; }
+.map-entrypoint-note { max-width: 830px; margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; } .map-entrypoint-note a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 /* Trust families and guard labels are reader-facing vocabulary, not identifiers. */
 .trust-domain-index, .trust-families code, .flow-guard strong { font-size: 12px; }
 

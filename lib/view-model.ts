@@ -1,4 +1,4 @@
-import { expandSourceUrl, type DesignMapSnapshot, type HLDRegion } from './design-map';
+import { expandSourceUrl, type BundleEntrypoint, type DesignMapSnapshot, type HLDRegion } from './design-map';
 export { illustrativeSnapshot } from './illustrative-suricata';
 
 export type SnapshotProvenance = 'illustrative' | 'graph-backed';
@@ -12,6 +12,7 @@ export type RepositorySnapshotView = {
   revision: string;
   description?: string;
   sourceUrlTemplate?: string;
+  entrypoints?: BundleEntrypoint[];
   generatedAt?: string;
   language: string;
   coverageScope: string;
@@ -119,6 +120,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     revision: snapshot.revision,
     description: snapshot.description,
     sourceUrlTemplate: snapshot.sourceUrlTemplate,
+    entrypoints: snapshot.entrypoints,
     generatedAt: snapshot.generatedAt,
     language: snapshot.language,
     coverageScope: snapshot.coverageScope,
