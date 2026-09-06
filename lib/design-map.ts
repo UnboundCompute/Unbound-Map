@@ -25,6 +25,11 @@ export type BundleModule = {
   parent_id?: string;
   node_ids?: string[];
   description?: string;
+  // Real declarations the module owns (the canonical headline size). Distinct
+  // from symbol_count / node_ids.length, which count all projected nodes.
+  definition_count?: number;
+  symbol_count?: number;
+  anchor_node_id?: string;
 };
 
 export type BundleConcept = {
@@ -93,6 +98,9 @@ export type LachesisBundle = {
     revision: string;
     generated_at?: string;
     description?: string;
+    // A real one-line "what is this repo" string, distinct from the generic
+    // projection boilerplate carried in `description`.
+    purpose?: string;
     lines: number;
     indexed_nodes: number;
     fixture?: boolean;
@@ -135,6 +143,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     && (meta.generated_at === undefined || typeof meta.generated_at === 'string')
     && (meta.fixture === undefined || typeof meta.fixture === 'boolean')
     && (meta.description === undefined || typeof meta.description === 'string')
+    && (meta.purpose === undefined || typeof meta.purpose === 'string')
     && (meta.source_url_template === undefined || typeof meta.source_url_template === 'string')
     && !!graph && typeof graph === 'object'
     && Array.isArray(graph.nodes) && graph.nodes.length > 0
@@ -171,6 +180,9 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || typeof module.name !== 'string' || !module.name.trim() || (module.path !== undefined && typeof module.path !== 'string')
     || (module.description !== undefined && typeof module.description !== 'string')
     || (module.parent_id !== undefined && (typeof module.parent_id !== 'string' || !module.parent_id.trim()))
+    || (module.definition_count !== undefined && (typeof module.definition_count !== 'number' || !Number.isInteger(module.definition_count) || module.definition_count < 0))
+    || (module.symbol_count !== undefined && (typeof module.symbol_count !== 'number' || !Number.isInteger(module.symbol_count) || module.symbol_count < 0))
+    || (module.anchor_node_id !== undefined && (typeof module.anchor_node_id !== 'string' || !module.anchor_node_id.trim()))
     || (module.node_ids !== undefined && (!Array.isArray(module.node_ids) || module.node_ids.some((id) => typeof id !== 'string' || !id.trim()))))) return false;
   if ((graph!.edges ?? []).some((edge) => !edge || typeof edge !== 'object' || (edge.id !== undefined && (typeof edge.id !== 'string' || !edge.id.trim())) || typeof edge.source !== 'string' || !edge.source.trim()
     || typeof edge.target !== 'string' || !edge.target.trim() || (edge.kind !== undefined && typeof edge.kind !== 'string') || (edge.relation !== undefined && typeof edge.relation !== 'string'))) return false;
@@ -257,6 +269,7 @@ export type DesignMapSnapshot = {
   repository: string;
   revision: string;
   description?: string;
+  purpose?: string;
   sourceUrlTemplate?: string;
   generatedAt?: string;
   language: string;
@@ -278,6 +291,9 @@ export type HLDRegion = {
   label: string;
   path?: string;
   nodeCount: number;
+  // Real declarations this area owns (the canonical headline size). Falls back
+  // to the projected-node count when a bundle omits definition_count.
+  definitionCount: number;
   rolledUp: boolean;
   summary?: string;
   anchor?: Pick<BundleNode, 'id' | 'label' | 'file' | 'line'>;
@@ -366,6 +382,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     repository: bundle.meta.repository,
     revision: bundle.meta.revision,
     description: bundle.meta.description,
+    purpose: bundle.meta.purpose,
     sourceUrlTemplate: bundle.meta.source_url_template,
     generatedAt: bundle.meta.generated_at,
     language: bundle.meta.language,
@@ -390,9 +407,11 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
  * keep the largest top-level modules and make the remainder an explicit
  * roll-up, rather than emitting a canvas full of peers.
  */
-export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12): HLDRegion[] {
-  const safeLimit = Math.max(1, Math.floor(limit));
+export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: number): HLDRegion[] {
   const nodeById = new Map(snapshot.nodes.map((node) => [node.id, node]));
+  // The real declarations an area owns is the canonical headline size; fall
+  // back to the projected-node count when a bundle omits definition_count.
+  const moduleDefCount = (module: BundleModule) => module.definition_count ?? (module.node_ids?.length ?? 0);
   const concepts = snapshot.concepts ?? [];
   // Concepts are semantic reading regions and may intentionally overlap (for
   // example, a request lifecycle and a query pipeline share their parsing nodes).
@@ -403,7 +422,11 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   // "sansio · app"), which collides sibling modules such as flask.app and
   // flask.sansio.app. Prefer the full qualified name from the declared module
   // that owns the concept's nodes so region labels stay disambiguated.
-  const qualifiedNameForConcept = (concept: BundleConcept): { name: string; path?: string } => {
+  // A projected concept-region inherits the qualified name AND the canonical
+  // definition_count of the declared module whose nodes it most overlaps, so the
+  // region's headline size stays the real "N definitions" the module owns rather
+  // than the projected-node count.
+  const ownerModuleForConcept = (concept: BundleConcept): BundleModule | undefined => {
     const conceptNodes = new Set(concept.node_ids);
     let best: BundleModule | undefined;
     let bestOverlap = 0;
@@ -411,19 +434,19 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       const overlap = (module.node_ids ?? []).reduce((total, id) => total + (conceptNodes.has(id) ? 1 : 0), 0);
       if (overlap > bestOverlap) { bestOverlap = overlap; best = module; }
     }
-    return bestOverlap > 0 && best ? { name: best.name, path: best.path } : { name: concept.label };
+    return bestOverlap > 0 ? best : undefined;
   };
   const modules: BundleModule[] = concepts.length >= 2
-    ? concepts.map((concept) => { const qualified = qualifiedNameForConcept(concept); return { id: concept.id, name: qualified.name, path: qualified.path, description: concept.description, node_ids: concept.node_ids }; })
+    ? concepts.map((concept) => { const owner = ownerModuleForConcept(concept); return { id: concept.id, name: owner?.name ?? concept.label, path: owner?.path, description: concept.description, node_ids: concept.node_ids, definition_count: owner?.definition_count, symbol_count: owner?.symbol_count, anchor_node_id: owner?.anchor_node_id }; })
     : snapshot.modules;
   const childProjection = (parentId: string) => {
     const children = modules
       .filter((module) => module.parent_id === parentId)
       .map((module) => ({
         label: module.name,
-        summary: `${module.node_ids?.length ?? 0} projected nodes${module.path ? ` · ${module.path}` : ''}.`,
+        summary: `${moduleDefCount(module).toLocaleString()} definitions${module.path ? ` · ${module.path}` : ''}.`,
         anchor: module.node_ids?.map((id) => nodeById.get(id)).find(Boolean)?.label,
-        nodeCount: module.node_ids?.length ?? 0,
+        nodeCount: moduleDefCount(module),
       }))
       .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
     if (children.length) {
@@ -459,12 +482,21 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       label: module.name,
       path: module.path,
       nodeCount: module.node_ids?.length ?? 0,
+      definitionCount: moduleDefCount(module),
       rolledUp: false,
       summary: module.description,
-      anchor: module.node_ids?.map((id) => nodeById.get(id)).find(Boolean),
+      anchor: (module.anchor_node_id ? nodeById.get(module.anchor_node_id) : undefined) ?? module.node_ids?.map((id) => nodeById.get(id)).find(Boolean),
       children: childProjection(module.id),
     }))
-    .sort((a, b) => b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
+    // Order by the real declarations an area owns so the largest-definition
+    // areas are the named regions; small recalled areas keep their identity
+    // instead of vanishing into an unlabeled remainder (H9).
+    .sort((a, b) => b.definitionCount - a.definitionCount || b.nodeCount - a.nodeCount || a.label.localeCompare(b.label));
+
+  // Scale the named-region budget with repository size so mid/large repos do not
+  // collapse most areas into a single "Other N" bucket (H8). A generous cap keeps
+  // the reader honest without emitting an unbounded canvas of peers.
+  const safeLimit = Math.max(1, Math.floor(limit ?? Math.min(Math.max(topLevel.length, 1), 16)));
 
   const regionIdForModule = new Map<string, string>();
   topLevel.slice(0, safeLimit).forEach((module) => regionIdForModule.set(module.id, module.id));
@@ -551,10 +583,14 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   if (topLevel.length <= safeLimit) return withRelationships(topLevel);
   const visible = topLevel.slice(0, safeLimit - 1);
   const remainder = topLevel.slice(safeLimit - 1);
+  // Keep the remaining areas named and reachable (as roll-up children) rather
+  // than dropping them into an anonymous bucket, so nothing is hidden (H8/H9).
   return withRelationships([...visible, {
     id: 'region:other',
-    label: `Other ${remainder.length} regions`,
+    label: `Other ${remainder.length} areas`,
     nodeCount: remainder.reduce((total, region) => total + region.nodeCount, 0),
+    definitionCount: remainder.reduce((total, region) => total + region.definitionCount, 0),
     rolledUp: true,
+    children: remainder.map((region) => ({ label: region.label, summary: `${region.definitionCount.toLocaleString()} definitions${region.path ? ` · ${region.path}` : ''}.`, anchor: region.anchor?.label })),
   }]);
 }

@@ -36,7 +36,7 @@ export default async function RegionPage({ params, searchParams }: { params: Pro
     const payload = await loadHostedBundle(context.bundle);
     if (!isLachesisBundle(payload)) throw new Error('This hosted map is malformed. Ask for a fresh bundle link from the repository owner.');
     const designSnapshot = toDesignMapSnapshot(payload);
-    snapshot = snapshotFromProjection(designSnapshot, projectTopLevelRegions(designSnapshot, 9));
+    snapshot = snapshotFromProjection(designSnapshot, projectTopLevelRegions(designSnapshot));
   } catch (error) {
     bundleError = error instanceof Error ? error.message : 'This hosted map could not be loaded.';
   }

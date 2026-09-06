@@ -20,12 +20,15 @@ function snapshot(count, childCount = 0) {
   return { repository: 'fixture', revision: 'test', language: 'C', lines: 1, indexedNodes: nodes.length, includedNodes: nodes.length, coverageScope: 'repository', limitations: [], modules, nodes };
 }
 
+// The default named-region budget scales with repository size up to a bound so
+// mid/large repos do not collapse most areas into one "Other N" bucket (H8).
+const REGION_BOUND = 16;
 for (const count of [0, 1, 8, 30, 500]) {
   const regions = projectTopLevelRegions(snapshot(count));
-  const expected = Math.min(count, 12);
+  const expected = Math.min(count, REGION_BOUND);
   if (regions.length !== expected) throw new Error(`${count} modules projected to ${regions.length}; expected ${expected}`);
-  if (regions.length > 12) throw new Error(`${count} modules exceeded the twelve-region adapter bound`);
-  if (count > 12 && !regions.at(-1)?.rolledUp) throw new Error(`${count} modules did not emit an explicit remainder region`);
+  if (regions.length > REGION_BOUND) throw new Error(`${count} modules exceeded the ${REGION_BOUND}-region adapter bound`);
+  if (count > REGION_BOUND && !regions.at(-1)?.rolledUp) throw new Error(`${count} modules did not emit an explicit remainder region`);
   console.log(`ok ${count} top-level modules → ${regions.length} regions`);
 }
 

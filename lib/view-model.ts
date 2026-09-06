@@ -10,6 +10,8 @@ export type RepositorySnapshotView = {
   repository: string;
   revision: string;
   description?: string;
+  /** A real one-line "what is this repo" string, distinct from generic projection boilerplate. */
+  purpose?: string;
   sourceUrlTemplate?: string;
   entrypoints?: BundleEntrypoint[];
   generatedAt?: string;
@@ -33,7 +35,11 @@ export type SystemRegion = {
   summary: string;
   path: string;
   nodeCount: number;
+  /** Real declarations this area owns (canonical headline size). */
+  definitionCount: number;
   metricLabel: string;
+  /** Secondary "all projected nodes" label (never "symbols"). */
+  projectedLabel: string;
   rolledUp?: boolean;
   role?: 'entry' | 'runtime' | 'fanout' | 'output' | 'boot';
   upstream?: string[];
@@ -80,6 +86,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     repository: snapshot.repository,
     revision: snapshot.revision,
     description: snapshot.description,
+    purpose: snapshot.purpose,
     sourceUrlTemplate: snapshot.sourceUrlTemplate,
     entrypoints: snapshot.entrypoints,
     generatedAt: snapshot.generatedAt,
@@ -95,7 +102,12 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       summary: region.rolledUp ? 'A bounded remainder of smaller regions.' : region.summary || 'Graph-derived top-level module projection.',
       path: region.path ?? 'top-level module',
       nodeCount: region.nodeCount,
-      metricLabel: `${region.nodeCount.toLocaleString()} projected nodes`,
+      definitionCount: region.definitionCount,
+      // Canonical vocabulary (H13): headline the real declarations as
+      // "definitions"; keep the projected-node count as a secondary "nodes"
+      // label, never "symbols".
+      metricLabel: `${region.definitionCount.toLocaleString()} definition${region.definitionCount === 1 ? '' : 's'}`,
+      projectedLabel: `${region.nodeCount.toLocaleString()} projected node${region.nodeCount === 1 ? '' : 's'}`,
       rolledUp: region.rolledUp,
       anchor: region.anchor,
       children: region.children,

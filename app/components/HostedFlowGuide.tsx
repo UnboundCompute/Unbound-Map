@@ -8,7 +8,7 @@ import { snapshotFromProjection, sourceHref, type SharedSnapshotContext } from '
 
 function publishSnapshot(bundle: LachesisBundle) {
   const projection = toDesignMapSnapshot(bundle);
-  const snapshot = snapshotFromProjection(projection, projectTopLevelRegions(projection, 9));
+  const snapshot = snapshotFromProjection(projection, projectTopLevelRegions(projection));
   window.dispatchEvent(new CustomEvent('design-map:snapshot-ready', { detail: {
     provenance: snapshot.provenance,
     coverageState: snapshot.coverageState,
@@ -19,14 +19,21 @@ function publishSnapshot(bundle: LachesisBundle) {
     generatedAt: snapshot.generatedAt,
     coverageScope: snapshot.coverageScope,
     indexedNodes: snapshot.indexedNodes,
+    includedNodes: snapshot.includedNodes,
   } }));
 }
 
+// Neutral, library-appropriate framing (H14): a call/execution path, not a
+// "request lifecycle" or "journey" — for a library the entry is the compiler
+// walking an AST, not an HTTP request.
+function flowDescription(description: string) {
+  return description.replace(/^request lifecycle\b/i, 'Call path');
+}
 function flowTitle(path: BundleRequestPath) {
   const description = path.description.trim();
   if (description && !/^request lifecycle from\b/i.test(description)) return description.replace(/[.]$/, '');
   const first = path.hops[0]?.caption || path.id.replace(/^request[.:_-]*/, '').replace(/[._-]+/g, ' ');
-  return `${first} lifecycle`;
+  return `${first} call path`;
 }
 
 function regionForNode(bundle: LachesisBundle, nodeId: string) {
@@ -115,7 +122,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
     {flows.length > 1 && <nav className="hosted-flow-index" aria-label="Available guided paths"><span>Choose a path</span><div>{flows.slice(0, 8).map((item) => <button key={item.id} type="button" aria-pressed={item.id === flow.id} onClick={() => chooseFlow(item)}>{flowTitle(item)}</button>)}</div></nav>}
     <section className="guided-flow" aria-labelledby="flow-steps-title">
       <div className="flow-progress"><div><span className="flow-label">Graph-backed path · {flow.hops.length} steps</span><h2 id="flow-steps-title">{flowTitle(flow)}</h2></div><span className="flow-count">{String(activeIndex + 1).padStart(2, '0')} / {String(flow.hops.length).padStart(2, '0')}</span></div>
-      <p className="flow-provenance">{flow.description} This is a selected static call path from the exported graph, not proof of one observed runtime execution.</p>
+      <p className="flow-provenance">{flowDescription(flow.description)} This is a selected static call path from the exported graph, not proof of one observed runtime execution.</p>
       <ol className="flow-path-map" aria-label="Flow path overview">{flow.hops.map((hop, index) => <li key={hop.id ?? `${hop.node_id}-${index}`} className={index === activeIndex ? 'is-current' : Math.abs(index - activeIndex) === 1 ? 'is-adjacent' : undefined}><button type="button" onClick={() => chooseStep(index)} aria-current={index === activeIndex ? 'step' : undefined}><span>step {index + 1}</span><strong>{hop.caption}</strong></button>{index < flow.hops.length - 1 && <span className="flow-path-connector" aria-hidden="true">→</span>}</li>)}</ol>
       <p className="sr-only" role="status" aria-live="polite">Step {activeIndex + 1} of {flow.hops.length}: {activeHop.caption}.</p>
       <div className="flow-stage" id="flow-step-detail" role="region" aria-labelledby="flow-step-title">
