@@ -2,21 +2,22 @@
 
 import { useState } from 'react';
 
-export function ShareButton() {
+export function ShareButton({ href }: { href?: string }) {
   const [state, setState] = useState<'idle' | 'copied' | 'unavailable'>('idle');
   const copy = async () => {
     try {
+      const shareUrl = href ?? window.location.href;
       if (navigator.share) {
-        await navigator.share({ title: document.title, url: window.location.href });
+        await navigator.share({ title: document.title, url: shareUrl });
         setState('copied');
         window.setTimeout(() => setState('idle'), 1800);
         return;
       }
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } else {
         const field = document.createElement('textarea');
-        field.value = window.location.href;
+        field.value = shareUrl;
         field.setAttribute('readonly', '');
         field.style.position = 'fixed';
         field.style.opacity = '0';

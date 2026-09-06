@@ -90,8 +90,11 @@ export function DocsShell({ children, active, snapshot = emptySnapshot, context 
   );
 }
 
-export function PageIntro({ eyebrow, title, children, snapshot = emptySnapshot }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView }) {
-  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><LiveSnapshotState showCoverage provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} repository={snapshot.repository} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} includedNodes={snapshot.includedNodes} /><ShareButton /></div></header>;
+export function PageIntro({ eyebrow, title, children, snapshot = emptySnapshot, context }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
+  const shareHref = context?.bundle && context?.flow
+    ? `/f/${encodeURIComponent(context.bundle)}/${encodeURIComponent(context.flow)}`
+    : undefined;
+  return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><LiveSnapshotState showCoverage provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} repository={snapshot.repository} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} includedNodes={snapshot.includedNodes} /><ShareButton href={shareHref} /></div></header>;
 }
 
 export function EvidenceNote({ children }: { children: ReactNode }) { return <aside className="evidence-note"><span className="evidence-label">How to read the evidence</span><p>{children}</p></aside>; }
