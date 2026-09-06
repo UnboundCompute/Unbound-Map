@@ -1,7 +1,13 @@
 {
-  "name": "design-map",
+  "name": "unbound-map",
   "version": "0.1.0",
-  "private": true,
+  "description": "A shareable, graph-backed field guide to a repository's architecture before the source.",
+  "private": false,
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "git+https://github.com/UnboundCompute/Unbound-Map.git" },
+  "homepage": "https://map.unboundcompute.com",
+  "bugs": { "url": "https://github.com/UnboundCompute/Unbound-Map/issues" },
+  "keywords": ["architecture", "code-understanding", "developer-tools", "documentation", "graph", "lachesis", "open-source"],
   "packageManager": "pnpm@11.22.0",
   "scripts": {
     "dev": "next dev",
