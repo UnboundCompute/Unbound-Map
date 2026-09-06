@@ -4,10 +4,13 @@ const MAX_BUNDLE_BYTES = 25 * 1024 * 1024;
 const BUNDLE_ID = /^b_[A-Za-z0-9_-]{8,128}$/;
 
 function serviceUrl(path: string) {
-  // Resolve against the shared bundle API origin (the AWS API Gateway by
-  // default). A relative path would resolve against the Design Map host, whose
-  // /api/bundles route does not exist, which is what left shared bundle links
-  // and cached repositories unable to load their graph snapshot server-side.
+  // In the browser, use a same-origin relative path so the request goes through
+  // this app's /api rewrite (see next.config.mjs). The bundle API origin sends
+  // no CORS headers, so a direct cross-origin fetch from the browser is blocked;
+  // the rewrite forwards to the bundle API server-side, where CORS does not
+  // apply. On the server there is no origin to resolve a relative path against,
+  // so call the absolute bundle API origin directly (no same-origin policy).
+  if (typeof window !== 'undefined') return path;
   return `${bundleApiOrigin()}${path}`;
 }
 
