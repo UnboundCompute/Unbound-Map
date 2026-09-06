@@ -29,7 +29,7 @@ function flowTitle(path: BundleRequestPath) {
   return `${first} lifecycle`;
 }
 
-export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep }: { bundleId: string; context: SharedSnapshotContext; initialFlow?: string; initialStep?: string }) {
+export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, route = '/flows' }: { bundleId: string; context: SharedSnapshotContext; initialFlow?: string; initialStep?: string; route?: string }) {
   const [bundle, setBundle] = useState<LachesisBundle>();
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [message, setMessage] = useState('');
@@ -73,7 +73,8 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep }:
     const params = new URLSearchParams(window.location.search);
     params.set('flow', nextFlow);
     nextStep ? params.set('step', nextStep) : params.delete('step');
-    window.history.pushState(null, '', `/flows?${params.toString()}`);
+    const nextRoute = route.startsWith('/flows/') ? `/flows/${encodeURIComponent(nextFlow)}` : route;
+    window.history.pushState(null, '', `${nextRoute}?${params.toString()}`);
   };
   const chooseFlow = (next: BundleRequestPath) => {
     setFlowId(next.id);

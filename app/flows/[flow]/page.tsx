@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { BundlePendingState, DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
+import { DocsShell, EvidenceNote, PageIntro } from '../../components/DocsShell';
 import { FlowDiagram } from '../../components/FlowDiagram';
+import { HostedFlowGuide } from '../../components/HostedFlowGuide';
 import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../../lib/view-model';
 import { documentMetadata } from '../../../lib/seo';
 
@@ -29,8 +30,9 @@ export default async function FlowPage({ params, searchParams }: { params: Promi
   const { flow } = await params;
   const query = await searchParams;
   const entry = flows[flow as keyof typeof flows];
-  if (!entry) notFound();
+  const bundle = one(query.bundle);
+  if (!entry && !bundle) notFound();
   const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle), flow, step: one(query.step), branch: one(query.branch) };
   const snapshot = snapshotWithContext(illustrativeSnapshot, context);
-  return <DocsShell active="/flows" snapshot={snapshot} context={context}><div className="doc-page flows-page"><PageIntro title={context.bundle ? 'Architectural flow snapshot' : entry.title} snapshot={snapshot}>{context.bundle ? 'A graph-backed flow will appear after the requested snapshot is validated.' : `${entry.intro} This is a design-level handoff story, not a runtime taint trace or a replacement for source reading.`}</PageIntro>{context.bundle ? <><BundlePendingState snapshot={snapshot} context={context} subject="architectural flow" /><EvidenceNote>The requested bundle is not yet verified. Flow steps and guards remain hidden until its graph projection succeeds.</EvidenceNote></> : <><section className="flow-intro"><span className="flow-label">Canonical design flow</span><h2>Packet bytes → validated layers → flow state</h2><p>The path names what changes at each boundary, the responsibility that owns the change, and the guard that makes the next stage safe to enter.</p></section><FlowDiagram route={`/flows/${flow}`} context={context} initialStep={one(query.step)} /><EvidenceNote>Illustrative architectural explanation. Presence in this flow does not establish that an input reaches a security sink; use Lachesis for that question.</EvidenceNote></>}</div></DocsShell>;
+  return <DocsShell active="/flows" snapshot={snapshot} context={context}><div className="doc-page flows-page"><PageIntro title={context.bundle ? 'Architectural path' : entry!.title} snapshot={snapshot}>{context.bundle ? 'Read this graph-backed path one source-linked handoff at a time.' : `${entry!.intro} This is a design-level handoff story, not a runtime taint trace or a replacement for source reading.`}</PageIntro>{context.bundle ? <><HostedFlowGuide bundleId={context.bundle} context={context} initialFlow={flow} initialStep={one(query.step)} route={`/flows/${encodeURIComponent(flow)}`} /><EvidenceNote>Graph-backed paths are static call-path projections selected for comprehension. They do not prove one observed runtime execution or a security finding.</EvidenceNote></> : <><section className="flow-intro"><span className="flow-label">Canonical design flow</span><h2>Packet bytes → validated layers → flow state</h2><p>The path names what changes at each boundary, the responsibility that owns the change, and the guard that makes the next stage safe to enter.</p></section><FlowDiagram route={`/flows/${flow}`} context={context} initialStep={one(query.step)} /><EvidenceNote>Illustrative architectural explanation. Presence in this flow does not establish that an input reaches a security sink; use Lachesis for that question.</EvidenceNote></>}</div></DocsShell>;
 }
