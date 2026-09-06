@@ -251,6 +251,7 @@ export type DesignMapSnapshot = {
   repository: string;
   revision: string;
   description?: string;
+  sourceUrlTemplate?: string;
   generatedAt?: string;
   language: string;
   lines: number;
@@ -353,6 +354,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     repository: bundle.meta.repository,
     revision: bundle.meta.revision,
     description: bundle.meta.description,
+    sourceUrlTemplate: bundle.meta.source_url_template,
     generatedAt: bundle.meta.generated_at,
     language: bundle.meta.language,
     lines: positiveInteger(bundle.meta.lines, 0),

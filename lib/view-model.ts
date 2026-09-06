@@ -11,6 +11,7 @@ export type RepositorySnapshotView = {
   repository: string;
   revision: string;
   description?: string;
+  sourceUrlTemplate?: string;
   generatedAt?: string;
   language: string;
   coverageScope: string;
@@ -117,6 +118,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     repository: snapshot.repository,
     revision: snapshot.revision,
     description: snapshot.description,
+    sourceUrlTemplate: snapshot.sourceUrlTemplate,
     generatedAt: snapshot.generatedAt,
     language: snapshot.language,
     coverageScope: snapshot.coverageScope,
@@ -143,6 +145,16 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       incomingRelationshipKinds: region.incomingRelationshipKinds,
     })),
   };
+}
+
+/** Build an exact source link when the exporter provides a revision-pinned template. */
+export function sourceHref(snapshot: RepositorySnapshotView, file?: string, line?: number, endLine?: number) {
+  if (!snapshot.sourceUrlTemplate || !file || !line || line < 1) return undefined;
+  return snapshot.sourceUrlTemplate
+    .replaceAll('{revision}', encodeURIComponent(snapshot.revision))
+    .replaceAll('{file}', file.split('/').map(encodeURIComponent).join('/'))
+    .replaceAll('{line}', String(line))
+    .replaceAll('{end_line}', String(endLine && endLine >= line ? endLine : line));
 }
 
 export function toHandoff(snapshot: RepositorySnapshotView, region: SystemRegion, anchor = region.anchor?.label ?? region.label, bundleId?: string): LachesisHandoff {

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot, type BundleRequestPath, type LachesisBundle } from '../../lib/design-map';
 import { loadHostedBundle } from '../../lib/hosted';
-import { snapshotFromProjection, type SharedSnapshotContext } from '../../lib/view-model';
+import { snapshotFromProjection, sourceHref, type SharedSnapshotContext } from '../../lib/view-model';
 
 function publishSnapshot(bundle: LachesisBundle) {
   const projection = toDesignMapSnapshot(bundle);
@@ -68,6 +68,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   const activeIndex = Math.max(0, flow?.hops.findIndex((hop) => (hop.id ?? hop.node_id) === stepId) ?? 0);
   const activeHop = flow?.hops[activeIndex];
   const activeNode = activeHop ? nodeById.get(activeHop.node_id) : undefined;
+  const sourceLink = activeNode ? sourceHref(snapshotFromProjection(toDesignMapSnapshot(bundle!), projectTopLevelRegions(toDesignMapSnapshot(bundle!), 9)), activeNode.file, activeNode.line) : undefined;
 
   const updateUrl = (nextFlow: string, nextStep?: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -113,7 +114,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
         <h3 id="flow-step-title">{activeHop.caption}</h3>
         <p className="flow-description">{activeNode?.documentation?.trim() || `${activeNode?.kind ?? 'Code element'} in the selected repository path.`}</p>
         <dl className="flow-fields"><div><dt>source</dt><dd><code>{activeNode?.file || 'Source location unavailable'}{activeNode?.line ? `:${activeNode.line}` : ''}</code></dd></div><div><dt>graph role</dt><dd>{activeNode?.kind ?? 'Included path node'}</dd></div>{activeHop.edge_label && <div><dt>incoming relation</dt><dd>{activeHop.edge_label}</dd></div>}</dl>
-        <Link className="quiet-link" href={explore}>Open {activeNode?.label ?? activeHop.caption} in Lachesis <span aria-hidden="true">↗</span></Link>
+        <div className="flow-stage-links"><Link className="quiet-link" href={explore}>Open {activeNode?.label ?? activeHop.caption} in Lachesis <span aria-hidden="true">↗</span></Link>{sourceLink && <a className="quiet-link" href={sourceLink} target="_blank" rel="noreferrer">Read source at {activeNode!.file}:{activeNode!.line} <span aria-hidden="true">↗</span></a>}</div>
       </div>
       <div className="flow-controls"><button type="button" onClick={() => chooseStep(Math.max(0, activeIndex - 1))} disabled={activeIndex === 0}>← Previous</button><button type="button" onClick={() => chooseStep(Math.min(flow.hops.length - 1, activeIndex + 1))} disabled={activeIndex === flow.hops.length - 1}>Next →</button></div>
       <details className="flow-linear"><summary>Read all {flow.hops.length} steps as text</summary><ol>{flow.hops.map((hop, index) => { const node = nodeById.get(hop.node_id); return <li key={hop.id ?? `${hop.node_id}-${index}`}><button type="button" className={index === activeIndex ? 'is-current' : undefined} onClick={() => chooseStep(index)} aria-current={index === activeIndex ? 'step' : undefined} aria-controls="flow-step-detail"><strong>{index + 1}. {hop.caption}</strong><span>{node?.documentation?.trim() || `${node?.kind ?? 'Code element'} in ${node?.file || 'the repository graph'}.`}</span><small>{node?.file || 'source unavailable'}{node?.line ? `:${node.line}` : ''}</small></button></li>; })}</ol></details>
