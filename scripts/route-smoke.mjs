@@ -52,7 +52,7 @@ async function redirect(path, target) {
   console.log(`ok ${path} → ${response.headers.get('location')}`);
 }
 
-await page('/?repository=Zeek&revision=main&bundle=b_demo1234', ['Zeek architecture snapshot', 'Graph-backed bundle requested', 'Awaiting a verified repository map.', 'Open Architecture loader', 'Open Lachesis context', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234', 'full revision', 'Not supplied by snapshot', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234"']);
+await page('/?repository=Zeek&revision=main&bundle=b_demo1234', ['Zeek architecture snapshot', 'Repository shape', 'Preparing the architecture map', 'Explore architecture', 'Open in Lachesis', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234', 'full revision', 'Not supplied by snapshot', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234"']);
 await pageWithout('/?repository=Zeek&revision=main&bundle=b_demo1234', ['Suricata turns network traffic', 'The structural idea', 'A long packet-processing path']);
 await page('/', ['Suricata, before the source.', 'Follow a packet', 'Open Architecture', 'Repository shape', 'map-workbench', 'Packet input', 'Alerts + output', 'node-role', 'Ordered reading path']);
 await pageWithout('/', ['class="bar-lachesis"']);

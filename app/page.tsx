@@ -31,18 +31,33 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
     <div className="doc-page start-page">
       {bundleRequested ? <>
         <PageIntro title={`${snapshot.repository} architecture snapshot`} snapshot={snapshot}>
-          A graph-backed bundle was requested for this repository. The orientation map will appear only after that snapshot is validated.
+          Start with the bounded system shape from this repository snapshot. The map appears only after its graph projection passes validation.
         </PageIntro>
-        <section className="map-state-panel" role="status" aria-live="polite" aria-atomic="true">
-          <span className="map-state-label">Graph-backed bundle requested</span>
-          <h2>Awaiting a verified repository map.</h2>
-          <p>Start here will not substitute the illustrative Suricata fixture while the requested bundle is unresolved.</p>
-          <div className="map-state-actions">
-            <Link className="primary-button" href={contextual('/architecture')}>Open Architecture loader <span aria-hidden="true">→</span></Link>
-            <Link className="quiet-link" href={`/explore?${new URLSearchParams({ repository: snapshot.repository, revision: snapshot.revision, bundle: context.bundle! }).toString()}`}>Open Lachesis context <span aria-hidden="true">↗</span></Link>
+        <section className="start-map-preview" aria-labelledby="preview-title">
+          <div className="section-heading-row">
+            <div>
+              <h2 id="preview-title">Repository shape</h2>
+              <p>Select a region to carry that context into the complete architecture guide.</p>
+            </div>
+          </div>
+          <MapClient
+            compact
+            initialBundle={context.bundle}
+            initialRegion={context.region}
+            initialQuery={contextQuery ? `?${contextQuery}` : ''}
+            route="/architecture"
+          />
+        </section>
+        <section className="start-actions" aria-labelledby="start-actions-title">
+          <div>
+            <h2 id="start-actions-title">Continue with this snapshot.</h2>
+          </div>
+          <div className="start-action-links">
+            <Link className="primary-button" href={architectureHref()}>Explore architecture <span aria-hidden="true">→</span></Link>
+            <Link className="start-action-secondary" href={`/explore?${new URLSearchParams({ repository: snapshot.repository, revision: snapshot.revision, bundle: context.bundle! }).toString()}`}>Open in Lachesis <span aria-hidden="true">↗</span></Link>
           </div>
         </section>
-        <EvidenceNote>The requested bundle is not yet verified. Repository facts, regions, and recommendations remain hidden until its graph projection succeeds.</EvidenceNote>
+        <EvidenceNote>The requested bundle is validated in the browser before any repository regions appear. Placement is an editorial reading projection; labels, counts, relationships, revision, and coverage come from the bundle.</EvidenceNote>
       </> : <>
         <PageIntro title={`${snapshot.repository}, before the source.`} snapshot={snapshot}>
           {snapshot.repository} turns network traffic into protocol state, detection, and alerts. This guide gives you the design-level orientation first.
