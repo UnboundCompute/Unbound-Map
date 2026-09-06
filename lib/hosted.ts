@@ -2,6 +2,8 @@ import { bundleApiOrigin } from './links';
 
 const MAX_BUNDLE_BYTES = 25 * 1024 * 1024;
 const BUNDLE_ID = /^b_[A-Za-z0-9_-]{8,128}$/;
+const REPOSITORY_PART = /^[A-Za-z0-9._-]{1,100}$/;
+const REPOSITORY_HOSTS = new Set(['github.com', 'gitlab.com', 'bitbucket.org']);
 
 function serviceUrl(path: string) {
   // In the browser, use a same-origin relative path so the request goes through
@@ -55,4 +57,36 @@ export async function loadHostedBundle(bundleId: string, signal?: AbortSignal): 
   } catch {
     throw new Error('The hosted map response was not valid JSON.');
   }
+}
+
+export type HostedRepositoryIndex = {
+  repository?: string;
+  revision?: string;
+  bundle_id: string;
+  curated_tour?: unknown;
+};
+
+/** Resolve only a publication candidate; callers decide whether curation is enough to index. */
+export async function loadHostedRepository(host: string, owner: string, repo: string, revision?: string): Promise<HostedRepositoryIndex> {
+  if (!process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim()) throw new Error('Hosted repository index is not configured.');
+  if (!REPOSITORY_HOSTS.has(host) || !REPOSITORY_PART.test(owner) || !REPOSITORY_PART.test(repo)) throw new Error('This repository link is invalid.');
+  if (revision && !/^[0-9a-f]{7,64}$/i.test(revision)) throw new Error('This repository revision is invalid.');
+  const route = host === 'github.com'
+    ? `/api/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
+    : `/api/repos/${encodeURIComponent(host)}/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+  const suffix = revision ? `?revision=${encodeURIComponent(revision)}` : '';
+  const response = await fetch(`${bundleApiOrigin()}${route}${suffix}`, { redirect: 'error', signal: requestSignal(), headers: { Accept: 'application/json' } });
+  if (!response.ok) throw new Error(`The repository index could not be loaded (HTTP ${response.status}).`);
+  const body = await response.json().catch(() => null) as Record<string, unknown> | null;
+  if (!body || typeof body.bundle_id !== 'string' || !BUNDLE_ID.test(body.bundle_id)) throw new Error('The repository index returned an invalid bundle link.');
+  return body as HostedRepositoryIndex;
+}
+
+export async function loadHostedRepositories(): Promise<HostedRepositoryIndex[]> {
+  if (!process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim()) return [];
+  const response = await fetch(`${bundleApiOrigin()}/api/repos`, { redirect: 'error', signal: requestSignal(), headers: { Accept: 'application/json' } });
+  if (!response.ok) throw new Error(`The repository index could not be loaded (HTTP ${response.status}).`);
+  const body = await response.json().catch(() => null) as { repositories?: unknown } | null;
+  if (!body || !Array.isArray(body.repositories)) throw new Error('The repository index returned an invalid catalog.');
+  return body.repositories.filter((item): item is HostedRepositoryIndex => Boolean(item && typeof item === 'object' && typeof (item as Record<string, unknown>).bundle_id === 'string' && BUNDLE_ID.test((item as Record<string, unknown>).bundle_id as string)));
 }
