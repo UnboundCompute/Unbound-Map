@@ -97,6 +97,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .embed-snippet code { display: block; overflow: auto; padding: 12px; color: var(--body); background: var(--paper-deep); font: 11px/1.5 var(--mono); white-space: nowrap; }
 .embed-snippet button { min-height: 44px; margin-top: 11px; padding: 0 12px; border: 1px solid var(--rule); color: var(--signal); background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; }
 .embed-snippet button:hover { border-color: var(--signal); background: var(--paper-deep); }
+.embed-badge { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.embed-badge p { margin-bottom: 10px; }
 .doc-page { width: min(100% - 96px, 930px); margin: 0 auto; padding: 72px 0 100px; }
 .page-intro { max-width: 730px; padding-bottom: 54px; }
 .page-intro h1 { max-width: 720px; margin: 0; font: 400 clamp(44px, 6vw, 76px)/.98 var(--serif); letter-spacing: -.035em; }
