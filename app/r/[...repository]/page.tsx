@@ -51,6 +51,24 @@ function isCurated(index: HostedRepositoryIndex) {
   return Boolean(index.curated_tour && typeof index.curated_tour === 'object' && !Array.isArray(index.curated_tour));
 }
 
+type VerifiedMaintainer = { name: string; url?: string };
+
+function verifiedMaintainer(value: unknown): VerifiedMaintainer | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const candidate = value as Record<string, unknown>;
+  if (candidate.verified !== true || typeof candidate.name !== 'string' || !candidate.name.trim()) return undefined;
+  if (candidate.url !== undefined) {
+    if (typeof candidate.url !== 'string') return undefined;
+    try {
+      const url = new URL(candidate.url);
+      if (!['http:', 'https:'].includes(url.protocol)) return undefined;
+    } catch {
+      return undefined;
+    }
+  }
+  return { name: candidate.name.trim(), ...(typeof candidate.url === 'string' ? { url: candidate.url } : {}) };
+}
+
 async function loadPublication(parts: string[]) {
   const context = routeContext(parts);
   if (!context || !process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim()) return undefined;
@@ -96,11 +114,15 @@ export default async function PublishedRepositoryPage({ params }: { params: Prom
   }
   if (!publication) notFound();
   const { context: route, index, snapshot, bundleId } = publication;
+  const curatedTour = index.curated_tour && typeof index.curated_tour === 'object' && !Array.isArray(index.curated_tour)
+    ? index.curated_tour as Record<string, unknown>
+    : undefined;
+  const maintainer = verifiedMaintainer(curatedTour?.maintainer);
   const repository = index.repository?.replace(`${route.host}/`, '') || `${route.owner}/${route.repo}`;
   const revision = index.revision || route.revision || snapshot.revision;
   const context: SharedSnapshotContext = { repository, revision, bundle: bundleId };
   const contextQuery = new URLSearchParams({ repository, revision, bundle: bundleId }).toString();
   const architectureLede = snapshot.description ?? `A bounded, graph-backed architecture guide for ${repository} at the pinned revision ${revision}.`;
   const structuredData = { '@context': 'https://schema.org', '@type': 'TechArticle', headline: `${repository} architecture`, description: architectureLede, about: { '@type': 'SoftwareSourceCode', name: repository }, version: revision };
-  return <DocsShell active="/architecture" snapshot={snapshot} context={context}><div className="doc-page architecture-page"><PageIntro eyebrow="Curated repository publication" title={`${repository} architecture`} snapshot={snapshot}>{architectureLede}</PageIntro><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /><MapClient initialBundle={bundleId} initialSnapshot={snapshot} initialQuery={`?${contextQuery}`} /><EmbedSnippet context={context} /><section className="architecture-next"><h2>Map before source.</h2><p>Placement is a reading aid. Labels, counts, relationships, revision, and coverage come from the validated snapshot; exact symbol behavior belongs in Lachesis.</p><Link className="quiet-link" href={`https://lachesis.unboundcompute.com/?${contextQuery}`} target="_blank" rel="noreferrer">Continue to Lachesis with this snapshot <span aria-hidden="true">↗</span></Link></section><EvidenceNote>This curated page is generated from a validated Lachesis projection at the pinned revision. It is not a vulnerability claim or maintainer endorsement unless the publication record says so.</EvidenceNote></div></DocsShell>;
+  return <DocsShell active="/architecture" snapshot={snapshot} context={context}><div className="doc-page architecture-page"><PageIntro eyebrow="Curated repository publication" title={`${repository} architecture`} snapshot={snapshot}>{architectureLede}</PageIntro><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />{maintainer ? <aside className="publication-note" aria-label="Maintainer verification"><p><strong>Maintainer verified.</strong> {maintainer.url ? <a href={maintainer.url} target="_blank" rel="noreferrer">{maintainer.name}</a> : maintainer.name} explicitly verified this publication context. This does not turn the map into a security or correctness guarantee.</p></aside> : <aside className="publication-note" aria-label="Publication status"><p><strong>Curated publication.</strong> This map passed the publication curation gate; no maintainer verification is claimed.</p></aside>}<MapClient initialBundle={bundleId} initialSnapshot={snapshot} initialQuery={`?${contextQuery}`} /><EmbedSnippet context={context} /><section className="architecture-next"><h2>Map before source.</h2><p>Placement is a reading aid. Labels, counts, relationships, revision, and coverage come from the validated snapshot; exact symbol behavior belongs in Lachesis.</p><Link className="quiet-link" href={`https://lachesis.unboundcompute.com/?${contextQuery}`} target="_blank" rel="noreferrer">Continue to Lachesis with this snapshot <span aria-hidden="true">↗</span></Link></section><EvidenceNote>This curated page is generated from a validated Lachesis projection at the pinned revision. It is not a vulnerability claim or maintainer endorsement unless the publication record says so.</EvidenceNote></div></DocsShell>;
 }
