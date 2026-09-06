@@ -1,11 +1,13 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { bundleApiOrigin } from '../../lib/links';
 
 type CachedRepo = { repository?: string; git_url?: string; ref?: string; revision?: string; bundle_id?: string };
 type BuildStatus = { status?: string; bundle_id?: string; sha?: string; error?: { message?: string } };
-function api(path: string) { return `${bundleApiOrigin()}${path}`; }
+// Call this app's own origin: the bundle API sends no CORS headers, so the
+// browser cannot reach it directly. The `/api/*` rewrite in next.config.mjs
+// forwards these requests to the bundle API server-side.
+function api(path: string) { return path; }
 function repoLabel(repo: CachedRepo) { return (repo.repository || repo.git_url || 'Repository').replace(/^https?:\/\//, '').replace(/\.git$/, ''); }
 function openSnapshot(repo: CachedRepo) { window.location.href = `/?${new URLSearchParams({ repository: repoLabel(repo), revision: repo.revision || repo.ref || 'main', bundle: repo.bundle_id! }).toString()}`; }
 function wait(milliseconds: number) { return new Promise((resolve) => window.setTimeout(resolve, milliseconds)); }
