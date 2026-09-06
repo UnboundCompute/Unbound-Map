@@ -418,14 +418,10 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
   // A single catch-all concept is not an architecture; with two or more concepts,
   // preserve the authored regions and resolve shared-node relationships by the
   // deterministic concept order supplied by the exporter.
-  // Concept labels are pre-truncated to the leaf (for example "scaffold" or
-  // "sansio · app"), which collides sibling modules such as flask.app and
-  // flask.sansio.app. Prefer the full qualified name from the declared module
-  // that owns the concept's nodes so region labels stay disambiguated.
-  // A projected concept-region inherits the qualified name AND the canonical
-  // definition_count of the declared module whose nodes it most overlaps, so the
-  // region's headline size stays the real "N definitions" the module owns rather
-  // than the projected-node count.
+  // Concept labels are authored reading vocabulary and must remain visible at
+  // repository altitude. Keep the owning module's path and canonical counts
+  // alongside them so the region stays source-grounded without replacing the
+  // explanation with an implementation name.
   const ownerModuleForConcept = (concept: BundleConcept): BundleModule | undefined => {
     const conceptNodes = new Set(concept.node_ids);
     let best: BundleModule | undefined;
@@ -437,7 +433,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
     return bestOverlap > 0 ? best : undefined;
   };
   const modules: BundleModule[] = concepts.length >= 2
-    ? concepts.map((concept) => { const owner = ownerModuleForConcept(concept); return { id: concept.id, name: owner?.name ?? concept.label, path: owner?.path, description: concept.description, node_ids: concept.node_ids, definition_count: owner?.definition_count, symbol_count: owner?.symbol_count, anchor_node_id: owner?.anchor_node_id }; })
+    ? concepts.map((concept) => { const owner = ownerModuleForConcept(concept); return { id: concept.id, name: concept.label, path: owner?.path, description: concept.description, node_ids: concept.node_ids, definition_count: owner?.definition_count, symbol_count: owner?.symbol_count, anchor_node_id: owner?.anchor_node_id }; })
     : snapshot.modules;
   const childProjection = (parentId: string) => {
     const children = modules
