@@ -3,9 +3,12 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { repositoryRefError, repositoryUrlError } from '../../lib/repository-intake';
 import { pollDelayMilliseconds, retryAfterMilliseconds } from '../../lib/build-polling';
+import { boundedJson } from '../../lib/response-bounds';
 
 type CachedRepo = { repository?: string; git_url?: string; ref?: string; revision?: string; bundle_id?: string };
 type BuildStatus = { status?: string; bundle_id?: string; sha?: string; error?: { message?: string } };
+type BuildSubmission = { job_id?: string; error?: { message?: string } };
+type BuildCancellation = { status?: string; error?: { message?: string } };
 const BUILD_STAGES = [
   ['fetching', 'Fetch repository'],
   ['inventory_ready', 'Inventory files'],
@@ -51,7 +54,7 @@ export function RepositoryLauncher({ initialRepository, initialRef }: { initialR
   const [contextStatus, setContextStatus] = useState<'idle' | 'checking' | 'not-found' | 'error'>('idle');
   const buildController = useRef<AbortController | null>(null);
   const activeJobId = useRef<string | null>(null);
-  useEffect(() => { const controller = new AbortController(); fetch(api('/api/repos'), { headers: { Accept: 'application/json' }, signal: controller.signal }).then((response) => { if (!response.ok) throw new Error('Repository catalog is unavailable right now.'); return response.json(); }).then((body) => { const next = Array.isArray(body?.repositories) ? body.repositories : []; setRepos(next); setCatalogState(next.length ? 'ready' : 'empty'); }).catch((error) => { if (error.name !== 'AbortError') { setCatalogState('error'); setMessage(error instanceof Error ? error.message : 'Repository catalog is unavailable right now.'); } }); return () => controller.abort(); }, []);
+  useEffect(() => { const controller = new AbortController(); fetch(api('/api/repos'), { headers: { Accept: 'application/json' }, signal: controller.signal }).then((response) => { if (!response.ok) throw new Error('Repository catalog is unavailable right now.'); return boundedJson<{ repositories?: CachedRepo[] }>(response); }).then((body) => { const next = Array.isArray(body?.repositories) ? body.repositories : []; setRepos(next); setCatalogState(next.length ? 'ready' : 'empty'); }).catch((error) => { if (error.name !== 'AbortError') { setCatalogState('error'); setMessage(error instanceof Error ? error.message : 'Repository catalog is unavailable right now.'); } }); return () => controller.abort(); }, []);
   useEffect(() => {
     if (!initialRepository) return;
     const cleaned = initialRepository.replace(/^https?:\/\//, '').replace(/\.git$/, '');
@@ -64,7 +67,7 @@ export function RepositoryLauncher({ initialRepository, initialRef }: { initialR
     const controller = new AbortController();
     setContextStatus('checking');
     fetch(api(`/api/repos/${encodeURIComponent(host)}/${encodeURIComponent(owner)}/${encodeURIComponent(name)}${params}`), { headers: { Accept: 'application/json' }, signal: controller.signal })
-      .then((response) => { if (response.status === 404) return null; if (!response.ok) throw new Error('The indexed repository could not be checked.'); return response.json(); })
+      .then((response) => { if (response.status === 404) return null; if (!response.ok) throw new Error('The indexed repository could not be checked.'); return boundedJson<CachedRepo>(response); })
       .then((record) => { if (record?.bundle_id) { openSnapshot(record); return; } setContextStatus('not-found'); })
       .catch((error) => { if (error.name !== 'AbortError') setContextStatus('error'); });
     return () => controller.abort();
@@ -80,7 +83,7 @@ export function RepositoryLauncher({ initialRepository, initialRef }: { initialR
     setBuildState('building'); setBuildStatus('submitted'); setMessage('Starting the repository build…');
     try {
       const response = await fetch(api('/api/build'), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ git_url: url.trim(), ref: ref.trim() || 'main' }), signal: controller.signal });
-      const body = await response.json();
+      const body = await boundedJson<BuildSubmission>(response);
       if (!response.ok || !body?.job_id) throw new Error(body?.error?.message || 'The hosted build could not be started.');
       activeJobId.current = body.job_id;
       const pollingDeadline = Date.now() + 15 * 60 * 1000;
@@ -98,7 +101,7 @@ export function RepositoryLauncher({ initialRepository, initialRef }: { initialR
             continue;
           }
         }
-        const status = await statusResponse.json() as BuildStatus;
+        const status = await boundedJson<BuildStatus>(statusResponse);
         if (!statusResponse.ok) throw new Error(status?.error?.message || 'The build status could not be read.');
         if (status.status === 'ready' && status.bundle_id) { activeJobId.current = null; openSnapshot({ repository: url.trim(), revision: status.sha || ref.trim() || 'main', bundle_id: status.bundle_id }); return; }
         if (['error', 'expired', 'cancelled', 'too_large', 'unsupported_language'].includes(status.status || '')) { activeJobId.current = null; throw new Error(status?.error?.message || `The build stopped with status: ${status.status}.`); }
@@ -125,7 +128,7 @@ export function RepositoryLauncher({ initialRepository, initialRef }: { initialR
     if (!jobId) return;
     try {
       const response = await fetch(api(`/api/build/${encodeURIComponent(jobId)}/cancel`), { method: 'POST', headers: { Accept: 'application/json' } });
-      const body = await response.json() as { status?: string; error?: { message?: string } };
+      const body = await boundedJson<BuildCancellation>(response);
       if (!response.ok) throw new Error(body?.error?.message || 'The server build could not be cancelled.');
       setMessage(body.status === 'cancelled' ? 'Hosted build cancelled. The current bundle was kept.' : `The hosted build is already ${body.status || 'finished'}.`);
     } catch (error) {
