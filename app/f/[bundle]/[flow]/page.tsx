@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../../../components/DocsShell';
 import { HostedFlowGuide } from '../../../components/HostedFlowGuide';
-import { emptySnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../../../lib/view-model';
+import { loadHostedBundle } from '../../../../lib/hosted';
+import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../../../../lib/design-map';
+import { emptySnapshot, snapshotFromProjection, snapshotWithContext, type RepositorySnapshotView, type SharedSnapshotContext } from '../../../../lib/view-model';
 import { documentMetadata } from '../../../../lib/seo';
 
 export const dynamic = 'force-dynamic';
@@ -28,8 +30,23 @@ export default async function FlowCardPage({ params, searchParams }: { params: P
   const { bundle, flow } = await params;
   if (!validBundleId(bundle)) notFound();
   const query = await searchParams;
-  const context: SharedSnapshotContext = { bundle, flow, step: one(query.step) };
-  const snapshot = snapshotWithContext(emptySnapshot, context);
+  let initialSnapshot: RepositorySnapshotView | undefined;
+  // Match the architecture publication path: server-render validated identity
+  // when a bundle API is explicitly configured, while local/offline builds keep
+  // the browser loader as the fallback and make no network request.
+  if (process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim()) {
+    try {
+      const value = await loadHostedBundle(bundle);
+      if (isLachesisBundle(value)) {
+        const projection = toDesignMapSnapshot(value);
+        initialSnapshot = snapshotFromProjection(projection, projectTopLevelRegions(projection));
+      }
+    } catch {
+      // HostedFlowGuide owns the recoverable loading/error state in the browser.
+    }
+  }
+  const context: SharedSnapshotContext = { repository: initialSnapshot?.repository, revision: initialSnapshot?.revision, bundle, flow, step: one(query.step) };
+  const snapshot = snapshotWithContext(initialSnapshot ?? emptySnapshot, context);
   const route = `/f/${encodeURIComponent(bundle)}/${encodeURIComponent(flow)}`;
   return <DocsShell active="/flows" snapshot={snapshot} context={context}><div className="doc-page flows-page"><PageIntro eyebrow="Bundle-pinned flow card" title="A path worth reading." snapshot={snapshot}>This shareable view is pinned to the bundle in its URL. The repository and revision shown below come from the validated snapshot, not from editable query parameters.</PageIntro><HostedFlowGuide bundleId={bundle} context={context} initialFlow={flow} initialStep={one(query.step)} route={route} /><EvidenceNote>This is a graph-backed comprehension artifact. It preserves the bundle identity and revision, but it does not claim that one runtime request executed every step or that the path is a vulnerability.</EvidenceNote></div></DocsShell>;
 }
