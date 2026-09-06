@@ -240,17 +240,18 @@ export function MapClient({ route = '/architecture', initialBundle, initialSnaps
       setMermaidState('failed');
     }
   }
-  function downloadPoster() {
+  function downloadPoster(orientation: 'landscape' | 'portrait' = 'landscape') {
     try {
-      const width = 1600;
-      const height = 900;
+      const portrait = orientation === 'portrait';
+      const width = portrait ? 1080 : 1600;
+      const height = portrait ? 1350 : 900;
       const nodeWidth = 250;
       const nodeHeight = 94;
       const nodePosition = new Map(regions.map((region, index) => {
         const position = positionFor(index);
         return [region.id, {
-          x: 100 + (position.x / 100) * 1400,
-          y: 130 + (position.y / 100) * 650,
+          x: 90 + (position.x / 100) * (width - 180),
+          y: (portrait ? 250 : 130) + (position.y / 100) * (portrait ? 850 : 650),
         }];
       }));
       const edgeMarkup = allEdges.flatMap((edge) => {
@@ -269,19 +270,19 @@ export function MapClient({ route = '/architecture', initialBundle, initialSnaps
   <style>text{font-family:ui-sans-serif,system-ui,sans-serif;fill:#f4f0e7} .eyebrow{font-size:18px;letter-spacing:3px;text-transform:uppercase;fill:#9fc8b0} .title{font-size:42px;font-weight:700} .subtitle{font-size:20px;fill:#b9c8bd} line{stroke:#719883;stroke-width:4;opacity:.8;marker-end:url(#poster-arrow)} g rect{fill:#20362d;stroke:#719883;stroke-width:2} g text{font-size:22px;font-weight:700} g .node-meta{font-size:16px;font-weight:400;fill:#b9c8bd} .footer{font-size:16px;fill:#9eafa3}</style>
   <rect width="${width}" height="${height}" fill="url(#poster-bg)"/>
   <text class="eyebrow" x="92" y="68">UNBOUND MAP · ARCHITECTURE READING ARTIFACT</text>
-  <text class="title" x="92" y="116">${svgLabel(linkSnapshot.repository)} architecture</text>
-  <text class="subtitle" x="92" y="150">revision · ${svgLabel(linkSnapshot.revision)} · graph-backed projection</text>
+  <text class="title" x="92" y="${portrait ? 150 : 116}">${svgLabel(linkSnapshot.repository)} architecture</text>
+  <text class="subtitle" x="92" y="${portrait ? 190 : 150}">revision · ${svgLabel(linkSnapshot.revision)} · graph-backed projection</text>
   <g>${edgeMarkup}</g>
   <g>${nodeMarkup}</g>
-  <text class="footer" x="92" y="850">Unbound Map · bounded reading artifact</text>
-  <text class="footer" x="92" y="878">Not proof of one observed runtime execution.</text>
+  <text class="footer" x="92" y="${height - 50}">Unbound Map · bounded reading artifact</text>
+  <text class="footer" x="92" y="${height - 22}">Not proof of one observed runtime execution.</text>
 </svg>`;
       const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       const slug = linkSnapshot.repository.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'architecture';
       link.href = url;
-      link.download = `${slug}-architecture.svg`;
+      link.download = `${slug}-architecture-${portrait ? 'portrait' : 'landscape'}.svg`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -365,7 +366,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialSnaps
     <section className={`map-workbench${compact ? ' is-compact' : ''}`} aria-labelledby="architecture-map-title">
       <h2 id="architecture-map-title" className="sr-only">Architecture map</h2>
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">graph-backed · {level === '0' ? `${placedSummary} · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {!compact && <><button type="button" className="map-export-button" onClick={() => void copyMermaid()}>{mermaidState === 'copied' ? 'Mermaid copied' : mermaidState === 'failed' ? 'Copy failed' : 'Copy Mermaid'}</button><button type="button" className="map-export-button" onClick={downloadPoster}>{posterState === 'saved' ? 'SVG saved' : posterState === 'failed' ? 'SVG failed' : 'Download SVG'}</button><button type="button" className="map-export-button" onClick={downloadArchitectureMarkdown}>{markdownState === 'saved' ? 'Markdown saved' : markdownState === 'failed' ? 'Markdown failed' : 'Download ARCHITECTURE.md'}</button></>} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
+        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">graph-backed · {level === '0' ? `${placedSummary} · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {!compact && <><button type="button" className="map-export-button" onClick={() => void copyMermaid()}>{mermaidState === 'copied' ? 'Mermaid copied' : mermaidState === 'failed' ? 'Copy failed' : 'Copy Mermaid'}</button><button type="button" className="map-export-button" onClick={() => downloadPoster('landscape')}>{posterState === 'saved' ? 'SVG saved' : posterState === 'failed' ? 'SVG failed' : 'Download landscape SVG'}</button><button type="button" className="map-export-button" onClick={() => downloadPoster('portrait')}>{posterState === 'saved' ? 'SVG saved' : posterState === 'failed' ? 'SVG failed' : 'Download portrait SVG'}</button><button type="button" className="map-export-button" onClick={downloadArchitectureMarkdown}>{markdownState === 'saved' ? 'Markdown saved' : markdownState === 'failed' ? 'Markdown failed' : 'Download ARCHITECTURE.md'}</button></>} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">{snapshot.limitations.some((item) => /demo fixture/i.test(item)) ? 'Demo graph fixture loaded. Shape is transport-valid; verify claims in Lachesis.' : 'Graph-backed snapshot loaded. Placement is a bounded reading projection — the small, readable subset of areas drawn from the full graph.'}</div>}
         {bundleState === 'ready' && thesis && <p className="map-thesis">{thesis}</p>}
         {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
