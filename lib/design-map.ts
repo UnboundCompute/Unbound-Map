@@ -70,6 +70,14 @@ export type BundleRequestPath = {
   hops: BundlePathHop[];
 };
 
+export type BundleFinding = {
+  finding_id?: string;
+  display_name?: string;
+  result_summary?: string;
+  analysis?: { confidence?: string; limitations?: string[] };
+  witness?: { steps?: { node_id: string; role?: string; note?: string }[] };
+};
+
 export type LachesisBundle = {
   format: 'lachesis-explorer-bundle';
   schema_version: '2.0';
@@ -105,7 +113,7 @@ export type LachesisBundle = {
     requests?: BundleRequestPath[];
     values?: unknown[];
   };
-  security?: { findings?: unknown[] };
+  security?: { findings?: BundleFinding[] };
 };
 
 export function isLachesisBundle(value: unknown): value is LachesisBundle {
@@ -198,6 +206,21 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || (path.limitations !== undefined && (!Array.isArray(path.limitations) || path.limitations.some((item) => typeof item !== 'string'))))) return false;
   if (candidate.security !== undefined && (!candidate.security || typeof candidate.security !== 'object'
     || (candidate.security.findings !== undefined && !Array.isArray(candidate.security.findings)))) return false;
+  const findings = candidate.security?.findings ?? [];
+  if (findings.some((finding) => {
+    if (!finding || typeof finding !== 'object') return true;
+    if (finding.finding_id !== undefined && (typeof finding.finding_id !== 'string' || !finding.finding_id.trim())) return true;
+    if (finding.display_name !== undefined && typeof finding.display_name !== 'string') return true;
+    if (finding.result_summary !== undefined && typeof finding.result_summary !== 'string') return true;
+    const analysis = finding.analysis;
+    if (analysis !== undefined && (!analysis || typeof analysis !== 'object'
+      || (analysis.confidence !== undefined && typeof analysis.confidence !== 'string')
+      || (analysis.limitations !== undefined && (!Array.isArray(analysis.limitations) || analysis.limitations.some((item) => typeof item !== 'string'))))) return true;
+    const witness = finding.witness;
+    if (witness !== undefined && (!witness || typeof witness !== 'object'
+      || (witness.steps !== undefined && (!Array.isArray(witness.steps) || witness.steps.some((step) => !step || typeof step !== 'object' || typeof step.node_id !== 'string' || !nodeIds.has(step.node_id) || (step.role !== undefined && typeof step.role !== 'string') || (step.note !== undefined && typeof step.note !== 'string')))))) return true;
+    return false;
+  })) return false;
   const modules = graph!.modules ?? [];
   const moduleIds = new Set(modules.map((module) => module.id));
   if (moduleIds.size !== modules.length) return false;
