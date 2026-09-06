@@ -253,6 +253,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .handoff-boundary { max-width: 790px; margin-top: 68px; } .boundary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 24px; padding-top: 19px; border-top: 1px solid var(--rule); } .boundary-grid strong { font: 600 13px var(--mono); } .boundary-grid p { margin: 10px 0 0; color: var(--body); font-size: 14px; line-height: 1.6; }
 .trust-meta .quiet-link { min-height: 44px; }
 .map-entrypoint-note { max-width: 830px; margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; } .map-entrypoint-note a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.map-entrypoint-list { max-width: 830px; margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--rule); } .map-entrypoint-list h2 { margin: 0 0 10px; font: 600 20px/1.2 var(--serif); } .map-entrypoint-list ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 0; padding: 0; list-style: none; } .map-entrypoint-list li { min-width: 0; padding: 11px 0; border-top: 1px solid var(--rule); } .map-entrypoint-list span, .map-entrypoint-list small { display: block; } .map-entrypoint-list small { margin-top: 4px; color: var(--muted); font: 12px/1.4 var(--mono); overflow-wrap: anywhere; }
 /* Trust families and guard labels are reader-facing vocabulary, not identifiers. */
 .trust-domain-index, .trust-families code, .flow-guard strong { font-size: 12px; }
 
@@ -280,4 +281,5 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; } }
 @media (max-width: 820px) { .hosted-entrypoints li { display: block; } .hosted-entrypoints li > span { justify-content: flex-start; margin-top: 9px; } .hosted-entrypoints .quiet-link { min-height: 44px; display: inline-flex; align-items: center; } }
+@media (max-width: 600px) { .map-entrypoint-list ul { grid-template-columns: 1fr; } }
 .trust-meta .quiet-link { min-height: 44px; }
