@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 /** Keep browser titles and social previews aligned with the same document context. */
-export function documentMetadata(title: string, description: string, context: { repository?: string; revision?: string; bundle?: string; flow?: string } = {}): Metadata {
-  const imageQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.flow ? { flow: context.flow } : {}) }).toString();
+export function documentMetadata(title: string, description: string, context: { repository?: string; revision?: string; bundle?: string; flow?: string; finding?: string } = {}): Metadata {
+  const imageQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.flow ? { flow: context.flow } : {}), ...(context.finding ? { finding: context.finding } : {}) }).toString();
   const image = { url: `/opengraph-image${imageQuery ? `?${imageQuery}` : ''}`, alt: `${title} — Unbound Map architecture guide` };
   return {
     title,
