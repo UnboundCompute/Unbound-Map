@@ -60,7 +60,7 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anc
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
 }
 
-export function MapClient({ route = '/architecture', initialBundle, initialLevel = '0', initialRegion = '', initialQuery = '', compact = false, maxRegions = 9, regionIds }: { route?: string; initialBundle?: string; initialLevel?: string; initialRegion?: string; initialQuery?: string; compact?: boolean; maxRegions?: number; regionIds?: string[] }) {
+export function MapClient({ route = '/architecture', initialBundle, initialSnapshot, initialLevel = '0', initialRegion = '', initialQuery = '', compact = false, maxRegions = 9, regionIds }: { route?: string; initialBundle?: string; initialSnapshot?: RepositorySnapshotView; initialLevel?: string; initialRegion?: string; initialQuery?: string; compact?: boolean; maxRegions?: number; regionIds?: string[] }) {
   const searchParams = useSearchParams();
   // Keep the server-provided bundle during the first client render. Next can
   // briefly expose an unhydrated search-param snapshot on a direct shared URL.
@@ -69,8 +69,8 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const revisionFromUrl = searchParams.get('revision') ?? undefined;
   const [selected, setSelected] = useState(initialRegion);
   const [level, setLevel] = useState(initialLevel);
-  const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(snapshotWithContext(emptySnapshot, { repository: repositoryFromUrl, revision: revisionFromUrl, bundle: bundleFromUrl ?? undefined }));
-  const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialBundle ? 'loading' : 'idle');
+  const [snapshot, setSnapshot] = useState<RepositorySnapshotView>(initialSnapshot ?? snapshotWithContext(emptySnapshot, { repository: repositoryFromUrl, revision: revisionFromUrl, bundle: bundleFromUrl ?? undefined }));
+  const [bundleState, setBundleState] = useState<'idle' | 'loading' | 'ready' | 'error'>(initialSnapshot ? 'ready' : initialBundle ? 'loading' : 'idle');
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
   const [mermaidState, setMermaidState] = useState<'idle' | 'copied' | 'failed'>('idle');
@@ -98,11 +98,11 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       return () => window.removeEventListener('popstate', restoreFocus);
     }
     setRequestedBundle(bundleFromUrl);
-    const pendingSnapshot = snapshotWithContext(emptySnapshot, { repository: repositoryFromUrl, revision: revisionFromUrl, bundle: bundleFromUrl });
+    const pendingSnapshot = initialSnapshot ?? snapshotWithContext(emptySnapshot, { repository: repositoryFromUrl, revision: revisionFromUrl, bundle: bundleFromUrl });
     setSnapshot(pendingSnapshot);
     publishSnapshot(pendingSnapshot);
     const controller = new AbortController();
-    setBundleState('loading');
+    if (!initialSnapshot) setBundleState('loading');
     loadHostedBundle(bundleFromUrl, controller.signal).then((bundle) => {
       if (!isLachesisBundle(bundle)) throw new Error('This hosted map is malformed. Ask for a fresh bundle link from the repository owner.');
       const raw = toDesignMapSnapshot(bundle);
@@ -113,15 +113,17 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       setBundleState('ready');
     }).catch((error) => {
       if (error instanceof DOMException && error.name === 'AbortError') return;
-      setBundleState('error');
-      setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
+      if (!initialSnapshot) {
+        setBundleState('error');
+        setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
+      }
       // The document title is server-rendered from the URL's repository param.
       // When the bundle fails to load we cannot trust that identity, so fall
       // back to a neutral title rather than echoing an unverified repository.
       if (typeof document !== 'undefined') document.title = 'Architecture · Unbound Map';
     });
     return () => { controller.abort(); window.removeEventListener('popstate', restoreFocus); };
-  }, [bundleFromUrl, repositoryFromUrl, revisionFromUrl]);
+  }, [bundleFromUrl, repositoryFromUrl, revisionFromUrl, initialSnapshot]);
 
   const allRegions = snapshot.regions;
   const regions = useMemo(() => regionIds?.length ? regionIds.map((id) => allRegions.find((region) => region.id === id)).filter((region): region is SystemRegion => Boolean(region)) : allRegions.slice(0, Math.max(1, Math.floor(maxRegions))), [allRegions, maxRegions, regionIds]);
