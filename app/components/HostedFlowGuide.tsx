@@ -50,6 +50,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   const [message, setMessage] = useState('');
   const [flowId, setFlowId] = useState(initialFlow ?? '');
   const [stepId, setStepId] = useState(initialStep ?? '');
+  const [artifactState, setArtifactState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -117,11 +118,35 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
 
   const stepKey = activeHop.id ?? activeHop.node_id;
   const explore = `/explore?${new URLSearchParams({ repository: bundle!.meta.repository, revision: bundle!.meta.revision, bundle: bundleId, flow: flow.id, step: stepKey, anchor: activeNode?.label ?? activeHop.caption, ...((activeNode?.module ?? regionForNode(bundle!, activeHop.node_id)) ? { region: activeNode?.module ?? regionForNode(bundle!, activeHop.node_id) } : {}) }).toString()}`;
+  const flowLabel = flowTitle(flow);
+  const artifactMarkdown = `## ${flowLabel}\n\nRepository: ${bundle.meta.repository}\nRevision: ${bundle.meta.revision}\n\n${flowDescription(flow.description)}\n\n${flow.hops.map((hop, index) => `${index + 1}. ${hop.caption}`).join('\n')}\n\nEvidence: graph-backed projection. This is not proof of one observed runtime execution.\n\nOpen the interactive flow: ${typeof window === 'undefined' ? route : window.location.href}`;
+  const artifactImage = `/opengraph-image?${new URLSearchParams({ repository: bundle.meta.repository, revision: bundle.meta.revision, bundle: bundleId, flow: flowLabel }).toString()}`;
+  async function copyArtifact(value: string) {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
+      else {
+        const field = document.createElement('textarea');
+        field.value = value;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        if (!document.execCommand('copy')) throw new Error('Clipboard unavailable');
+        field.remove();
+      }
+      setArtifactState('copied');
+      window.setTimeout(() => setArtifactState('idle'), 1800);
+    } catch {
+      setArtifactState('failed');
+      window.setTimeout(() => setArtifactState('idle'), 2600);
+    }
+  }
   return <>
     {bundle.graph.entrypoints?.length ? <section className="hosted-entrypoints" aria-labelledby="hosted-entrypoints-title"><div><span className="flow-label">Repository entrypoints</span><h2 id="hosted-entrypoints-title">Begin with a real boundary.</h2><p>These exported places are intended starting points for reading the repository.</p></div><ul>{bundle.graph.entrypoints.slice(0, 8).map((entry) => { const region = regionForNode(bundle!, entry.node_id); const href = `/explore?${new URLSearchParams({ repository: bundle!.meta.repository, revision: bundle!.meta.revision, bundle: bundleId, anchor: entry.label, ...(region ? { region } : {}) }).toString()}`; const source = sourceHref({ sourceUrlTemplate: bundle!.meta.source_url_template, revision: bundle!.meta.revision }, entry.file, entry.line); return <li key={entry.id}><div><strong>{entry.label}</strong><small>{entry.kind} · {entry.file}{entry.line ? `:${entry.line}` : ''}</small></div><span>{source && <a className="quiet-link" href={source} target="_blank" rel="noreferrer">Source <span aria-hidden="true">↗</span></a>}<Link className="quiet-link" href={href}>Open in Lachesis <span aria-hidden="true">↗</span></Link></span></li>; })}</ul></section> : null}
     {flows.length > 1 && <nav className="hosted-flow-index" aria-label="Available guided paths"><span>Choose a path</span><div>{flows.slice(0, 8).map((item) => <button key={item.id} type="button" aria-pressed={item.id === flow.id} onClick={() => chooseFlow(item)}>{flowTitle(item)}</button>)}</div></nav>}
     <section className="guided-flow" aria-labelledby="flow-steps-title">
-      <div className="flow-progress"><div><span className="flow-label">Graph-backed path · {flow.hops.length} steps</span><h2 id="flow-steps-title">{flowTitle(flow)}</h2></div><span className="flow-count">{String(activeIndex + 1).padStart(2, '0')} / {String(flow.hops.length).padStart(2, '0')}</span></div>
+      <div className="flow-progress"><div><span className="flow-label">Graph-backed path · {flow.hops.length} steps</span><h2 id="flow-steps-title">{flowLabel}</h2><p className="flow-snapshot-meta">{bundle.meta.repository} · revision {bundle.meta.revision}</p></div><div className="flow-progress-side"><span className="flow-count">{String(activeIndex + 1).padStart(2, '0')} / {String(flow.hops.length).padStart(2, '0')}</span><div className="flow-artifact-actions" aria-label="Share this flow"><button type="button" onClick={() => void copyArtifact(typeof window === 'undefined' ? '' : window.location.href)}>{artifactState === 'copied' ? 'Link copied' : artifactState === 'failed' ? 'Copy failed' : 'Copy link'}</button><button type="button" onClick={() => void copyArtifact(artifactMarkdown)}>Copy Markdown</button><a href={artifactImage} target="_blank" rel="noreferrer">Open social card ↗</a></div></div></div>
       <p className="flow-provenance">{flowDescription(flow.description)} This is a selected static call path from the exported graph, not proof of one observed runtime execution.</p>
       <ol className="flow-path-map" aria-label="Flow path overview">{flow.hops.map((hop, index) => <li key={hop.id ?? `${hop.node_id}-${index}`} className={index === activeIndex ? 'is-current' : Math.abs(index - activeIndex) === 1 ? 'is-adjacent' : undefined}><button type="button" onClick={() => chooseStep(index)} aria-current={index === activeIndex ? 'step' : undefined}><span>step {index + 1}</span><strong>{hop.caption}</strong></button>{index < flow.hops.length - 1 && <span className="flow-path-connector" aria-hidden="true">→</span>}</li>)}</ol>
       <p className="sr-only" role="status" aria-live="polite">Step {activeIndex + 1} of {flow.hops.length}: {activeHop.caption}.</p>
@@ -137,5 +162,6 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
       <details className="flow-linear"><summary>Read all {flow.hops.length} steps as text</summary><ol>{flow.hops.map((hop, index) => { const node = nodeById.get(hop.node_id); return <li key={hop.id ?? `${hop.node_id}-${index}`}><button type="button" className={index === activeIndex ? 'is-current' : undefined} onClick={() => chooseStep(index)} aria-current={index === activeIndex ? 'step' : undefined} aria-controls="flow-step-detail"><strong>{index + 1}. {hop.caption}</strong><span>{node?.documentation?.trim() || `${node?.kind ?? 'Code element'} in ${node?.file || 'the repository graph'}.`}</span><small>{node?.file || 'source unavailable'}{node?.line ? `:${node.line}` : ''}</small></button></li>; })}</ol></details>
       {flow.limitations?.length ? <p className="flow-limitations">Path limitation: {flow.limitations.join(' ')}</p> : null}
     </section>
+    <section className="flow-next" aria-labelledby="flow-next-title"><span className="flow-label">Continue exploring</span><h2 id="flow-next-title">Map another repository.</h2><p>Start a new graph-backed architecture guide when you are ready to compare another codebase.</p><Link className="quiet-link" href="/">Choose a repository <span aria-hidden="true">→</span></Link></section>
   </>;
 }
