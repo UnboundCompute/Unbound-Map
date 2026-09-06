@@ -1,4 +1,4 @@
-import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../lib/design-map.ts';
+import { expandSourceUrl, isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../lib/design-map.ts';
 
 function snapshot(count, childCount = 0) {
   const modules = Array.from({ length: count }, (_, index) => ({
@@ -110,6 +110,7 @@ const comprehensionBundle = {
 if (!isLachesisBundle(comprehensionBundle)) throw new Error('valid comprehension projection rejected by the schema guard');
 const comprehensionSnapshot = toDesignMapSnapshot(comprehensionBundle);
 if (comprehensionSnapshot.description !== 'A bounded request path through the system.' || comprehensionSnapshot.sourceUrlTemplate !== comprehensionBundle.meta.source_url_template || comprehensionSnapshot.entrypoints.length !== 1 || comprehensionSnapshot.requestPaths[0]?.hops.length !== 3) throw new Error('comprehension metadata, source template, entrypoints, or request paths were dropped by the adapter');
+if (expandSourceUrl(comprehensionSnapshot.sourceUrlTemplate, comprehensionSnapshot.revision, 'src/main file.c', 4, 6) !== 'https://github.com/example/repo/blob/test/src/main%20file.c#L4-L6') throw new Error('source template URL was not expanded safely');
 if (isLachesisBundle({ ...comprehensionBundle, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.slice(0, 2) }] } })) throw new Error('underspecified comprehension path accepted by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, graph: { ...comprehensionBundle.graph, entrypoints: [] } })) throw new Error('code-understanding bundle without an entrypoint accepted by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, graph: { ...comprehensionBundle.graph, nodes: comprehensionBundle.graph.nodes.map((node) => node.id === 'node-2' ? { ...node, file: '', line: 0 } : node) }, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.map((hop) => hop.node_id === 'node-2' ? { ...hop, node_id: 'node-2' } : hop) }] } })) throw new Error('code-understanding bundle without a source-backed multi-hop path accepted by the schema guard');

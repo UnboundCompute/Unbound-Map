@@ -1,4 +1,4 @@
-import type { DesignMapSnapshot, HLDRegion } from './design-map';
+import { expandSourceUrl, type DesignMapSnapshot, type HLDRegion } from './design-map';
 export { illustrativeSnapshot } from './illustrative-suricata';
 
 export type SnapshotProvenance = 'illustrative' | 'graph-backed';
@@ -149,12 +149,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
 
 /** Build an exact source link when the exporter provides a revision-pinned template. */
 export function sourceHref(snapshot: Pick<RepositorySnapshotView, 'sourceUrlTemplate' | 'revision'>, file?: string, line?: number, endLine?: number) {
-  if (!snapshot.sourceUrlTemplate || !file || !line || line < 1) return undefined;
-  return snapshot.sourceUrlTemplate
-    .replaceAll('{revision}', encodeURIComponent(snapshot.revision))
-    .replaceAll('{file}', file.split('/').map(encodeURIComponent).join('/'))
-    .replaceAll('{line}', String(line))
-    .replaceAll('{end_line}', String(endLine && endLine >= line ? endLine : line));
+  return expandSourceUrl(snapshot.sourceUrlTemplate, snapshot.revision, file, line, endLine);
 }
 
 export function toHandoff(snapshot: RepositorySnapshotView, region: SystemRegion, anchor = region.anchor?.label ?? region.label, bundleId?: string): LachesisHandoff {

@@ -285,6 +285,12 @@ export type HLDRegion = {
   incomingRelationshipKinds?: Record<string, string>;
 };
 
+/** Expand an exporter-provided revision-pinned source URL template. */
+export function expandSourceUrl(template: string | undefined, revision: string, file?: string, line?: number, endLine?: number) {
+  if (!template || !file || !line || line < 1) return undefined;
+  return template.replaceAll('{revision}', encodeURIComponent(revision)).replaceAll('{file}', file.split('/').map(encodeURIComponent).join('/')).replaceAll('{line}', String(line)).replaceAll('{end_line}', String(endLine && endLine >= line ? endLine : line));
+}
+
 function positiveInteger(value: unknown, fallback: number) {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : fallback;
 }
