@@ -37,6 +37,15 @@ npm run smoke              # routes, previews, broken-link recovery (needs dev o
 The map stays at a high level on purpose. Code-level questions go to Lachesis, with
 the repository, commit, and part carried along.
 
+## Export architecture artifacts
+
+On a validated Architecture snapshot, use the map toolbar to copy Mermaid, download
+`ARCHITECTURE.md`, or save a revision-pinned SVG poster. Both landscape and portrait
+poster exports include the repository, revision, graph-backed status, and the bounded
+reading disclaimer. The Trust page also lets you copy or download an individual
+Security Witness as Markdown, including its source/sink, semantic context, evidence
+status, and reported limitations.
+
 ## Put a map in your README
 
 GitHub doesn't render iframes, so use the pinned README badge. The Architecture page can generate this exact Markdown with its “Copy README badge” action:
