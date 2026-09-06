@@ -85,6 +85,7 @@ export type BundleFinding = {
   // dropping it from the exhaustive envelope.
   low_signal?: boolean;
   analysis?: { confidence?: string; limitations?: string[] };
+  semantic?: { provider?: string; model_id?: string; access_path?: string; role?: string; cwe?: string[] };
   witness?: { steps?: { node_id: string; role?: string; note?: string }[] };
 };
 
