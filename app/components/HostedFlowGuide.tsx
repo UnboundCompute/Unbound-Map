@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot, type BundleRequestPath, type LachesisBundle } from '../../lib/design-map';
 import { loadHostedBundle } from '../../lib/hosted';
 import { snapshotFromProjection, sourceHref, type SharedSnapshotContext } from '../../lib/view-model';
+import { trackEvent } from '../../lib/analytics';
 
 function publishSnapshot(bundle: LachesisBundle) {
   const projection = toDesignMapSnapshot(bundle);
@@ -71,6 +72,10 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
     });
     return () => controller.abort();
   }, [bundleId]);
+
+  useEffect(() => {
+    if (state === 'ready' && bundle) trackEvent('artifact_viewed', { surface: route.startsWith('/f/') ? 'flow_card' : 'flow_guide' });
+  }, [bundle, route, state]);
 
   useEffect(() => {
     const restore = () => {
@@ -141,6 +146,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
         field.remove();
       }
       setArtifactState('copied');
+      trackEvent('artifact_created', { format: value === immutableArtifactHref ? 'link' : 'markdown' });
       window.setTimeout(() => setArtifactState('idle'), 1800);
     } catch {
       setArtifactState('failed');
@@ -167,6 +173,6 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
       <details className="flow-linear"><summary>Read all {flow.hops.length} steps as text</summary><ol>{flow.hops.map((hop, index) => { const node = nodeById.get(hop.node_id); return <li key={hop.id ?? `${hop.node_id}-${index}`}><button type="button" className={index === activeIndex ? 'is-current' : undefined} onClick={() => chooseStep(index)} aria-current={index === activeIndex ? 'step' : undefined} aria-controls="flow-step-detail"><strong>{index + 1}. {hop.caption}</strong><span>{node?.documentation?.trim() || `${node?.kind ?? 'Code element'} in ${node?.file || 'the repository graph'}.`}</span><small>{node?.file || 'source unavailable'}{node?.line ? `:${node.line}` : ''}</small></button></li>; })}</ol></details>
       {flow.limitations?.length ? <p className="flow-limitations">Path limitation: {flow.limitations.join(' ')}</p> : null}
     </section>
-    <section className="flow-next" aria-labelledby="flow-next-title"><span className="flow-label">Continue exploring</span><h2 id="flow-next-title">Map another repository.</h2><p>Start a new graph-backed architecture guide when you are ready to compare another codebase.</p><Link className="quiet-link" href="/">Choose a repository <span aria-hidden="true">→</span></Link></section>
+    <section className="flow-next" aria-labelledby="flow-next-title"><span className="flow-label">Continue exploring</span><h2 id="flow-next-title">Map another repository.</h2><p>Start a new graph-backed architecture guide when you are ready to compare another codebase.</p><Link className="quiet-link" href="/" onClick={() => trackEvent('artifact_conversion', { action: 'map_another_repository' })}>Choose a repository <span aria-hidden="true">→</span></Link></section>
   </>;
 }
