@@ -26,9 +26,9 @@ function repoLabel(repo: CachedRepo) { return (repo.repository || repo.git_url |
 function openSnapshot(repo: CachedRepo) { window.location.href = `/?${new URLSearchParams({ repository: repoLabel(repo), revision: repo.revision || repo.ref || 'main', bundle: repo.bundle_id! }).toString()}`; }
 function wait(milliseconds: number) { return new Promise((resolve) => window.setTimeout(resolve, milliseconds)); }
 
-export function RepositoryLauncher() {
+export function RepositoryLauncher({ initialRepository, initialRef }: { initialRepository?: string; initialRef?: string } = {}) {
   const [repos, setRepos] = useState<CachedRepo[]>([]); const [catalogState, setCatalogState] = useState<'loading' | 'ready' | 'empty' | 'error'>('loading');
-  const [url, setUrl] = useState(''); const [ref, setRef] = useState('main'); const [buildState, setBuildState] = useState<'idle' | 'building' | 'error'>('idle'); const [message, setMessage] = useState(''); const [buildStatus, setBuildStatus] = useState('submitted');
+  const [url, setUrl] = useState(initialRepository ? `https://github.com/${initialRepository.replace(/^https?:\/\//, '').replace(/^github\.com\//, '').replace(/\.git$/, '')}` : ''); const [ref, setRef] = useState(initialRef || 'main'); const [buildState, setBuildState] = useState<'idle' | 'building' | 'error'>('idle'); const [message, setMessage] = useState(''); const [buildStatus, setBuildStatus] = useState('submitted');
   const buildController = useRef<AbortController | null>(null);
   useEffect(() => { const controller = new AbortController(); fetch(api('/api/repos'), { headers: { Accept: 'application/json' }, signal: controller.signal }).then((response) => { if (!response.ok) throw new Error('Repository catalog is unavailable right now.'); return response.json(); }).then((body) => { const next = Array.isArray(body?.repositories) ? body.repositories : []; setRepos(next); setCatalogState(next.length ? 'ready' : 'empty'); }).catch((error) => { if (error.name !== 'AbortError') { setCatalogState('error'); setMessage(error instanceof Error ? error.message : 'Repository catalog is unavailable right now.'); } }); return () => controller.abort(); }, []);
   const validUrl = useMemo(() => /^https:\/\/(github\.com|gitlab\.com|bitbucket\.org)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/?$/.test(url.trim()), [url]);
