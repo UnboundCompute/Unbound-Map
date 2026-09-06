@@ -7,6 +7,10 @@ export function documentMetadata(title: string, description: string, context: { 
   return {
     title,
     description,
+    // Bundle/query URLs are shareable working artifacts, not approved
+    // repository publications. Keep them discoverable through links while
+    // withholding them from search until a canonical approval route exists.
+    ...(context.bundle ? { robots: { index: false, follow: true } } : {}),
     openGraph: { title, description, type: 'article', images: [image] },
     twitter: { card: 'summary_large_image', title, description, images: [image] },
   };
