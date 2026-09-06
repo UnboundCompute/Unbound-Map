@@ -44,6 +44,7 @@ export type SystemRegion = {
   role?: 'entry' | 'runtime' | 'fanout' | 'output' | 'boot';
   upstream?: string[];
   downstream?: string[];
+  internalRelationshipCount?: number;
   relationshipKinds?: Record<string, string>;
   incomingRelationshipKinds?: Record<string, string>;
   children?: { label: string; summary: string; anchor?: string }[];
@@ -80,6 +81,13 @@ export function snapshotWithContext(snapshot: RepositorySnapshotView, context: S
 }
 
 export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLDRegion[]): RepositorySnapshotView {
+  const entrypoints = snapshot.entrypoints.filter((entry) => !/^(?:<)?anonymous(?:@|>|$)/i.test(entry.label.trim()));
+  // A module with no declarations is usually a transport stub or generated
+  // placeholder. Keep it in the raw projection for provenance, but do not make
+  // it a named repository area when real declaration-backed regions exist.
+  const displayRegions = regions.some((region) => region.definitionCount > 0)
+    ? regions.filter((region) => region.definitionCount > 0)
+    : regions;
   return {
     provenance: 'graph-backed',
     coverageState: snapshot.includedNodes < snapshot.indexedNodes || snapshot.limitations.length > 0 ? 'limited' : 'verified',
@@ -88,7 +96,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     description: snapshot.description,
     purpose: snapshot.purpose,
     sourceUrlTemplate: snapshot.sourceUrlTemplate,
-    entrypoints: snapshot.entrypoints,
+    entrypoints,
     generatedAt: snapshot.generatedAt,
     language: snapshot.language,
     coverageScope: snapshot.coverageScope,
@@ -96,7 +104,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
     includedNodes: snapshot.includedNodes,
     relationshipCount: snapshot.relationships.length,
     limitations: snapshot.limitations,
-    regions: regions.map((region) => ({
+    regions: displayRegions.map((region) => ({
       id: region.id,
       label: region.label,
       summary: region.rolledUp ? 'A bounded remainder of smaller regions.' : region.summary || 'Graph-derived top-level module projection.',
@@ -116,6 +124,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       structures: region.structures,
       upstream: region.upstream,
       downstream: region.downstream,
+      internalRelationshipCount: region.internalRelationshipCount,
       relationshipKinds: region.relationshipKinds,
       incomingRelationshipKinds: region.incomingRelationshipKinds,
     })),

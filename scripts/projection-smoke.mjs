@@ -47,6 +47,9 @@ if (!relationshipRegions[0]?.downstream?.includes('module-1') || !relationshipRe
 if (relationshipRegions[0]?.relationshipKinds?.['module-1'] !== 'call') throw new Error('relationship kind did not project to top-level regions');
 if (relationshipRegions[1]?.incomingRelationshipKinds?.['module-0'] !== 'call') throw new Error('incoming relationship kind did not project to top-level regions');
 console.log('ok node relationships → top-level region relationships');
+const internalRelationshipRegions = projectTopLevelRegions(topologySnapshot(1, [[0, 0]]), 9);
+if (internalRelationshipRegions[0]?.internalRelationshipCount !== 1) throw new Error('internal relationships were not retained on their projected region');
+console.log('ok internal relationships remain visible without inventing a cross-region edge');
 
 function topologySnapshot(count, pairs) {
   const base = snapshot(count);

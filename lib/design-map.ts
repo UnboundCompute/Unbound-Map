@@ -311,6 +311,8 @@ export type HLDRegion = {
   structures?: string[];
   upstream?: string[];
   downstream?: string[];
+  /** Graph relationships whose endpoints remain inside this projected area. */
+  internalRelationshipCount?: number;
   relationshipKinds?: Record<string, string>;
   incomingRelationshipKinds?: Record<string, string>;
 };
@@ -556,12 +558,17 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
   };
   const outgoing = new Map<string, Set<string>>();
   const incoming = new Map<string, Set<string>>();
+  const internalRelationships = new Map<string, number>();
   const relationshipKinds = new Map<string, Map<string, Set<string>>>();
   const incomingRelationshipKinds = new Map<string, Map<string, Set<string>>>();
   (snapshot.relationships ?? []).forEach((edge) => {
     const from = ambiguousNodeModules.has(edge.source) ? undefined : regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.source)) ?? '');
     const to = ambiguousNodeModules.has(edge.target) ? undefined : regionIdForModule.get(findTopLevel(moduleByNodeId.get(edge.target)) ?? '');
-    if (!from || !to || from === to) return;
+    if (!from || !to) return;
+    if (from === to) {
+      internalRelationships.set(from, (internalRelationships.get(from) ?? 0) + 1);
+      return;
+    }
     if (!outgoing.has(from)) outgoing.set(from, new Set());
     if (!incoming.has(to)) incoming.set(to, new Set());
     outgoing.get(from)!.add(to);
@@ -580,6 +587,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
     ...region,
     upstream: [...(incoming.get(region.id) ?? [])].sort(),
     downstream: [...(outgoing.get(region.id) ?? [])].sort(),
+    internalRelationshipCount: internalRelationships.get(region.id) ?? 0,
     relationshipKinds: Object.fromEntries([... (relationshipKinds.get(region.id) ?? new Map())].sort(([a], [b]) => a.localeCompare(b)).map(([target, kinds]) => [target, [...kinds].sort().join(', ')])),
     incomingRelationshipKinds: Object.fromEntries([... (incomingRelationshipKinds.get(region.id) ?? new Map())].sort(([a], [b]) => a.localeCompare(b)).map(([source, kinds]) => [source, [...kinds].sort().join(', ')])),
   }));
