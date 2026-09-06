@@ -296,6 +296,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .launcher-submit { margin-top: 13px; border: 0; cursor: pointer; }
 .launcher-submit:disabled { opacity: .65; cursor: wait; }
 .launcher-message, .launcher-status { margin: 13px 0 0; color: var(--signal); font-size: 13px; line-height: 1.5; }
+.launcher-progress { margin-top: 14px; padding: 14px; border: 1px solid var(--rule); background: var(--paper); }
+.launcher-progress-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: var(--ink); font: 600 12px var(--sans); }
+.launcher-progress-head button { min-height: 36px; padding: 0 9px; border: 1px solid var(--rule); color: var(--signal); background: transparent; cursor: pointer; font-size: 11px; }
+.launcher-progress-head button:hover { border-color: var(--signal); background: var(--paper-deep); }
+.launcher-progress ol { display: grid; gap: 7px; margin: 13px 0 10px; padding: 0; list-style: none; color: var(--muted); font: 11px var(--mono); }
+.launcher-progress li { display: flex; align-items: center; gap: 8px; }
+.launcher-progress li i { width: 7px; height: 7px; border: 1px solid var(--map-rule); border-radius: 50%; background: transparent; }
+.launcher-progress li.is-done { color: #547966; }
+.launcher-progress li.is-done i { border-color: #547966; background: #547966; }
+.launcher-progress li.is-current { color: var(--ink); font-weight: 600; }
+.launcher-progress li.is-current i { border-color: var(--signal); background: var(--signal-light); box-shadow: 0 0 0 3px rgba(198, 154, 105, .2); }
+.launcher-progress p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
 .cached-list { margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
 .cached-list li { border-bottom: 1px solid var(--rule); }
 .cached-list button { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; min-height: 60px; padding: 0; border: 0; color: var(--ink); background: transparent; font: inherit; text-align: left; cursor: pointer; }
