@@ -2,7 +2,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from './components/DocsShell';
 import { MapClient } from './components/MapClient';
-import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../lib/view-model';
+import { RepositoryLauncher } from './components/RepositoryLauncher';
+import { emptySnapshot, snapshotWithContext, type SharedSnapshotContext } from '../lib/view-model';
 import { documentMetadata } from '../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -11,17 +12,17 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const query = await searchParams;
   const repository = one(query.repository);
-  const label = repository ?? illustrativeSnapshot.repository;
-  return documentMetadata(`${label} · Design Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
+  const label = repository ?? 'Unbound Map';
+  return documentMetadata(`${label} · Unbound Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function HomePage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
   const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle) };
-  const snapshot = snapshotWithContext(illustrativeSnapshot, context);
+  const snapshot = snapshotWithContext(emptySnapshot, context);
   const bundleRequested = Boolean(context.bundle);
+  if (!bundleRequested) return <div className="selection-shell"><a className="skip-link" href="#main-content">Skip to repository selection</a><header className="selection-header"><Link href="/" className="wordmark" aria-label="Unbound Map home"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Unbound Map</span></Link><span>Repository architecture, before the source</span></header><main id="main-content" className="selection-main" tabIndex={-1}><header className="selection-intro"><h1>Choose a repository to begin.</h1><p>Generate a graph-backed map from a public repository, or open one Lachesis has already indexed.</p></header><RepositoryLauncher /></main><footer className="selection-footer">Unbound Map · powered by Lachesis</footer></div>;
   const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
-  const contextual = (href: string) => `${href}${contextQuery ? `?${contextQuery}` : ''}`;
   const architectureHref = (region?: string) => {
     const params = new URLSearchParams({ ...(region ? { region, level: '1' } : {}), ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) });
     return `/architecture${params.size ? `?${params.toString()}` : ''}`;
@@ -29,7 +30,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
 
   return <DocsShell active="/" snapshot={snapshot} context={context}>
     <div className="doc-page start-page">
-      {bundleRequested ? <>
+      <>
         <PageIntro title={`${snapshot.repository} architecture snapshot`} snapshot={snapshot}>
           Start with the bounded system shape from this repository snapshot. The map appears only after its graph projection passes validation.
         </PageIntro>
@@ -58,48 +59,7 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
           </div>
         </section>
         <EvidenceNote>The requested bundle is validated in the browser before any repository regions appear. Placement is an editorial reading projection; labels, counts, relationships, revision, and coverage come from the bundle.</EvidenceNote>
-      </> : <>
-        <PageIntro title={`${snapshot.repository}, before the source.`} snapshot={snapshot}>
-          {snapshot.repository} turns network traffic into protocol state, detection, and alerts. This guide gives you the design-level orientation first.
-        </PageIntro>
-
-        <section className="start-actions" aria-labelledby="start-actions-title">
-          <div>
-            <h2 id="start-actions-title">Follow one packet first.</h2>
-          </div>
-          <div className="start-action-links">
-            <Link className="primary-button" href={contextual('/flows/packet-decode')}>Follow a packet <span aria-hidden="true">→</span></Link>
-            <Link className="start-action-secondary" href={architectureHref()}>Open Architecture <span aria-hidden="true">→</span></Link>
-          </div>
-        </section>
-
-        <section className="start-map-preview" aria-labelledby="preview-title">
-          <div className="section-heading-row">
-            <div>
-              <h2 id="preview-title">Repository shape</h2>
-              <p>Select a region for its architecture chapter.</p>
-            </div>
-          </div>
-          <MapClient compact regionIds={['input', 'decode', 'core', 'protocols', 'detect', 'matcher', 'output', 'boot']} route="/architecture" initialRegion="decode" initialQuery={contextQuery ? `?${contextQuery}` : ''} />
-          <div className="start-path-reading">
-            <h3>Ordered reading path</h3>
-            <p>For a linear introduction, follow these same handoffs from the wire to output.</p>
-            <nav className="macro-path" aria-label="Network input to output architecture path">
-              {[
-                ['wire', 'input'],
-                ['decode', 'decode'],
-                ['flow + stream', 'core'],
-                ['protocols', 'protocols'],
-                ['detect', 'detect'],
-                ['output', 'output'],
-              ].map(([label, region], index) => <Link key={label} href={architectureHref(region)} className={index === 4 ? 'path-emphasis' : ''}>{label}</Link>)}
-            </nav>
-          </div>
-          <p className="map-caption">Detection is intentionally wider: protocol-aware rules, prefilters, and matchers meet the normalized stream here.</p>
-        </section>
-
-        <EvidenceNote>Illustrative prototype: repository facts and {snapshot.repository} wording here are a content fixture until a graph-backed snapshot is connected. Structural claims should carry the loaded revision and coverage when published.</EvidenceNote>
-      </>}
+      </>
     </div>
   </DocsShell>;
 }

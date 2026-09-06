@@ -199,7 +199,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
   if (requests.some((path) => !path || typeof path !== 'object'
     || typeof path.id !== 'string' || !path.id.trim() || typeof path.kind !== 'string' || !path.kind.trim()
     || typeof path.description !== 'string' || typeof path.entry_node !== 'string' || !nodeIds.has(path.entry_node)
-    || !Array.isArray(path.hops) || path.hops.length < 3
+    || !Array.isArray(path.hops) || path.hops.length < 2
     || path.hops.some((hop) => !hop || typeof hop !== 'object' || typeof hop.node_id !== 'string' || !nodeIds.has(hop.node_id) || typeof hop.caption !== 'string' || !hop.caption.trim()
       || (hop.id !== undefined && (typeof hop.id !== 'string' || !hop.id.trim())) || (hop.edge_label !== undefined && typeof hop.edge_label !== 'string'))
     || (path.source_node !== undefined && !nodeIds.has(path.source_node)) || (path.sink_node !== undefined && !nodeIds.has(path.sink_node))
@@ -207,7 +207,7 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     || (path.limitations !== undefined && (!Array.isArray(path.limitations) || path.limitations.some((item) => typeof item !== 'string'))))) return false;
   if (candidate.analysis_projection === 'code-understanding') {
     const entrypoints = graph!.entrypoints ?? [];
-    const hasSourceBackedPath = requests.some((path) => path.hops.length >= 3 && path.hops.every((hop) => {
+    const hasSourceBackedPath = requests.some((path) => path.hops.length >= 2 && path.hops.every((hop) => {
       const node = nodesById.get(hop.node_id);
       return Boolean(node?.file && node.line > 0);
     }));

@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { DocsShell, EvidenceNote, PageIntro } from '../components/DocsShell';
-import { FlowDiagram } from '../components/FlowDiagram';
 import { HostedFlowGuide } from '../components/HostedFlowGuide';
-import { illustrativeSnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../lib/view-model';
+import { emptySnapshot, snapshotWithContext, type SharedSnapshotContext } from '../../lib/view-model';
 import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -12,15 +11,17 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const query = await searchParams;
   const repository = one(query.repository);
-  const label = repository ?? illustrativeSnapshot.repository;
+  const label = repository ?? 'Repository';
   const bundle = one(query.bundle);
-  return documentMetadata(bundle ? `${label} architectural flow snapshot · Design Map` : `${label} architectural flows · Design Map`, bundle ? `Review ${label}'s validated graph-backed architectural flow snapshot before opening the source.` : `Follow a canonical packet journey through ${label}, one design boundary at a time.`, { repository, revision: one(query.revision), bundle });
+  return documentMetadata(`${label} architectural flow snapshot · Unbound Map`, `Review ${label}'s validated graph-backed architectural flow snapshot before opening the source.`, { repository, revision: one(query.revision), bundle });
 }
 
 export default async function FlowsPage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
-  const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle), flow: one(query.flow) ?? 'packet-decode', step: one(query.step), branch: one(query.branch) };
-  const snapshot = snapshotWithContext(illustrativeSnapshot, context);
-  const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
-  return <DocsShell active="/flows" snapshot={snapshot} context={context}><div className="doc-page flows-page"><PageIntro title={context.bundle ? 'Which path explains this repository?' : 'How does a packet enter the engine?'} snapshot={snapshot}>{context.bundle ? 'Choose a bounded graph-backed path, then read one source-linked handoff at a time.' : 'Follow one architectural journey from bytes on the wire into flow state. This is a design-level handoff story, not a runtime taint trace or a replacement for source reading.'}</PageIntro>{context.bundle ? <><HostedFlowGuide bundleId={context.bundle} context={context} initialFlow={one(query.flow)} initialStep={one(query.step)} /><EvidenceNote>Graph-backed paths are static call-path projections selected for comprehension. They do not prove that one request executed every step or that an input reached a security-sensitive effect.</EvidenceNote></> : <><section className="flow-intro"><span className="flow-label">Recommended first flow</span><h2>Packet bytes → validated layers → flow state</h2><p>The path names what changes at each boundary, the responsibility that owns the change, and the guard that makes the next stage safe to enter.</p><Link className="quiet-link" href={`/flows/packet-decode${contextQuery ? `?${contextQuery}` : ''}`}>Open the dedicated flow page <span aria-hidden="true">→</span></Link></section><FlowDiagram context={context} initialStep={one(query.step)} /><section className="flow-next"><h2>Need the exact branch?</h2><p>Open a step in Lachesis when you need the function body, callers, dispatch targets, or source evidence.</p><Link className="quiet-link" href={`/explore${contextQuery ? `?${contextQuery}` : ''}`}>See the handoff contract <span aria-hidden="true">→</span></Link></section><EvidenceNote>The flow is a generated or illustrative architectural explanation. It does not establish that an input reaches a security sink; use Lachesis for that question.</EvidenceNote></>}</div></DocsShell>;
+  const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle), flow: one(query.flow), step: one(query.step), branch: one(query.branch) };
+  const snapshot = snapshotWithContext(emptySnapshot, context);
+  if (!context.bundle) {
+    return <DocsShell active="/flows" snapshot={snapshot} context={context}><div className="doc-page flows-page"><PageIntro title="Choose a repository first." snapshot={snapshot}>Architectural flows are generated from a validated graph snapshot. Select or build a repository to read its source-linked paths.</PageIntro><section className="map-state-panel" role="status" aria-live="polite" aria-atomic="true"><span className="map-state-label">No repository selected</span><h2>Open a repository to load its flows.</h2><p>Unbound Map does not show placeholder flows. Pick a cached repository or add a public repository URL to begin.</p><Link className="primary-button" href="/">Choose a repository <span aria-hidden="true">→</span></Link></section></div></DocsShell>;
+  }
+  return <DocsShell active="/flows" snapshot={snapshot} context={context}><div className="doc-page flows-page"><PageIntro title="Which path explains this repository?" snapshot={snapshot}>Choose a bounded graph-backed path, then read one source-linked handoff at a time.</PageIntro><HostedFlowGuide bundleId={context.bundle} context={context} initialFlow={one(query.flow)} initialStep={one(query.step)} /><EvidenceNote>Graph-backed paths are static call-path projections selected for comprehension. They do not prove that one request executed every step or that an input reached a security-sensitive effect.</EvidenceNote></div></DocsShell>;
 }

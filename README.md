@@ -97,8 +97,13 @@ example `http://localhost:3210`). Invalid values or values with credentials/quer
 fall back to `https://lachesis.unboundcompute.com`; production deployments should leave the
 default unless the public Explorer origin is intentionally changed.
 
-Graph-backed pages load opaque bundles through `NEXT_PUBLIC_BUNDLE_API_URL`. For the local
-companion server, build or run Design Map with both origins configured:
+Graph-backed pages load opaque bundles through `NEXT_PUBLIC_BUNDLE_API_URL`. When it is unset,
+the bundle transport defaults to the shared hosted API Gateway
+`https://56h5zgua56.execute-api.us-east-1.amazonaws.com`, which serves `/api/repos`, `/api/build`,
+and `/api/bundles/{id}`. This is what lets cached repositories and shared deep links resolve their
+graph snapshot out of the box. Override it only to point at a different backend (for example a
+local companion server). For the local companion server, build or run Design Map with both origins
+configured:
 
 ```bash
 NEXT_PUBLIC_LACHESIS_URL=http://localhost:3210 \\
@@ -120,9 +125,8 @@ This fixture is intentionally labeled as a demo; it proves transport and renderi
 evidence.
 
 The bundle API value is required to be an origin/path without credentials, query, or fragment;
-production values must use HTTPS. If it is omitted, Design Map requests `/api/bundles/{id}` from
-its own origin, which requires a same-origin reverse proxy or API route; a standalone static host
-does not provide that route automatically.
+production values must use HTTPS. Invalid values fall back to the shared API Gateway origin above,
+so a standalone static host resolves bundles without a same-origin reverse proxy or API route.
 
 Suggested maintainer-share framing:
 

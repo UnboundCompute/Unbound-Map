@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { MapClient } from '../components/MapClient';
-import { illustrativeSnapshot } from '../../lib/view-model';
 import { documentMetadata } from '../../lib/seo';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -11,16 +10,16 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const query = await searchParams;
   const repository = one(query.repository);
   const bundle = one(query.bundle);
-  const label = repository ?? (bundle ? 'Graph-backed repository' : illustrativeSnapshot.repository);
-  return documentMetadata(`${label} architecture map · Design Map`, `An embeddable high-level architecture map for ${label}.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
+  const label = repository ?? 'Repository';
+  return documentMetadata(`${label} architecture map · Unbound Map`, `An embeddable high-level architecture map for ${label}.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function EmbedPage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
   const bundle = one(query.bundle);
-  const repository = one(query.repository) ?? (bundle ? 'Graph-backed repository' : illustrativeSnapshot.repository);
+  const repository = one(query.repository) ?? (bundle ? 'Graph-backed repository' : 'Repository');
   const contextQuery = new URLSearchParams({ ...(one(query.repository) ? { repository: one(query.repository)! } : {}), ...(one(query.revision) ? { revision: one(query.revision)! } : {}), ...(bundle ? { bundle } : {}) }).toString();
   const initialLevel = one(query.level) === '1' || one(query.level) === '2' ? one(query.level)! : '0';
   const initialQuery = new URLSearchParams({ ...(contextQuery ? Object.fromEntries(new URLSearchParams(contextQuery).entries()) : {}), ...(one(query.region) ? { region: one(query.region)! } : {}), ...(one(query.level) ? { level: one(query.level)! } : {}), ...(one(query.anchor) ? { anchor: one(query.anchor)! } : {}) }).toString();
-  return <main className="embed-page"><a className="skip-link" href="#embed-content">Skip to map</a><header className="embed-header"><div><span className="embed-kicker">Design Map · HLD</span><h1>{repository} architecture</h1><p>Read the system shape before the source.</p></div><Link href={`/architecture${contextQuery ? `?${contextQuery}` : ''}`}>Open full guide <span aria-hidden="true">↗</span></Link></header><div id="embed-content" tabIndex={-1}><MapClient compact route="/embed" initialBundle={bundle} initialLevel={initialLevel} initialRegion={one(query.region) ?? 'decode'} initialQuery={initialQuery ? `?${initialQuery}` : ''} /></div><footer className="embed-footer"><span>{bundle ? 'Graph-backed bundle requested' : `Illustrative snapshot · ${illustrativeSnapshot.revision}`}</span><Link href={`/${contextQuery ? `?${contextQuery}` : ''}`}>About this map</Link></footer></main>;
+  return <main className="embed-page"><a className="skip-link" href="#embed-content">Skip to map</a><header className="embed-header"><div><span className="embed-kicker">Unbound Map · HLD</span><h1>{repository} architecture</h1><p>Read the system shape before the source.</p></div><Link href={`/architecture${contextQuery ? `?${contextQuery}` : ''}`}>Open full guide <span aria-hidden="true">↗</span></Link></header><div id="embed-content" tabIndex={-1}><MapClient compact route="/embed" initialBundle={bundle} initialLevel={initialLevel} initialRegion={one(query.region) ?? ''} initialQuery={initialQuery ? `?${initialQuery}` : ''} /></div><footer className="embed-footer"><span>{bundle ? 'Graph-backed bundle requested' : 'No repository selected'}</span><Link href={`/${contextQuery ? `?${contextQuery}` : ''}`}>About this map</Link></footer></main>;
 }

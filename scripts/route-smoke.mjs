@@ -1,7 +1,13 @@
 import { readFile } from 'node:fs/promises';
 
 const origin = (process.env.DESIGN_MAP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-const lachesis = (process.env.NEXT_PUBLIC_LACHESIS_URL ?? 'https://lachesis.unboundcompute.com').replace(/\/$/, '');
+// A bundle id only needs to exist for the browser to resolve the graph; the
+// server-rendered HTML shows the awaiting/loading state regardless, so these
+// route assertions do not depend on a live bundle API. Point SMOKE_BUNDLE at a
+// real cached bundle when running the full browser-backed validation.
+const bundle = process.env.SMOKE_BUNDLE ?? 'b_smoketest0000';
+const ctx = `repository=Flask&revision=main&bundle=${bundle}`;
+const enc = bundle.replace(/&/g, '&amp;');
 
 async function page(path, expected) {
   const response = await fetch(`${origin}${path}`);
@@ -26,7 +32,7 @@ async function pageWithout(path, forbidden) {
   for (const marker of forbidden) {
     if (body.includes(marker)) throw new Error(`${path} unexpectedly contains ${JSON.stringify(marker)}`);
   }
-  console.log(`ok ${path} (without fixture fallback)`);
+  console.log(`ok ${path} (no placeholder content)`);
 }
 
 async function image(path) {
@@ -48,47 +54,56 @@ async function xml(path, expected) {
 async function redirect(path, target) {
   const response = await fetch(`${origin}${path}`, { redirect: 'manual' });
   if (![301, 302, 307, 308].includes(response.status)) throw new Error(`${path} returned HTTP ${response.status}, expected redirect`);
-  if (!response.headers.get('location')?.includes(target)) throw new Error(`${path} does not redirect to ${target}`);
-  console.log(`ok ${path} → ${response.headers.get('location')}`);
+  const location = response.headers.get('location') ?? '';
+  if (!location.includes(target)) throw new Error(`${path} redirected to ${location}, expected ${target}`);
+  console.log(`ok ${path} → ${location}`);
 }
 
-await page('/?repository=Zeek&revision=main&bundle=b_demo1234', ['Zeek architecture snapshot', 'Repository shape', 'Preparing the architecture map', 'Explore architecture', 'Open in Lachesis', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234', 'full revision', 'Not supplied by snapshot', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234"']);
-await pageWithout('/?repository=Zeek&revision=main&bundle=b_demo1234', ['Suricata turns network traffic', 'The structural idea', 'A long packet-processing path']);
-await page('/', ['Suricata, before the source.', 'Follow a packet', 'Open Architecture', 'Repository shape', 'map-workbench', 'Packet input', 'Alerts + output', 'node-role', 'Ordered reading path']);
-await pageWithout('/', ['class="bar-lachesis"']);
+// A no-bundle deep link is gated: the proxy sends it back to the repository picker.
+async function redirectHome(path) {
+  const response = await fetch(`${origin}${path}`, { redirect: 'manual' });
+  if (![301, 302, 307, 308].includes(response.status)) throw new Error(`${path} returned HTTP ${response.status}, expected a gate redirect`);
+  const location = new URL(response.headers.get('location') ?? '', origin);
+  if (location.pathname !== '/' || location.search) throw new Error(`${path} did not redirect to the bare picker (got ${location.pathname}${location.search})`);
+  console.log(`ok ${path} → / (selection gate)`);
+}
+
+// 1. The selection gate: the bare map opens on the repository picker only.
+await page('/', ['Choose a repository to begin', 'class="launcher"', 'Enter a repository URL', 'Select a cached repository']);
+await pageWithout('/', ['map-workbench', 'class="bar-lachesis"', 'Suricata', 'Packet input', 'wire input']);
+
+// 2. Every non-home surface is gated behind a bundle: no bundle → back to the picker.
+for (const route of ['/architecture', '/flows', '/trust', '/explore', '/embed', '/map', '/flow']) {
+  await redirectHome(route);
+  await redirectHome(`${route}?repository=Flask&revision=main`);
+}
+// Region chapters and nested flow paths are gated too.
+await redirectHome('/architecture/some-region');
+await redirectHome('/flows/some-flow');
+
+// 3. A shared deep link that carries a bundle renders (this is the shared-link path).
+await page(`/?${ctx}`, ['architecture snapshot', 'Repository shape', 'The map appears only after its graph projection passes validation', 'Explore architecture', 'Open in Lachesis', `bundle=${enc}`]);
+await page(`/architecture?${ctx}`, ['What are the major responsibilities', 'A graph-backed bundle was requested', 'Loading graph snapshot', 'Preparing the architecture map']);
+await pageWithout(`/architecture?${ctx}`, ['Suricata', 'Packet input', 'wire input', 'runtime spine', 'Illustrative']);
+await page(`/flows?${ctx}`, ['Which path explains this repository?']);
+await pageWithout(`/flows?${ctx}`, ['Suricata', 'packet-decode', 'validated IPv4 payload', 'Illustrative']);
+await page(`/trust?${ctx}`, ['What evidence needs a closer read?']);
+await pageWithout(`/trust?${ctx}`, ['Memory safety', 'Illustrative taxonomy', 'Suricata']);
+await page(`/embed?${ctx}`, ['Flask architecture', 'Skip to map', 'id="embed-content"', 'Graph-backed bundle requested']);
+await pageWithout(`/embed?${ctx}`, ['Suricata', 'Illustrative snapshot']);
+
+// 4. Legacy aliases keep working when they carry a bundle.
+await redirect(`/map?${ctx}`, '/architecture');
+await redirect(`/flow?${ctx}`, '/flows');
+
+// 5. Metadata, preview image, and discovery documents.
+await image('/opengraph-image?repository=Flask&revision=main');
+await page(`/architecture?${ctx}`, ['<meta property="og:title" content="Flask architecture · Unbound Map"', '<meta name="twitter:title" content="Flask architecture · Unbound Map"']);
+await xml('/sitemap.xml', ['<loc>http://localhost:3000/']);
+
+// 6. The superseded snapshot-state implementation must be gone from the shell.
 const shellSource = await readFile(new URL('../app/components/DocsShell.tsx', import.meta.url), 'utf8');
 if (shellSource.includes('export function SnapshotState')) throw new Error('superseded SnapshotState implementation remains in the shell');
-await image('/opengraph-image?repository=Zeek&revision=main');
-await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Design anchors', 'DecodeEthernet()', 'aria-current="true"', '<meta property="og:title" content="Zeek architecture · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main', 'href="/explore?repository=Zeek&amp;revision=main&amp;region=decode&amp;label=Packet+decode&amp;anchor=DecodeEthernet%28%29"', '<meta name="twitter:title" content="Zeek architecture · Design Map"']);
-await page('/architecture?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['&lt;iframe src=&quot;https://&lt;your-design-map-host&gt;/embed?repository=Zeek&amp;revision=main&amp;region=decode&amp;level=2&amp;anchor=DecodeEthernet%28%29']);
-await page('/architecture', ['receives from', 'hands off to', 'The projection, in words', 'Text view: wire input enters Packet input']);
-await page('/architecture?repository=Zeek&revision=main&bundle=b_demo1234', ['A graph-backed bundle was requested', 'Preparing the architecture map', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234']);
-await pageWithout('/architecture?repository=Zeek&revision=main&bundle=b_demo1234', ['Illustrative prototype: this eight-region map is editorial fixture content.']);
-await page('/flows?repository=Zeek&revision=main&step=ipv4', ['validated IPv4 payload', 'step=ipv4', 'flow-path-map', 'href="/explore?repository=Zeek&amp;revision=main&amp;region=decode&amp;label=validated+IPv4+payload&amp;flow=packet-decode&amp;step=ipv4&amp;anchor=DecodeIPV4%28%29"', '<meta property="og:title" content="Zeek architectural flows · Design Map"', '<meta name="twitter:title" content="Zeek architectural flows · Design Map"']);
-await page('/flows?repository=Zeek&revision=main&bundle=b_demo1234', ['Which path explains this repository?', 'Loading guided paths', 'Preparing the repository flows', '<meta property="og:title" content="Zeek architectural flow snapshot · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234']);
-await pageWithout('/flows?repository=Zeek&revision=main&bundle=b_demo1234', ['Packet bytes → validated layers → flow state', 'Read all five handoffs as text']);
-await page('/flows?step=missing-step', ['requested step is not in this flow']);
-await page('/flows?branch=runtime', ['Runtime flow dispatch', 'aria-pressed="true"', 'StateAlloc selects the parser path from observed flow state.']);
-await page('/flows/packet-decode?repository=Zeek&revision=main&bundle=b_demo1234&step=ipv4', ['Architectural path', 'Loading guided paths', 'Preparing the repository flows', '<meta property="og:title" content="Zeek · Architectural flow snapshot · Design Map"', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234']);
-await page('/flows/request.wsgi.app?repository=Zeek&revision=main&bundle=b_demo1234', ['Architectural path', 'Loading guided paths', 'Preparing the repository flows', '<meta property="og:title" content="Zeek · Architectural flow snapshot · Design Map"']);
-await pageWithout('/flows/packet-decode?repository=Zeek&revision=main&bundle=b_demo1234&step=ipv4', ['validated IPv4 payload', 'Read all five handoffs as text']);
-await page('/trust?repository=Zeek&revision=main&q=memory&kind=input', ['value="memory"', 'value="input"', 'Memory safety', '<meta property="og:title" content="Zeek trust surfaces · Design Map"', '<meta name="twitter:title" content="Zeek trust surfaces · Design Map"']);
-await page('/trust?repository=Zeek&revision=main&domain=memory-safety', ['id="memory-safety"', 'id="memory-safety-title"', 'Selected trust domain.', 'Memory safety']);
-await page('/trust?repository=Zeek&revision=main&bundle=b_demo1234', ['What evidence needs a closer read?', 'Loading trust evidence', 'Preparing the evidence index', 'opengraph-image?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234']);
-await pageWithout('/trust?repository=Zeek&revision=main&bundle=b_demo1234', ['Memory safety', 'Illustrative taxonomy']);
-await page('/explore?repository=Zeek&revision=main&region=decode&anchor=DecodeIPV4%28%29&bundle=b_demo1234', ['Context ready', 'DecodeIPV4()', 'b_demo1234', 'Trace', 'Reviewed findings and adjudicated evidence', 'aria-label="Open DecodeIPV4() in Lachesis in a new tab"', 'href="/explore?repository=Zeek&amp;revision=main&amp;bundle=b_demo1234&amp;region=decode&amp;anchor=DecodeIPV4%28%29"']);
-await page('/explore?region=decode&anchor=DecodeIPV4%28%29', [`href="${lachesis}/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;anchor=DecodeIPV4%28%29"`]);
-await page('/embed?repository=Zeek&revision=main&bundle=b_demo1234', ['Zeek architecture', 'Graph-backed bundle requested', 'Preparing the architecture map', 'Skip to map', 'id="embed-content"']);
-await page('/embed?repository=Zeek&revision=main&region=decode&level=2&anchor=DecodeEthernet%28%29', ['Zeek architecture', 'Design anchors', 'DecodeEthernet()', 'id="embed-content"']);
-await page('/architecture?region=unknown&level=1', ['requested region is not present']);
-await page('/architecture/not-a-region', ['Region context unavailable', 'aria-atomic="true"']);
-await page('/architecture?region=decode&level=2&anchor=MissingAnchor%28%29', ['requested anchor is not present']);
-await page('/architecture/decode', ['Inputs and outputs', 'Validated payload window', 'Key structures and state', 'href="/architecture?region=decode&amp;level=1"', `href="${lachesis}/?repository=Suricata&amp;revision=8f4c1b2&amp;region=decode&amp;label=Packet+decode&amp;anchor=DecodeEthernet%28%29"`]);
-// Use an opaque ID that is guaranteed not to be the local demo fixture so the
-// unavailable-state assertion remains deterministic with either the public API
-// or a locally running Explorer server.
-await page('/architecture/decode?repository=Zeek&revision=main&bundle=b_missing9999', ['Graph-backed chapter unavailable', 'will not substitute an illustrative chapter', '<meta property="og:title" content="Architecture region · Zeek"']);
-await pageWithout('/architecture/decode?repository=Zeek&revision=main&bundle=b_missing9999', ['What this region owns', 'Validated payload window']);
-await redirect('/map?region=decode&level=1', '/architecture?region=decode&level=1');
-await redirect('/flow?step=ipv4', '/flows?step=ipv4');
-await xml('/sitemap.xml', ['<loc>http://localhost:3000/explore</loc>']);
+if (shellSource.includes('illustrativeSnapshot')) throw new Error('illustrative snapshot reference remains in the shell');
+
+console.log('\nall route smoke checks passed');

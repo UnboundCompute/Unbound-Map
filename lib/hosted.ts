@@ -1,13 +1,14 @@
+import { bundleApiOrigin } from './links';
+
 const MAX_BUNDLE_BYTES = 25 * 1024 * 1024;
 const BUNDLE_ID = /^b_[A-Za-z0-9_-]{8,128}$/;
 
 function serviceUrl(path: string) {
-  const configured = process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim().replace(/\/$/, '');
-  if (!configured) return path;
-  const base = new URL(configured);
-  if (base.username || base.password || base.search || base.hash) throw new Error('Bundle API must be an origin and path only.');
-  if (base.protocol !== 'https:' && process.env.NODE_ENV === 'production') throw new Error('Bundle API must use HTTPS in production.');
-  return `${base.toString().replace(/\/$/, '')}${path}`;
+  // Resolve against the shared bundle API origin (the AWS API Gateway by
+  // default). A relative path would resolve against the Design Map host, whose
+  // /api/bundles route does not exist, which is what left shared bundle links
+  // and cached repositories unable to load their graph snapshot server-side.
+  return `${bundleApiOrigin()}${path}`;
 }
 
 function requestSignal(signal?: AbortSignal) {

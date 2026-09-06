@@ -7,12 +7,12 @@ export type BadgeState = { provenance: SnapshotProvenance; coverageState: Covera
 
 function labelFor({ provenance, coverageState, limitations, regionCount, repository }: BadgeState) {
   if (repository === 'No repository selected') return { label: 'No snapshot selected', className: 'snapshot-state snapshot-empty' };
-  const bundlePending = provenance === 'illustrative' && limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item));
-  const demoFixture = provenance === 'graph-backed' && limitations.some((item) => /demo fixture/i.test(item));
-  const stale = provenance === 'graph-backed' && limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
-  const sparse = provenance === 'graph-backed' && regionCount <= 1;
+  const bundlePending = limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item));
+  const demoFixture = limitations.some((item) => /demo fixture/i.test(item));
+  const stale = limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
+  const sparse = regionCount <= 1;
   return {
-    label: bundlePending ? 'Graph-backed bundle requested' : provenance === 'illustrative' ? 'Illustrative fixture · coverage limited' : demoFixture ? 'Demo fixture · not verified' : stale ? 'Graph-backed · stale snapshot' : sparse ? 'Graph-backed · sparse projection' : coverageState === 'limited' ? 'Graph-backed · coverage limited' : 'Verified graph-backed',
+    label: bundlePending ? 'Graph-backed bundle requested' : demoFixture ? 'Demo fixture · not verified' : stale ? 'Graph-backed · stale snapshot' : sparse ? 'Graph-backed · sparse projection' : coverageState === 'limited' ? 'Graph-backed · coverage limited' : 'Verified graph-backed',
     className: `snapshot-state snapshot-${provenance}${stale ? ' snapshot-stale' : ''}${bundlePending ? ' snapshot-pending' : ''}${sparse ? ' snapshot-sparse' : ''}${demoFixture ? ' snapshot-fixture' : ''}`,
   };
 }
@@ -42,10 +42,10 @@ export function LiveSnapshotDetails(initial: BadgeState) {
     window.addEventListener('design-map:snapshot-ready', update);
     return () => window.removeEventListener('design-map:snapshot-ready', update);
   }, []);
-  const sparse = state.provenance === 'graph-backed' && state.regionCount <= 1;
-  const stale = state.provenance === 'graph-backed' && state.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
-  const demoFixture = state.provenance === 'graph-backed' && state.limitations.some((item) => /demo fixture/i.test(item));
-  return <><dl className="snapshot-list"><div><dt>revision</dt><dd><code>{state.revision}</code></dd></div><div><dt>generated</dt><dd>{state.generatedAt ? <time dateTime={state.generatedAt}><code>{state.generatedAt}</code></time> : 'Not supplied by snapshot'}</dd></div><div><dt>coverage</dt><dd>{state.coverageScope}</dd></div><div><dt>indexed</dt><dd>{state.indexedNodes.toLocaleString()} nodes</dd></div></dl><p className="rail-note">{state.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item)) ? 'A graph-backed bundle is requested. The map will replace the fixture only after validation succeeds.' : state.provenance === 'illustrative' ? 'Illustrative content for the prototype. Replace with a verified bundle before sharing.' : demoFixture ? 'This is a public transport fixture for demos. It is not verified evidence from the repository; use Lachesis for source confirmation.' : sparse ? 'Generated from the Lachesis graph, but only one top-level region is available. Treat this as a sparse projection until coverage expands.' : stale ? 'Generated from the Lachesis graph, but this snapshot is marked stale. Confirm the revision before relying on it.' : state.coverageState === 'limited' ? 'Generated from the Lachesis graph, but this view covers only part of the indexed repository.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p></>;
+  const sparse = state.regionCount <= 1;
+  const stale = state.limitations.some((item) => /\b(stale|outdated|superseded)\b/i.test(item));
+  const demoFixture = state.limitations.some((item) => /demo fixture/i.test(item));
+  return <><dl className="snapshot-list"><div><dt>revision</dt><dd><code>{state.revision}</code></dd></div><div><dt>generated</dt><dd>{state.generatedAt ? <time dateTime={state.generatedAt}><code>{state.generatedAt}</code></time> : 'Not supplied by snapshot'}</dd></div><div><dt>coverage</dt><dd>{state.coverageScope}</dd></div><div><dt>indexed</dt><dd>{state.indexedNodes.toLocaleString()} nodes</dd></div></dl><p className="rail-note">{state.limitations.some((item) => /bundle\s+(?:was\s+)?requested/i.test(item)) ? 'A graph-backed bundle is requested. The map will render only after validation succeeds.' : demoFixture ? 'This is a public transport fixture for demos. It is not verified evidence from the repository; use Lachesis for source confirmation.' : sparse ? 'Generated from the Lachesis graph, but only one top-level region is available. Treat this as a sparse projection until coverage expands.' : stale ? 'Generated from the Lachesis graph, but this snapshot is marked stale. Confirm the revision before relying on it.' : state.coverageState === 'limited' ? 'Generated from the Lachesis graph, but this view covers only part of the indexed repository.' : 'Generated from the Lachesis graph. Layout is editorial; counts retain bundle provenance.'}</p></>;
 }
 
 export function LiveSnapshotIdentity({ repository, revision }: { repository: string; revision: string }) {
