@@ -43,5 +43,13 @@ export default async function ArchitecturePage({ searchParams }: { searchParams:
     }
   }
   const architectureLede = `The first map is deliberately bounded. It shows the responsibilities represented in ${snapshot.repository}'s validated graph projection, then lets you focus one region at a time.`;
-  return <DocsShell active="/architecture" snapshot={snapshot} context={context}><div className="doc-page architecture-page"><PageIntro title="What are the major responsibilities?" snapshot={snapshot}>{architectureLede}</PageIntro><MapClient initialBundle={context.bundle} initialSnapshot={initialSnapshot} initialLevel={initialLevel} initialRegion={one(query.region) ?? ''} initialQuery={initialQuery ? `?${initialQuery}` : ''} /><EmbedSnippet context={context} /><section className="architecture-next"><h2>Map before source.</h2><p>Placement is a reading aid. Labels, counts, and anchors come from the loaded graph snapshot; exact symbol behavior belongs in Lachesis.</p><Link className="quiet-link" href={`/explore?${contextQuery}`}>Continue to Lachesis with this snapshot <span aria-hidden="true">↗</span></Link></section><EvidenceNote>A graph-backed bundle was requested. The map stays hidden until validation succeeds; regions, counts, relationships, and coverage come from that snapshot.</EvidenceNote></div></DocsShell>;
+  const structuredData = initialSnapshot ? {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: `${initialSnapshot.repository} architecture`,
+    description: initialSnapshot.description ?? architectureLede,
+    about: { '@type': 'SoftwareSourceCode', name: initialSnapshot.repository },
+    version: initialSnapshot.revision,
+  } : undefined;
+  return <DocsShell active="/architecture" snapshot={snapshot} context={context}><div className="doc-page architecture-page"><PageIntro title="What are the major responsibilities?" snapshot={snapshot}>{architectureLede}</PageIntro>{structuredData && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /> }<MapClient initialBundle={context.bundle} initialSnapshot={initialSnapshot} initialLevel={initialLevel} initialRegion={one(query.region) ?? ''} initialQuery={initialQuery ? `?${initialQuery}` : ''} /><EmbedSnippet context={context} /><section className="architecture-next"><h2>Map before source.</h2><p>Placement is a reading aid. Labels, counts, and anchors come from the loaded graph snapshot; exact symbol behavior belongs in Lachesis.</p><Link className="quiet-link" href={`/explore?${contextQuery}`}>Continue to Lachesis with this snapshot <span aria-hidden="true">↗</span></Link></section><EvidenceNote>A graph-backed bundle was requested. The map stays hidden until validation succeeds; regions, counts, relationships, and coverage come from that snapshot.</EvidenceNote></div></DocsShell>;
 }
