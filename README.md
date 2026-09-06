@@ -39,10 +39,10 @@ the repository, commit, and part carried along.
 
 ## Put a map in your README
 
-GitHub doesn't render iframes, so use a linked preview image:
+GitHub doesn't render iframes, so use the pinned README badge. The Architecture page can generate this exact Markdown with its “Copy README badge” action:
 
 ```markdown
-[![Repository architecture field guide](https://<your-host>/opengraph-image?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…)](https://<your-host>/architecture?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…)
+[![OWNER/REPO architecture field guide](https://<your-host>/opengraph-image?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…)](https://<your-host>/architecture?repository=OWNER%2FREPO&revision=COMMIT&bundle=b_…)
 ```
 
 Anywhere that does render iframes, use the `/embed` page:
