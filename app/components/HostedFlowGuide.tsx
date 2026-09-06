@@ -29,6 +29,12 @@ function flowTitle(path: BundleRequestPath) {
   return `${first} lifecycle`;
 }
 
+function regionForNode(bundle: LachesisBundle, nodeId: string) {
+  const concept = bundle.graph.concepts?.find((item) => item.node_ids.includes(nodeId));
+  if (concept) return concept.id;
+  return bundle.graph.modules?.find((item) => item.node_ids?.includes(nodeId))?.id;
+}
+
 export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, route = '/flows' }: { bundleId: string; context: SharedSnapshotContext; initialFlow?: string; initialStep?: string; route?: string }) {
   const [bundle, setBundle] = useState<LachesisBundle>();
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -100,7 +106,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   if (!flow) return <section className="map-state-panel" role="status"><span className="map-state-label">No guided path in snapshot</span><h2>This repository does not have a flow to read yet.</h2><p>The graph is valid, but its code-understanding projection did not include a request path. Architecture remains available.</p><div className="map-state-actions"><Link className="primary-button" href={`/architecture?${new URLSearchParams({ repository: bundle!.meta.repository, revision: bundle!.meta.revision, bundle: bundleId }).toString()}`}>Open Architecture <span aria-hidden="true">→</span></Link></div></section>;
 
   const stepKey = activeHop.id ?? activeHop.node_id;
-  const explore = `/explore?${new URLSearchParams({ repository: bundle!.meta.repository, revision: bundle!.meta.revision, bundle: bundleId, flow: flow.id, step: stepKey, anchor: activeNode?.label ?? activeHop.caption, ...(activeNode?.module ? { region: activeNode.module } : {}) }).toString()}`;
+  const explore = `/explore?${new URLSearchParams({ repository: bundle!.meta.repository, revision: bundle!.meta.revision, bundle: bundleId, flow: flow.id, step: stepKey, anchor: activeNode?.label ?? activeHop.caption, ...((activeNode?.module ?? regionForNode(bundle!, activeHop.node_id)) ? { region: activeNode?.module ?? regionForNode(bundle!, activeHop.node_id) } : {}) }).toString()}`;
   return <>
     {flows.length > 1 && <nav className="hosted-flow-index" aria-label="Available guided paths"><span>Choose a path</span><div>{flows.slice(0, 8).map((item) => <button key={item.id} type="button" aria-pressed={item.id === flow.id} onClick={() => chooseFlow(item)}>{flowTitle(item)}</button>)}</div></nav>}
     <section className="guided-flow" aria-labelledby="flow-steps-title">
