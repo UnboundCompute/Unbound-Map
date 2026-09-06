@@ -20,10 +20,22 @@ function flowLabel(value: string) {
   return decodeURIComponent(value).replace(/[._-]+/g, ' ').replace(/\s+/g, ' ').trim() || 'Selected flow';
 }
 
+async function bundleIdentity(bundle: string) {
+  if (!process.env.NEXT_PUBLIC_BUNDLE_API_URL?.trim()) return {};
+  try {
+    const value = await loadHostedBundle(bundle);
+    if (isLachesisBundle(value)) return { repository: value.meta.repository, revision: value.meta.revision };
+  } catch {
+    // The page remains useful as a client-loaded recovery surface.
+  }
+  return {};
+}
+
 export async function generateMetadata({ params }: { params: Params; searchParams: SearchParams }): Promise<Metadata> {
   const { bundle, flow } = await params;
   const label = flowLabel(flow);
-  return documentMetadata(`${label} · Bundle-pinned flow card · Unbound Map`, `Read the ${label} graph-backed flow from its bundle-pinned repository snapshot.`, { bundle, flow: label });
+  const identity = await bundleIdentity(bundle);
+  return documentMetadata(`${label} · Bundle-pinned flow card · Unbound Map`, `Read the ${label} graph-backed flow from its bundle-pinned repository snapshot.`, { ...identity, bundle, flow: label });
 }
 
 export default async function FlowCardPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
