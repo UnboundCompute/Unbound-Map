@@ -100,6 +100,10 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       if (error instanceof DOMException && error.name === 'AbortError') return;
       setBundleState('error');
       setBundleMessage(error instanceof Error ? error.message : 'This bundle could not be loaded.');
+      // The document title is server-rendered from the URL's repository param.
+      // When the bundle fails to load we cannot trust that identity, so fall
+      // back to a neutral title rather than echoing an unverified repository.
+      if (typeof document !== 'undefined') document.title = 'Architecture · Unbound Map';
     });
     return () => { controller.abort(); window.removeEventListener('popstate', restoreFocus); };
   }, [bundleFromUrl, repositoryFromUrl, revisionFromUrl]);

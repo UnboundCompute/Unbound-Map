@@ -74,6 +74,11 @@ export type BundleFinding = {
   finding_id?: string;
   display_name?: string;
   result_summary?: string;
+  // The exporter marks a finding whose featured surface is an internal artifact
+  // (a traceback local, a bare file handle, an anonymous callback) low_signal so
+  // the trust view can demote it beneath the named security surfaces without
+  // dropping it from the exhaustive envelope.
+  low_signal?: boolean;
   analysis?: { confidence?: string; limitations?: string[] };
   witness?: { steps?: { node_id: string; role?: string; note?: string }[] };
 };
@@ -394,15 +399,29 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
   // A single catch-all concept is not an architecture; with two or more concepts,
   // preserve the authored regions and resolve shared-node relationships by the
   // deterministic concept order supplied by the exporter.
+  // Concept labels are pre-truncated to the leaf (for example "scaffold" or
+  // "sansio · app"), which collides sibling modules such as flask.app and
+  // flask.sansio.app. Prefer the full qualified name from the declared module
+  // that owns the concept's nodes so region labels stay disambiguated.
+  const qualifiedNameForConcept = (concept: BundleConcept): { name: string; path?: string } => {
+    const conceptNodes = new Set(concept.node_ids);
+    let best: BundleModule | undefined;
+    let bestOverlap = 0;
+    for (const module of snapshot.modules) {
+      const overlap = (module.node_ids ?? []).reduce((total, id) => total + (conceptNodes.has(id) ? 1 : 0), 0);
+      if (overlap > bestOverlap) { bestOverlap = overlap; best = module; }
+    }
+    return bestOverlap > 0 && best ? { name: best.name, path: best.path } : { name: concept.label };
+  };
   const modules: BundleModule[] = concepts.length >= 2
-    ? concepts.map((concept) => ({ id: concept.id, name: concept.label, description: concept.description, node_ids: concept.node_ids }))
+    ? concepts.map((concept) => { const qualified = qualifiedNameForConcept(concept); return { id: concept.id, name: qualified.name, path: qualified.path, description: concept.description, node_ids: concept.node_ids }; })
     : snapshot.modules;
   const childProjection = (parentId: string) => {
     const children = modules
       .filter((module) => module.parent_id === parentId)
       .map((module) => ({
         label: module.name,
-        summary: `${module.node_ids?.length ?? 0} indexed nodes${module.path ? ` · ${module.path}` : ''}.`,
+        summary: `${module.node_ids?.length ?? 0} projected nodes${module.path ? ` · ${module.path}` : ''}.`,
         anchor: module.node_ids?.map((id) => nodeById.get(id)).find(Boolean)?.label,
         nodeCount: module.node_ids?.length ?? 0,
       }))
@@ -411,7 +430,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
       if (children.length <= 12) return children.map(({ nodeCount: _nodeCount, ...child }) => child);
       const visible = children.slice(0, 11).map(({ nodeCount: _nodeCount, ...child }) => child);
       const remainder = children.slice(11);
-      return [...visible, { label: `Other ${remainder.length} regions`, summary: `${remainder.reduce((total, child) => total + child.nodeCount, 0)} indexed nodes across the bounded remainder.` }];
+      return [...visible, { label: `Other ${remainder.length} regions`, summary: `${remainder.reduce((total, child) => total + child.nodeCount, 0)} projected nodes across the bounded remainder.` }];
     }
 
     // Some graph bundles declare top-level modules but not nested communities.
@@ -431,7 +450,7 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit = 12):
     if (nodeChildren.length <= 12) return nodeChildren.map(({ nodeCount: _nodeCount, ...child }) => child);
     const visible = nodeChildren.slice(0, 11).map(({ nodeCount: _nodeCount, ...child }) => child);
     const remainder = nodeChildren.slice(11);
-    return [...visible, { label: `Other ${remainder.length} nodes`, summary: `${remainder.length} indexed nodes across the bounded remainder.` }];
+    return [...visible, { label: `Other ${remainder.length} nodes`, summary: `${remainder.length} projected nodes across the bounded remainder.` }];
   };
   const topLevel = modules
     .filter((module) => !module.parent_id)

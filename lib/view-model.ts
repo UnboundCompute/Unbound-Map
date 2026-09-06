@@ -95,7 +95,7 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       summary: region.rolledUp ? 'A bounded remainder of smaller regions.' : region.summary || 'Graph-derived top-level module projection.',
       path: region.path ?? 'top-level module',
       nodeCount: region.nodeCount,
-      metricLabel: `${region.nodeCount.toLocaleString()} indexed nodes`,
+      metricLabel: `${region.nodeCount.toLocaleString()} projected nodes`,
       rolledUp: region.rolledUp,
       anchor: region.anchor,
       children: region.children,
