@@ -241,8 +241,8 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
     if (finding.result_summary !== undefined && typeof finding.result_summary !== 'string') return true;
     const semantic = finding.semantic;
     if (semantic !== undefined && (!semantic || typeof semantic !== 'object'
-      || (semantic.provider !== undefined && semantic.provider !== 'atropos')
-      || (semantic.model_id !== undefined && (typeof semantic.model_id !== 'string' || !semantic.model_id.trim()))
+      || semantic.provider !== 'atropos'
+      || (typeof semantic.model_id !== 'string' || !semantic.model_id.trim())
       || (semantic.access_path !== undefined && typeof semantic.access_path !== 'string')
       || (semantic.role !== undefined && typeof semantic.role !== 'string')
       || (semantic.cwe !== undefined && (!Array.isArray(semantic.cwe) || semantic.cwe.some((item) => typeof item !== 'string'))))) return true;

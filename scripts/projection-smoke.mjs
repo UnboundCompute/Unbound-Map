@@ -117,6 +117,13 @@ if (expandSourceUrl(comprehensionSnapshot.sourceUrlTemplate, comprehensionSnapsh
 if (isLachesisBundle({ ...comprehensionBundle, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], sink_node: 'node-1', hops: comprehensionBundle.paths.requests[0].hops.slice(0, 2) }] } }) === false) throw new Error('valid two-hop comprehension path rejected by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.slice(0, 1) }] } })) throw new Error('single-hop comprehension path accepted by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, graph: { ...comprehensionBundle.graph, entrypoints: [] } })) throw new Error('code-understanding bundle without an entrypoint accepted by the schema guard');
+const semanticFinding = {
+  finding_id: 'finding.semantic',
+  semantic: { provider: 'atropos', model_id: 'python.requests.Session.request', access_path: 'network', role: 'sink', cwe: ['CWE-918'] },
+};
+if (!isLachesisBundle({ ...comprehensionBundle, security: { findings: [semanticFinding] } })) throw new Error('valid Atropos finding binding rejected by the schema guard');
+if (isLachesisBundle({ ...comprehensionBundle, security: { findings: [{ ...semanticFinding, semantic: { provider: 'atropos' } }] } })) throw new Error('Atropos finding binding without model ID accepted by the schema guard');
+if (isLachesisBundle({ ...comprehensionBundle, security: { findings: [{ ...semanticFinding, semantic: { provider: 'other', model_id: 'model.id' } }] } })) throw new Error('non-Atropos semantic provider accepted by the schema guard');
 if (isLachesisBundle({ ...comprehensionBundle, graph: { ...comprehensionBundle.graph, nodes: comprehensionBundle.graph.nodes.map((node) => node.id === 'node-2' ? { ...node, file: '', line: 0 } : node) }, paths: { requests: [{ ...comprehensionBundle.paths.requests[0], hops: comprehensionBundle.paths.requests[0].hops.map((hop) => hop.node_id === 'node-2' ? { ...hop, node_id: 'node-2' } : hop) }] } })) throw new Error('code-understanding bundle without a source-backed multi-hop path accepted by the schema guard');
 console.log('ok comprehension entrypoints and guided paths retained');
 const conceptBundle = {
