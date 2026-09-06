@@ -60,6 +60,12 @@ function handoffHref(snapshot: RepositorySnapshotView, region: SystemRegion, anc
   return `/explore?${new URLSearchParams({ repository: handoff.repository, revision: handoff.revision, region: handoff.regionId, label: handoff.regionLabel, anchor: handoff.anchor, ...(handoff.bundleId ? { bundle: handoff.bundleId } : {}) }).toString()}`;
 }
 
+function regionForSource(snapshot: RepositorySnapshotView, file?: string, line?: number) {
+  if (!file) return undefined;
+  return snapshot.regions.find((region) => region.anchor?.file === file && (line === undefined || region.anchor.line === line))
+    ?? snapshot.regions.find((region) => region.anchor?.file === file);
+}
+
 export function MapClient({ route = '/architecture', initialBundle, initialSnapshot, initialLevel = '0', initialRegion = '', initialQuery = '', compact = false, maxRegions = 9, regionIds }: { route?: string; initialBundle?: string; initialSnapshot?: RepositorySnapshotView; initialLevel?: string; initialRegion?: string; initialQuery?: string; compact?: boolean; maxRegions?: number; regionIds?: string[] }) {
   const searchParams = useSearchParams();
   // Keep the server-provided bundle during the first client render. Next can
@@ -78,9 +84,13 @@ export function MapClient({ route = '/architecture', initialBundle, initialSnaps
   const [markdownState, setMarkdownState] = useState<'idle' | 'saved' | 'failed'>('idle');
 
   useEffect(() => {
-    setSelected(searchParams.get('region') ?? '');
-    setLevel(normalizeLevel(searchParams.get('level')));
-  }, [searchParams]);
+    const sourceFile = searchParams.get('source_file') ?? undefined;
+    const sourceLineValue = searchParams.get('source_line');
+    const sourceLine = sourceLineValue && /^\d+$/.test(sourceLineValue) ? Number(sourceLineValue) : undefined;
+    const sourceRegion = regionForSource(snapshot, sourceFile, sourceLine);
+    setSelected(searchParams.get('region') ?? sourceRegion?.id ?? '');
+    setLevel(normalizeLevel(searchParams.get('level') ?? (sourceRegion ? '1' : undefined)));
+  }, [searchParams, snapshot]);
 
   useEffect(() => {
     const publishSnapshot = (next: RepositorySnapshotView) => window.dispatchEvent(new CustomEvent('design-map:snapshot-ready', { detail: { provenance: next.provenance, coverageState: next.coverageState, limitations: next.limitations, regionCount: next.regions.length, repository: next.repository, revision: next.revision, generatedAt: next.generatedAt, coverageScope: next.coverageScope, indexedNodes: next.indexedNodes, includedNodes: next.includedNodes } }));
@@ -127,7 +137,6 @@ export function MapClient({ route = '/architecture', initialBundle, initialSnaps
 
   const allRegions = snapshot.regions;
   const regions = useMemo(() => regionIds?.length ? regionIds.map((id) => allRegions.find((region) => region.id === id)).filter((region): region is SystemRegion => Boolean(region)) : allRegions.slice(0, Math.max(1, Math.floor(maxRegions))), [allRegions, maxRegions, regionIds]);
-  const current = allRegions.find((region) => region.id === selected) ?? regions[0];
   const startParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
   const startContext = new URLSearchParams();
   ['repository', 'revision', 'bundle'].forEach((key) => { const value = startParams.get(key); if (value) startContext.set(key, value); });
@@ -136,28 +145,39 @@ export function MapClient({ route = '/architecture', initialBundle, initialSnaps
   if (requestedBundle && bundleState !== 'ready') {
     return <section className="map-state-panel" role={bundleState === 'error' ? 'alert' : 'status'} aria-live="polite" aria-atomic="true"><span className="map-state-label">{bundleState === 'loading' ? 'Loading graph snapshot' : 'Graph snapshot unavailable'}</span><h2>{bundleState === 'loading' ? 'Preparing the architecture map…' : 'This snapshot could not be loaded.'}</h2><p>{bundleState === 'loading' ? 'The hosted bundle is being validated. No map is shown until that result is known.' : bundleMessage}</p>{bundleState === 'error' && <div className="map-state-actions"><button type="button" className="quiet-link map-retry" onClick={() => window.location.reload()}>Try loading this snapshot again <span aria-hidden="true">↻</span></button><Link className="quiet-link" href={startHref}>Return to Start here <span aria-hidden="true">→</span></Link><Link className="quiet-link" href={recoveryHref}>Open Lachesis context <span aria-hidden="true">↗</span></Link></div>}</section>;
   }
-  if (!current) {
-    return <section className="map-state-panel" role="status" aria-live="polite" aria-atomic="true"><span className="map-state-label">No regions in snapshot</span><h2>There is no architecture to draw yet.</h2><p>This snapshot is valid but contains no displayable top-level regions. Return to the repository start page or open the source explorer for coverage details.</p><div className="map-state-actions"><Link className="quiet-link" href={startHref}>Return to Start here <span aria-hidden="true">→</span></Link><Link className="quiet-link" href={recoveryHref}>Open Lachesis context <span aria-hidden="true">↗</span></Link></div></section>;
-  }
   const boundedPairs = regions.flatMap((region) => (region.downstream ?? []).map((target) => ({ from: region.id, to: target })));
   const layout = layoutFor(regions, boundedPairs);
   const positionFor = (index: number) => layout.positions[index] ?? { x: 12 + (index % 5) * 18, y: 25 + Math.floor(index / 5) * 48, tone: 'blue' as const };
   const renderParams = new URLSearchParams(typeof window === 'undefined' ? initialQuery : window.location.search);
-  const requestedRegion = renderParams.get('region');
+  const sourceFile = renderParams.get('source_file') ?? undefined;
+  const sourceLineValue = renderParams.get('source_line');
+  const sourceLine = sourceLineValue && /^\d+$/.test(sourceLineValue) ? Number(sourceLineValue) : undefined;
+  const sourceRegion = regionForSource(snapshot, sourceFile, sourceLine);
+  const requestedRegion = renderParams.get('region') ?? sourceRegion?.id;
   const regionIsUnknown = Boolean(requestedRegion && !allRegions.some((region) => region.id === requestedRegion));
   const activeBundle = renderParams.has('bundle') ? (renderParams.get('bundle') ?? undefined) : (typeof window === 'undefined' ? initialBundle : undefined);
   const linkSnapshot: RepositorySnapshotView = { ...snapshot, repository: renderParams.get('repository') ?? snapshot.repository, revision: renderParams.get('revision') ?? snapshot.revision };
+  const current = allRegions.find((region) => region.id === selected) ?? sourceRegion ?? regions[0];
+  if (!current) {
+    return <section className="map-state-panel" role="status" aria-live="polite" aria-atomic="true"><span className="map-state-label">No regions in snapshot</span><h2>There is no architecture to draw yet.</h2><p>This snapshot is valid but contains no displayable top-level regions. Return to the repository start page or open the source explorer for coverage details.</p><div className="map-state-actions"><Link className="quiet-link" href={startHref}>Return to Start here <span aria-hidden="true">→</span></Link><Link className="quiet-link" href={recoveryHref}>Open Lachesis context <span aria-hidden="true">↗</span></Link></div></section>;
+  }
   const systemShapeParams = new URLSearchParams(renderParams);
   systemShapeParams.delete('region');
   systemShapeParams.delete('anchor');
+  systemShapeParams.delete('source_file');
+  systemShapeParams.delete('source_line');
   systemShapeParams.set('level', '0');
   const systemShapeHref = `${route}?${systemShapeParams.toString()}`;
   const regionFocusParams = new URLSearchParams(renderParams);
   regionFocusParams.delete('anchor');
+  regionFocusParams.delete('source_file');
+  regionFocusParams.delete('source_line');
   regionFocusParams.set('region', current.id);
   regionFocusParams.set('level', '1');
   const regionFocusHref = `${route}?${regionFocusParams.toString()}`;
   const designAnchorParams = new URLSearchParams(renderParams);
+  designAnchorParams.delete('source_file');
+  designAnchorParams.delete('source_line');
   designAnchorParams.set('region', current.id);
   designAnchorParams.set('level', '2');
   const designAnchorHref = `${route}?${designAnchorParams.toString()}`;

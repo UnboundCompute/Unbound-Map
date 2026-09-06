@@ -21,9 +21,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 export default async function ArchitecturePage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
   const context: SharedSnapshotContext = { repository: one(query.repository), revision: one(query.revision), bundle: one(query.bundle), region: one(query.region), anchor: one(query.anchor) };
+  const sourceFile = one(query.source_file);
+  const sourceLine = one(query.source_line);
   const snapshot = snapshotWithContext(emptySnapshot, context);
   const contextQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}) }).toString();
-  const initialQuery = new URLSearchParams({ ...(contextQuery ? Object.fromEntries(new URLSearchParams(contextQuery).entries()) : {}), ...(one(query.region) ? { region: one(query.region)! } : {}), ...(one(query.level) ? { level: one(query.level)! } : {}), ...(one(query.anchor) ? { anchor: one(query.anchor)! } : {}) }).toString();
+  const initialQuery = new URLSearchParams({ ...(contextQuery ? Object.fromEntries(new URLSearchParams(contextQuery).entries()) : {}), ...(one(query.region) ? { region: one(query.region)! } : {}), ...(one(query.level) ? { level: one(query.level)! } : {}), ...(one(query.anchor) ? { anchor: one(query.anchor)! } : {}), ...(sourceFile ? { source_file: sourceFile } : {}), ...(sourceLine ? { source_line: sourceLine } : {}) }).toString();
   const initialLevel = one(query.level) === '1' || one(query.level) === '2' ? one(query.level)! : '0';
   if (!context.bundle) {
     return <DocsShell active="/architecture" snapshot={snapshot} context={context}><div className="doc-page architecture-page"><PageIntro title="Choose a repository first." snapshot={snapshot}>The architecture map is generated from a validated graph snapshot. Select or build a repository to load its bounded responsibilities and region chapters.</PageIntro><section className="map-state-panel" role="status" aria-live="polite" aria-atomic="true"><span className="map-state-label">No repository selected</span><h2>Open a repository to load its map.</h2><p>Unbound Map does not show placeholder architecture. Pick a cached repository or add a public repository URL to begin.</p><Link className="primary-button" href="/">Choose a repository <span aria-hidden="true">→</span></Link></section></div></DocsShell>;
