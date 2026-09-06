@@ -21,6 +21,10 @@ function mermaidLabel(value: string) {
   return value.replace(/["`\\]/g, '').replace(/[\r\n]+/g, ' ').trim() || 'Unnamed region';
 }
 
+function svgLabel(value: string) {
+  return mermaidLabel(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function mermaidId(index: number) {
   return `region_${index + 1}`;
 }
@@ -70,6 +74,7 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
   const [bundleMessage, setBundleMessage] = useState('');
   const [requestedBundle, setRequestedBundle] = useState(initialBundle ?? '');
   const [mermaidState, setMermaidState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const [posterState, setPosterState] = useState<'idle' | 'saved' | 'failed'>('idle');
 
   useEffect(() => {
     setSelected(searchParams.get('region') ?? '');
@@ -231,11 +236,63 @@ export function MapClient({ route = '/architecture', initialBundle, initialLevel
       setMermaidState('failed');
     }
   }
+  function downloadPoster() {
+    try {
+      const width = 1600;
+      const height = 900;
+      const nodeWidth = 250;
+      const nodeHeight = 94;
+      const nodePosition = new Map(regions.map((region, index) => {
+        const position = positionFor(index);
+        return [region.id, {
+          x: 100 + (position.x / 100) * 1400,
+          y: 130 + (position.y / 100) * 650,
+        }];
+      }));
+      const edgeMarkup = allEdges.flatMap((edge) => {
+        const from = nodePosition.get(edge.from);
+        const to = nodePosition.get(edge.to);
+        if (!from || !to) return [];
+        return [`<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" />`];
+      }).join('');
+      const nodeMarkup = regions.map((region) => {
+        const position = nodePosition.get(region.id)!;
+        return `<g transform="translate(${position.x - nodeWidth / 2} ${position.y - nodeHeight / 2})"><rect width="${nodeWidth}" height="${nodeHeight}" rx="18" /><text x="24" y="39">${svgLabel(region.label)}</text><text class="node-meta" x="24" y="66">${svgLabel(region.metricLabel)}</text></g>`;
+      }).join('');
+      const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <defs><linearGradient id="poster-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101b18"/><stop offset="1" stop-color="#172621"/></linearGradient><marker id="poster-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#93b9a4"/></marker></defs>
+  <style>text{font-family:ui-sans-serif,system-ui,sans-serif;fill:#f4f0e7} .eyebrow{font-size:18px;letter-spacing:3px;text-transform:uppercase;fill:#9fc8b0} .title{font-size:42px;font-weight:700} .subtitle{font-size:20px;fill:#b9c8bd} line{stroke:#719883;stroke-width:4;opacity:.8;marker-end:url(#poster-arrow)} g rect{fill:#20362d;stroke:#719883;stroke-width:2} g text{font-size:22px;font-weight:700} g .node-meta{font-size:16px;font-weight:400;fill:#b9c8bd} .footer{font-size:16px;fill:#9eafa3}</style>
+  <rect width="${width}" height="${height}" fill="url(#poster-bg)"/>
+  <text class="eyebrow" x="92" y="68">UNBOUND MAP · ARCHITECTURE READING ARTIFACT</text>
+  <text class="title" x="92" y="116">${svgLabel(linkSnapshot.repository)} architecture</text>
+  <text class="subtitle" x="92" y="150">revision · ${svgLabel(linkSnapshot.revision)} · graph-backed projection</text>
+  <g>${edgeMarkup}</g>
+  <g>${nodeMarkup}</g>
+  <text class="footer" x="92" y="850">Unbound Map · bounded reading artifact</text>
+  <text class="footer" x="92" y="878">Not proof of one observed runtime execution.</text>
+</svg>`;
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const slug = linkSnapshot.repository.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'architecture';
+      link.href = url;
+      link.download = `${slug}-architecture.svg`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setPosterState('saved');
+      window.setTimeout(() => setPosterState('idle'), 2200);
+    } catch {
+      setPosterState('failed');
+    }
+  }
   return <>
     <section className={`map-workbench${compact ? ' is-compact' : ''}`} aria-labelledby="architecture-map-title">
       <h2 id="architecture-map-title" className="sr-only">Architecture map</h2>
       <div className="map-bezel">
-        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">graph-backed · {level === '0' ? `${placedSummary} · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {!compact && <button type="button" className="map-export-button" onClick={() => void copyMermaid()}>{mermaidState === 'copied' ? 'Mermaid copied' : mermaidState === 'failed' ? 'Copy failed' : 'Copy Mermaid'}</button>} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
+        <div className="map-toolbar"><span className="map-status" role="status" aria-live="polite" aria-atomic="true"><i aria-hidden="true" /> level {level} · {level === '0' ? 'system shape' : level === '1' ? 'region focus' : 'design anchors'}</span><span className="map-scale">graph-backed · {level === '0' ? `${placedSummary} · ${layout.label} layout` : level === '1' ? '1 region focused' : `${focusAnchors.length} anchors shown`} {!compact && <><button type="button" className="map-export-button" onClick={() => void copyMermaid()}>{mermaidState === 'copied' ? 'Mermaid copied' : mermaidState === 'failed' ? 'Copy failed' : 'Copy Mermaid'}</button><button type="button" className="map-export-button" onClick={downloadPoster}>{posterState === 'saved' ? 'SVG saved' : posterState === 'failed' ? 'SVG failed' : 'Download SVG'}</button></>} {level === '2' ? <Link className="map-level-reset" href={regionFocusHref}>Back to region focus</Link> : level === '1' ? <Link className="map-level-reset" href={systemShapeHref}>Back to system shape</Link> : null}</span></div>
         {bundleState === 'ready' && <div className="map-banner" role="status">{snapshot.limitations.some((item) => /demo fixture/i.test(item)) ? 'Demo graph fixture loaded. Shape is transport-valid; verify claims in Lachesis.' : 'Graph-backed snapshot loaded. Placement is a bounded reading projection — the small, readable subset of areas drawn from the full graph.'}</div>}
         {bundleState === 'ready' && thesis && <p className="map-thesis">{thesis}</p>}
         {regionIsUnknown && <div className="map-banner map-banner-caution" role="status">The requested region is not present in this projection. Showing the system’s first available region; open the matching snapshot or region chapter for its evidence.</div>}
