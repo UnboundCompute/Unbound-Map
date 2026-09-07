@@ -6,6 +6,7 @@ This prototype is intentionally a fixture-backed HLD surface. Each implementatio
 
 | Commit | Change | Evidence |
 | --- | --- | --- |
+| `045f1d2` | Keep local TypeScript smoke imports resolvable | Explicit `.ts` imports and `allowImportingTsExtensions` make the hosted transport smoke executable under Node's strip-types runner. Design Map typecheck, contract checks, hosted transport smoke, Explorer integration smoke, production build, local SSR/curl probe, and diff checks passed. No graph was built. |
 | `4e19e5e` | Link graph claims to revision-pinned source | Hosted architecture anchors, guided-flow steps, and exported trust evidence now expose direct source links when `meta.source_url_template` is supplied. Links preserve the bundle revision and exact file/line, while remaining absent when the exporter has no source template. TypeScript, projection smoke, and diff checks passed. |
 | `4bc58bc` | Test source-template projection | Projection smoke now asserts that a revision-pinned source URL template survives bundle normalization, keeping the source-link contract executable. Projection smoke and diff checks passed. |
 | `20dbdeb` | Keep source-link rendering lightweight | Hosted flow source links now use the already-loaded bundle metadata directly instead of rebuilding the full projection during render. TypeScript and diff checks passed. |
