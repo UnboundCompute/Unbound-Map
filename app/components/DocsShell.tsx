@@ -6,10 +6,10 @@ import { LiveSnapshotDetails, LiveSnapshotIdentity, LiveSnapshotState } from './
 import { lachesisOrigin } from '../../lib/links';
 
 export const navItems = [
-  { href: '/', label: 'Start here', note: 'Get oriented' },
+  { href: '/', label: 'Overview', note: 'Get oriented' },
   { href: '/architecture', label: 'Architecture', note: 'See the system' },
-  { href: '/flows', label: 'Flows', note: 'Follow a path' },
-  { href: '/trust', label: 'Trust', note: 'Name obligations' },
+  { href: '/flows', label: 'Important flows', note: 'Follow a path' },
+  { href: '/trust', label: 'Security', note: 'Name obligations' },
 ];
 
 const ecosystemLinks = [
@@ -67,7 +67,7 @@ export function DocsShell({ children, active, snapshot = emptySnapshot, context 
         </div>
       </nav>
       <header className="repo-bar" role="banner">
-        <Link href={contextualHref('/', context)} className="wordmark" aria-label="Unbound Map start here"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Unbound Map</span></Link>
+        <Link href={contextualHref('/', context)} className="wordmark" aria-label="Unbound Map overview"><span className="wordmark-mark" aria-hidden="true"><i /><i /><i /></span><span>Unbound Map</span></Link>
         <span className="bar-divider" aria-hidden="true" />
         <LiveSnapshotIdentity repository={snapshot.repository} revision={snapshot.revision} />
         <LiveSnapshotState provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} repository={snapshot.repository} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} includedNodes={snapshot.includedNodes} />
