@@ -1,4 +1,4 @@
-import { bundleApiOrigin } from './links';
+import { bundleApiOrigin } from './links.ts';
 
 const MAX_BUNDLE_BYTES = 25 * 1024 * 1024;
 const MAX_METADATA_BYTES = 2 * 1024 * 1024;

@@ -1,4 +1,4 @@
-import { expandSourceUrl, type BundleEntrypoint, type DesignMapSnapshot, type HLDRegion } from './design-map';
+import { expandSourceUrl, type BundleEntrypoint, type DesignMapSnapshot, type HLDRegion } from './design-map.ts';
 
 export type SnapshotProvenance = 'graph-backed';
 export type CoverageState = 'limited' | 'verified';
