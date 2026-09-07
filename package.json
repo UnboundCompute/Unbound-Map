@@ -25,7 +25,7 @@
     "verify:seo": "node --experimental-strip-types scripts/verify-seo.mjs",
     "verify:analytics": "node --experimental-strip-types scripts/verify-analytics.mjs",
     "verify:artifact-contract": "node scripts/verify-artifact-contract.mjs",
-    "check": "tsc --noEmit && npm run verify:build-polling && npm run verify:response-bounds && npm run verify:repository-intake && npm run verify:casefile-links && npm run verify:sitemap && npm run verify:seo && npm run verify:analytics && npm run verify:artifact-contract"
+    "check": "tsc --noEmit && npm run verify:build-polling && npm run verify:response-bounds && npm run verify:repository-intake && npm run projection-smoke && node scripts/hosted-smoke.mjs && npm run verify:casefile-links && npm run verify:sitemap && npm run verify:seo && npm run verify:analytics && npm run verify:artifact-contract"
   },
   "dependencies": {
     "@vercel/analytics": "1.6.1",
