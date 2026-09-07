@@ -23,7 +23,8 @@
     "verify:repository-intake": "node --experimental-strip-types scripts/verify-repository-intake.mjs",
     "verify:sitemap": "node --experimental-strip-types scripts/verify-sitemap.mjs",
     "verify:seo": "node --experimental-strip-types scripts/verify-seo.mjs",
-    "check": "tsc --noEmit && npm run verify:response-bounds && npm run verify:casefile-links && npm run verify:seo"
+    "verify:analytics": "node --experimental-strip-types scripts/verify-analytics.mjs",
+    "check": "tsc --noEmit && npm run verify:response-bounds && npm run verify:casefile-links && npm run verify:seo && npm run verify:analytics"
   },
   "dependencies": {
     "@vercel/analytics": "1.6.1",

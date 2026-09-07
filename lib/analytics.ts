@@ -2,9 +2,9 @@ import { track } from '@vercel/analytics';
 
 type EventProperties = Record<string, string | number | boolean>;
 
-const sensitiveKeys = new Set(['url', 'path', 'file', 'repo', 'bundle', 'revision', 'commit', 'sha', 'source', 'name']);
+const sensitiveKeys = new Set(['url', 'path', 'file', 'repo', 'repository', 'bundle', 'revision', 'commit', 'sha', 'source', 'name']);
 
-function safeProperties(properties?: EventProperties) {
+export function sanitizeEventProperties(properties?: EventProperties) {
   if (!properties) return undefined;
   const safe = Object.entries(properties).reduce<EventProperties>((result, [key, value]) => {
     if (key.toLowerCase().split('_').some((part) => sensitiveKeys.has(part))) return result;
@@ -19,5 +19,5 @@ function safeProperties(properties?: EventProperties) {
 /** Aggregate-only instrumentation; repository and source identifiers never leave the page. */
 export function trackEvent(name: string, properties?: EventProperties) {
   if (typeof window === 'undefined') return;
-  void track(name, safeProperties(properties));
+  void track(name, sanitizeEventProperties(properties));
 }
