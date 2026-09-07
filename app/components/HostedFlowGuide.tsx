@@ -6,6 +6,7 @@ import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot, type Bun
 import { loadHostedBundle } from '../../lib/hosted';
 import { snapshotFromProjection, sourceHref, type SharedSnapshotContext } from '../../lib/view-model';
 import { trackEvent } from '../../lib/analytics';
+import { flowCardHref } from '../../lib/artifact-id';
 
 function publishSnapshot(bundle: LachesisBundle) {
   const projection = toDesignMapSnapshot(bundle);
@@ -134,7 +135,7 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   const flowLabel = flowTitle(flow);
   const artifactMarkdown = `## ${flowLabel}\n\nRepository: ${bundle.meta.repository}\nRevision: ${bundle.meta.revision}\nFlow type: ${flow.kind}\nStart: ${flowStart || 'not reported'}\nEnd: ${flowEnd || 'not reported'}\nSteps: ${flow.hops.length}\nModules represented: ${flowModuleCount || 'not reported'}\nEvidence confidence: ${flow.confidence || 'not reported'}\n\n${flowDescription(flow.description)}\n\n${flow.hops.map((hop, index) => `${index + 1}. ${hop.caption}`).join('\n')}\n\nEvidence: graph-backed projection. This is not proof of one observed runtime execution.\n\nOpen the interactive flow: ${typeof window === 'undefined' ? route : window.location.href}`;
   const artifactImage = `/opengraph-image?${new URLSearchParams({ repository: bundle.meta.repository, revision: bundle.meta.revision, bundle: bundleId, flow: flowLabel }).toString()}`;
-  const immutableArtifactHref = `/f/${encodeURIComponent(bundleId)}/${encodeURIComponent(flow.id)}`;
+  const immutableArtifactHref = flowCardHref(bundleId, flow.id);
   async function copyArtifact(value: string) {
     try {
       if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);

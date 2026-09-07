@@ -4,6 +4,7 @@ import { emptySnapshot, type RepositorySnapshotView, type SharedSnapshotContext 
 import { ShareButton } from './ShareButton';
 import { LiveSnapshotDetails, LiveSnapshotIdentity, LiveSnapshotState } from './LiveSnapshotState';
 import { lachesisOrigin } from '../../lib/links';
+import { flowCardHref } from '../../lib/artifact-id';
 
 export const navItems = [
   { href: '/', label: 'Overview', note: 'Get oriented' },
@@ -92,7 +93,7 @@ export function DocsShell({ children, active, snapshot = emptySnapshot, context 
 
 export function PageIntro({ eyebrow, title, children, snapshot = emptySnapshot, context }: { eyebrow?: string; title: string; children: ReactNode; snapshot?: RepositorySnapshotView; context?: SharedSnapshotContext }) {
   const shareHref = context?.bundle && context?.flow
-    ? `/f/${encodeURIComponent(context.bundle)}/${encodeURIComponent(context.flow)}`
+    ? flowCardHref(context.bundle, context.flow)
     : undefined;
   return <header className="page-intro">{eyebrow && <p className="page-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p className="page-lede">{children}</p><div className="intro-source"><LiveSnapshotState showCoverage provenance={snapshot.provenance} coverageState={snapshot.coverageState} limitations={snapshot.limitations} regionCount={snapshot.regions.length} repository={snapshot.repository} revision={snapshot.revision} generatedAt={snapshot.generatedAt} coverageScope={snapshot.coverageScope} indexedNodes={snapshot.indexedNodes} includedNodes={snapshot.includedNodes} /><ShareButton href={shareHref} /></div></header>;
 }

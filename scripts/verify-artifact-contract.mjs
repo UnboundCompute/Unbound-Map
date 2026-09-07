@@ -5,6 +5,7 @@ const mapClient = fs.readFileSync(new URL('../app/components/MapClient.tsx', imp
 const flowGuide = fs.readFileSync(new URL('../app/components/HostedFlowGuide.tsx', import.meta.url), 'utf8');
 const embed = fs.readFileSync(new URL('../app/components/EmbedSnippet.tsx', import.meta.url), 'utf8');
 const openGraph = fs.readFileSync(new URL('../app/opengraph-image.tsx', import.meta.url), 'utf8');
+const artifactIds = fs.readFileSync(new URL('../lib/artifact-id.ts', import.meta.url), 'utf8');
 
 for (const [label, source, terms] of [
   ['architecture poster', mapClient, ['Download landscape SVG', 'Download portrait SVG', 'graph-backed projection', 'revision ·']],
@@ -21,5 +22,8 @@ assert.match(mapClient, /const height = portrait \? 1350 : 900;/, 'poster export
 assert.match(mapClient, /width="\$\{width\}" height="\$\{height\}" viewBox=/, 'poster SVG must declare intrinsic dimensions and viewBox');
 assert.match(openGraph, /export const size = \{ width: 1200, height: 630 \};/, 'Open Graph image must be 1200x630');
 assert.match(openGraph, /export const alt = /, 'Open Graph image must provide alt text');
+assert.match(artifactIds, /FLOW_CARD_RENDERER_VERSION = '1'/, 'flow cards must declare a renderer version');
+assert.match(artifactIds, /renderer: FLOW_CARD_RENDERER_VERSION/, 'flow card URLs must carry the renderer version');
+assert.match(flowGuide, /flowCardHref\(bundleId, flow\.id\)/, 'flow card links must use the versioned artifact identity');
 
 console.log('Map artifact contract: poster, Mermaid, Markdown, flow card, and README badge preserve context');
