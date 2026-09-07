@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot, type BundleRequestPath, type LachesisBundle } from '../../lib/design-map';
+import { isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot, type BundleNode, type BundleRequestPath, type LachesisBundle } from '../../lib/design-map';
 import { loadHostedBundle } from '../../lib/hosted';
 import { snapshotFromProjection, sourceHref, type SharedSnapshotContext } from '../../lib/view-model';
 import { trackEvent } from '../../lib/analytics';
@@ -48,6 +48,14 @@ function regionForNode(bundle: LachesisBundle, nodeId: string) {
 
 function readableEntrypoint(entry: { label: string }) {
   return !/^(?:<)?anonymous(?:@|>|$)/i.test(entry.label.trim());
+}
+
+function sourceExcerpt(node?: BundleNode) {
+  if (node?.source_window?.lines.length) {
+    const start = node.source_window.start_line ?? node.line;
+    return node.source_window.lines.map((line, index) => `${String(start + index).padStart(4, ' ')} | ${line}`).join('\n');
+  }
+  return node?.snippet?.trim() || '';
 }
 
 export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, route = '/flows' }: { bundleId: string; context: SharedSnapshotContext; initialFlow?: string; initialStep?: string; route?: string }) {
@@ -133,7 +141,14 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   const stepKey = activeHop.id ?? activeHop.node_id;
   const explore = `/explore?${new URLSearchParams({ repository: bundle!.meta.repository, revision: bundle!.meta.revision, bundle: bundleId, flow: flow.id, step: stepKey, anchor: activeNode?.label ?? activeHop.caption, ...((activeNode?.module ?? regionForNode(bundle!, activeHop.node_id)) ? { region: activeNode?.module ?? regionForNode(bundle!, activeHop.node_id) } : {}) }).toString()}`;
   const flowLabel = flowTitle(flow);
-  const artifactMarkdown = `## ${flowLabel}\n\nRepository: ${bundle.meta.repository}\nRevision: ${bundle.meta.revision}\nFlow type: ${flow.kind}\nStart: ${flowStart || 'not reported'}\nEnd: ${flowEnd || 'not reported'}\nSteps: ${flow.hops.length}\nModules represented: ${flowModuleCount || 'not reported'}\nEvidence confidence: ${flow.confidence || 'not reported'}\n\n${flowDescription(flow.description)}\n\n${flow.hops.map((hop, index) => `${index + 1}. ${hop.caption}`).join('\n')}\n\nEvidence: graph-backed projection. This is not proof of one observed runtime execution.\n\nOpen the interactive flow: ${typeof window === 'undefined' ? route : window.location.href}`;
+  const excerpt = sourceExcerpt(activeNode);
+  const includedNodes = bundle.graph.coverage?.included_nodes ?? bundle.graph.nodes.length;
+  const indexedNodes = bundle.graph.coverage?.indexed_nodes ?? bundle.meta.indexed_nodes;
+  const graphEdges = bundle.graph.edges?.length ?? 0;
+  const graphModules = bundle.graph.modules?.length ?? flowModuleCount;
+  const limitations = [...new Set([...(bundle.graph.coverage?.limitations ?? []), ...(flow.limitations ?? [])])];
+  const markdownFence = '```';
+  const artifactMarkdown = `## ${flowLabel}\n\nRepository: ${bundle.meta.repository}\nRevision: ${bundle.meta.revision}\nFlow type: ${flow.kind}\nStart: ${flowStart || 'not reported'}\nEnd: ${flowEnd || 'not reported'}\nSteps: ${flow.hops.length}\nModules represented: ${flowModuleCount || 'not reported'}\nEvidence confidence: ${flow.confidence || 'not reported'}\n\n${flowDescription(flow.description)}\n\n### Path\n\n${flow.hops.map((hop, index) => `${index + 1}. ${hop.caption}`).join('\n')}\n\n### Technical metrics\n\n- Indexed nodes: ${indexedNodes}\n- Nodes represented in this projection: ${includedNodes}\n- Graph edges: ${graphEdges}\n- Graph modules: ${graphModules}\n\n### Source excerpt\n\n${excerpt ? `\`${activeNode?.file || 'source'}:${activeNode?.line || '—'}\`\n\n${markdownFence}text\n${excerpt}\n${markdownFence}` : 'No source excerpt was included for the selected step.'}\n\nEvidence: graph-backed projection. This is not proof of one observed runtime execution.${limitations.length ? `\n\nLimitations: ${limitations.join(' ')}` : ''}\n\nOpen the interactive flow: ${typeof window === 'undefined' ? route : window.location.href}`;
   const artifactImage = `/opengraph-image?${new URLSearchParams({ repository: bundle.meta.repository, revision: bundle.meta.revision, bundle: bundleId, flow: flowLabel }).toString()}`;
   const immutableArtifactHref = flowCardHref(bundleId, flow.id);
   async function copyArtifact(value: string) {
