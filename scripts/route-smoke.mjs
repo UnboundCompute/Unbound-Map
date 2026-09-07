@@ -83,7 +83,7 @@ await redirectHome('/flows/some-flow');
 
 // 3. A shared deep link that carries a bundle renders (this is the shared-link path).
 await page(`/?${ctx}`, ['architecture snapshot', 'Repository shape', 'The map appears only after its graph projection passes validation', 'Explore architecture', 'Open in Lachesis', `bundle=${enc}`]);
-await page(`/architecture?${ctx}`, ['What are the major responsibilities', 'A graph-backed bundle was requested', 'Loading graph snapshot', 'Preparing the architecture map']);
+await page(`/architecture?${ctx}`, ['What are the major responsibilities', 'A graph-backed bundle was requested', 'Loading graph snapshot', 'Preparing the architecture map', 'Overview', 'Important flows', 'Security']);
 await pageWithout(`/architecture?${ctx}`, ['Suricata', 'Packet input', 'wire input', 'runtime spine', 'Illustrative']);
 await page(`/flows?${ctx}`, ['Which path explains this repository?']);
 await pageWithout(`/flows?${ctx}`, ['Suricata', 'packet-decode', 'validated IPv4 payload', 'Illustrative']);
