@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const mapClient = fs.readFileSync(new URL('../app/components/MapClient.tsx', import.meta.url), 'utf8');
 const flowGuide = fs.readFileSync(new URL('../app/components/HostedFlowGuide.tsx', import.meta.url), 'utf8');
 const embed = fs.readFileSync(new URL('../app/components/EmbedSnippet.tsx', import.meta.url), 'utf8');
+const openGraph = fs.readFileSync(new URL('../app/opengraph-image.tsx', import.meta.url), 'utf8');
 
 for (const [label, source, terms] of [
   ['architecture poster', mapClient, ['Download landscape SVG', 'Download portrait SVG', 'graph-backed projection', 'revision ·']],
@@ -14,5 +15,11 @@ for (const [label, source, terms] of [
 ]) {
   for (const term of terms) assert.ok(source.includes(term), `${label} is missing ${term}`);
 }
+
+assert.match(mapClient, /const width = portrait \? 1080 : 1600;/, 'poster export widths must be 1080px portrait and 1600px landscape');
+assert.match(mapClient, /const height = portrait \? 1350 : 900;/, 'poster export heights must be 1350px portrait and 900px landscape');
+assert.match(mapClient, /width="\$\{width\}" height="\$\{height\}" viewBox=/, 'poster SVG must declare intrinsic dimensions and viewBox');
+assert.match(openGraph, /export const size = \{ width: 1200, height: 630 \};/, 'Open Graph image must be 1200x630');
+assert.match(openGraph, /export const alt = /, 'Open Graph image must provide alt text');
 
 console.log('Map artifact contract: poster, Mermaid, Markdown, flow card, and README badge preserve context');
