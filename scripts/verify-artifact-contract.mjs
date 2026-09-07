@@ -6,6 +6,7 @@ const flowGuide = fs.readFileSync(new URL('../app/components/HostedFlowGuide.tsx
 const embed = fs.readFileSync(new URL('../app/components/EmbedSnippet.tsx', import.meta.url), 'utf8');
 const openGraph = fs.readFileSync(new URL('../app/opengraph-image.tsx', import.meta.url), 'utf8');
 const publication = fs.readFileSync(new URL('../app/r/[...repository]/page.tsx', import.meta.url), 'utf8');
+const docsShell = fs.readFileSync(new URL('../app/components/DocsShell.tsx', import.meta.url), 'utf8');
 const artifactIds = fs.readFileSync(new URL('../lib/artifact-id.ts', import.meta.url), 'utf8');
 
 for (const [label, source, terms] of [
@@ -15,6 +16,7 @@ for (const [label, source, terms] of [
   ['flow card', flowGuide, ['Open flow card', 'artifactMarkdown', 'bundle.meta.repository', 'bundle.meta.revision']],
   ['README badge', embed, ['README badge Markdown', 'previewQuery', 'architecture field guide']],
   ['repository publication', publication, ['Continue to Lachesis with this snapshot', 'Map another repository']],
+  ['shared documentation shell', docsShell, ['Continue to Lachesis', 'Map another repository', 'docs-footer-actions']],
 ]) {
   for (const term of terms) assert.ok(source.includes(term), `${label} is missing ${term}`);
 }

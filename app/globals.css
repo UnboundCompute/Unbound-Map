@@ -78,6 +78,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .rail-note { margin: 26px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .docs-main { min-width: 0; }
 .docs-footer { display: flex; justify-content: space-between; gap: 20px; padding: 19px clamp(24px, 5vw, 78px) 24px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 12px; }
+.docs-footer-actions { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 18px; }
 .docs-footer a { display: inline-flex; align-items: center; min-height: 44px; color: var(--signal); font-weight: 600; text-decoration: none; }
 .docs-footer a:hover { text-decoration: underline; }
 .embed-page { min-height: 100vh; padding: 28px clamp(18px, 4vw, 56px) 30px; background: var(--paper); }

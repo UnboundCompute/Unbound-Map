@@ -86,7 +86,7 @@ export function DocsShell({ children, active, snapshot = emptySnapshot, context 
         </aside>
         <main id="main-content" className="docs-main" tabIndex={-1}>{children}{hasPublicSnapshot && <aside className="publication-note" aria-label="Publication and correction controls"><p><strong>Independent analysis.</strong> Generated from public source at the pinned revision. This map is not affiliated with or endorsed by the repository maintainers unless explicitly marked verified.</p><div className="publication-actions"><a href={publicationMailto('Verify architecture', context!, snapshot)}>Verify architecture</a><a href={publicationMailto('Suggest a correction', context!, snapshot)}>Suggest a correction</a><a href={publicationMailto('Request a refresh', context!, snapshot)}>Request a refresh</a><a href={publicationMailto('Report a misleading claim', context!, snapshot)}>Report a misleading claim</a><a href={publicationMailto('Request a takedown', context!, snapshot)}>Request a takedown</a></div></aside>}</main>
       </div>
-      <footer className="docs-footer"><span>Unbound Map · read this before the source</span><Link href={contextualHandoffHref(context)}>Continue to Lachesis <span aria-hidden="true">↗</span></Link></footer>
+      <footer className="docs-footer"><span>Unbound Map · read this before the source</span><span className="docs-footer-actions"><Link href={contextualHandoffHref(context)}>Continue to Lachesis <span aria-hidden="true">↗</span></Link><Link href="/" aria-label="Map another repository">Map another repository <span aria-hidden="true">→</span></Link></span></footer>
     </div>
   );
 }
