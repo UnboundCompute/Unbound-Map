@@ -18,7 +18,7 @@ for (const [label, source, terms] of [
   ['README badge', embed, ['README badge Markdown', 'previewQuery', 'architecture field guide']],
   ['repository publication', publication, ['Continue to Lachesis with this snapshot', 'Map another repository']],
   ['shared documentation shell', docsShell, ['Continue to Lachesis', 'Map another repository', 'docs-footer-actions']],
-  ['security witness', trust, ["evidenceStatusLabel('lead')", 'not an adjudicated vulnerability']],
+  ['security witness', trust, ["evidenceStatusLabel('lead')", 'not an adjudicated vulnerability', 'Open the interactive witness', 'Continue in Lachesis', 'Map another repository']],
 ]) {
   for (const term of terms) assert.ok(source.includes(term), `${label} is missing ${term}`);
 }

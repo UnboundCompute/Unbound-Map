@@ -27,6 +27,10 @@ function witnessMarkdown(bundle: LachesisBundle, bundleId: string, finding: Bund
   const first = steps[0] ? nodes.get(steps[0].node_id) : undefined;
   const last = steps.at(-1) ? nodes.get(steps.at(-1)!.node_id) : undefined;
   const status = `${evidenceStatusLabel('lead')}${finding.low_signal ? ' · lower-signal internal surface' : ''}`;
+  const findingId = finding.finding_id ?? findingLabel(finding, index);
+  const witnessUrl = `https://map.unboundcompute.com/w/${encodeURIComponent(bundleId)}/${encodeURIComponent(findingId)}`;
+  const contextQuery = new URLSearchParams({ repository: bundle.meta.repository, revision: bundle.meta.revision, bundle: bundleId }).toString();
+  const lachesisUrl = `https://lachesis.unboundcompute.com/?${contextQuery}`;
   const semantic = finding.semantic;
   const lines = [
     `# Security Witness — ${findingLabel(finding, index)}`,
@@ -65,6 +69,10 @@ function witnessMarkdown(bundle: LachesisBundle, bundleId: string, finding: Bund
     ...(finding.analysis?.limitations?.length ? finding.analysis.limitations.map((limitation) => `- ${limitation}`) : ['- Presence marks a place to investigate; it does not establish exploitability or a finding.']),
     '',
     `Generated from the validated Lachesis bundle at revision ${bundle.meta.revision}.`,
+    '',
+    `Open the interactive witness: ${witnessUrl}`,
+    `Continue in Lachesis: ${lachesisUrl}`,
+    'Map another repository: https://map.unboundcompute.com/',
   ];
   return lines.join('\n');
 }
