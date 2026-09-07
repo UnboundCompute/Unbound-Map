@@ -69,7 +69,7 @@ async function redirectHome(path) {
 }
 
 // 1. The selection gate: the bare map opens on the repository picker only.
-await page('/', ['Choose a repository to begin', 'class="launcher"', 'Enter a repository URL', 'Select a cached repository']);
+await page('/', ['Choose a repository to begin', 'class="launcher"', 'Enter a repository URL', 'Select an indexed repository']);
 await pageWithout('/', ['map-workbench', 'class="bar-lachesis"', 'Suricata', 'Packet input', 'wire input']);
 
 // 2. Every non-home surface is gated behind a bundle: no bundle → back to the picker.
