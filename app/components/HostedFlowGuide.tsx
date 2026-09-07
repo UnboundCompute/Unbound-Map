@@ -90,10 +90,11 @@ export function HostedFlowGuide({ bundleId, context, initialFlow, initialStep, r
   const flows = bundle?.paths?.requests ?? [];
   const flow = flows.find((item) => item.id === flowId) ?? flows[0];
   const nodeById = useMemo(() => new Map((bundle?.graph.nodes ?? []).map((node) => [node.id, node])), [bundle]);
+  const moduleByNodeId = useMemo(() => new Map((bundle?.graph.modules ?? []).flatMap((module) => (module.node_ids ?? []).map((nodeId) => [nodeId, module.id] as const))), [bundle]);
   const activeIndex = Math.max(0, flow?.hops.findIndex((hop) => (hop.id ?? hop.node_id) === stepId) ?? 0);
   const activeHop = flow?.hops[activeIndex];
   const activeNode = activeHop ? nodeById.get(activeHop.node_id) : undefined;
-  const flowModuleCount = flow ? new Set(flow.hops.map((hop) => nodeById.get(hop.node_id)?.module).filter(Boolean)).size : 0;
+  const flowModuleCount = flow ? new Set(flow.hops.map((hop) => moduleByNodeId.get(hop.node_id) ?? nodeById.get(hop.node_id)?.module).filter(Boolean)).size : 0;
   const sourceLink = activeNode && bundle ? sourceHref({ sourceUrlTemplate: bundle.meta.source_url_template, revision: bundle.meta.revision }, activeNode.file, activeNode.line) : undefined;
 
   const updateUrl = (nextFlow: string, nextStep?: string) => {
