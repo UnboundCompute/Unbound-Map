@@ -12,8 +12,11 @@ function one(value: string | string[] | undefined) { return Array.isArray(value)
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const query = await searchParams;
   const repository = one(query.repository);
-  const label = repository ?? 'Unbound Map';
-  return documentMetadata(`${label} · Unbound Map`, `See ${label}'s structure, responsibilities, and first architectural path before reading the source.`, { repository, revision: one(query.revision), bundle: one(query.bundle) });
+  const title = repository ? `${repository} · Unbound Map` : 'Unbound Map — Read this before the source';
+  const description = repository
+    ? `See ${repository}'s structure, responsibilities, and first architectural path before reading the source.`
+    : 'Generate a graph-backed architecture map from any public repository — see its structure, responsibilities, flows, and trust surfaces before reading the source.';
+  return documentMetadata(title, description, { repository, revision: one(query.revision), bundle: one(query.bundle) });
 }
 
 export default async function HomePage({ searchParams }: { searchParams: SearchParams }) {
