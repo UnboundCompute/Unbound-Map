@@ -26,7 +26,7 @@ export type RepositorySnapshotView = {
 };
 
 export const emptySnapshot: RepositorySnapshotView = {
-  provenance: 'graph-backed', coverageState: 'limited', repository: 'No repository selected', revision: '—', language: '—', coverageScope: 'awaiting repository', indexedNodes: 0, includedNodes: 0, relationshipCount: 0, limitations: ['Choose a cached repository or add a public repository URL to begin.'], regions: [],
+  provenance: 'graph-backed', coverageState: 'limited', repository: 'No repository selected', revision: '—', language: '—', coverageScope: 'awaiting repository', indexedNodes: 0, includedNodes: 0, relationshipCount: 0, limitations: ['Choose an indexed repository or add a public repository URL to begin.'], regions: [],
 };
 
 export type SystemRegion = {
