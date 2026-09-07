@@ -5,6 +5,7 @@ const mapClient = fs.readFileSync(new URL('../app/components/MapClient.tsx', imp
 const flowGuide = fs.readFileSync(new URL('../app/components/HostedFlowGuide.tsx', import.meta.url), 'utf8');
 const embed = fs.readFileSync(new URL('../app/components/EmbedSnippet.tsx', import.meta.url), 'utf8');
 const openGraph = fs.readFileSync(new URL('../app/opengraph-image.tsx', import.meta.url), 'utf8');
+const publication = fs.readFileSync(new URL('../app/r/[...repository]/page.tsx', import.meta.url), 'utf8');
 const artifactIds = fs.readFileSync(new URL('../lib/artifact-id.ts', import.meta.url), 'utf8');
 
 for (const [label, source, terms] of [
@@ -13,6 +14,7 @@ for (const [label, source, terms] of [
   ['ARCHITECTURE.md export', mapClient, ['Download ARCHITECTURE.md', 'Revision-pinned architecture reading guide', 'Repository:', 'Revision:']],
   ['flow card', flowGuide, ['Open flow card', 'artifactMarkdown', 'bundle.meta.repository', 'bundle.meta.revision']],
   ['README badge', embed, ['README badge Markdown', 'previewQuery', 'architecture field guide']],
+  ['repository publication', publication, ['Continue to Lachesis with this snapshot', 'Map another repository']],
 ]) {
   for (const term of terms) assert.ok(source.includes(term), `${label} is missing ${term}`);
 }
