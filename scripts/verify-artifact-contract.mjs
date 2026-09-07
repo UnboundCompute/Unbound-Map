@@ -7,6 +7,7 @@ const embed = fs.readFileSync(new URL('../app/components/EmbedSnippet.tsx', impo
 const openGraph = fs.readFileSync(new URL('../app/opengraph-image.tsx', import.meta.url), 'utf8');
 const publication = fs.readFileSync(new URL('../app/r/[...repository]/page.tsx', import.meta.url), 'utf8');
 const docsShell = fs.readFileSync(new URL('../app/components/DocsShell.tsx', import.meta.url), 'utf8');
+const trust = fs.readFileSync(new URL('../app/components/HostedTrustGlossary.tsx', import.meta.url), 'utf8');
 const artifactIds = fs.readFileSync(new URL('../lib/artifact-id.ts', import.meta.url), 'utf8');
 
 for (const [label, source, terms] of [
@@ -17,6 +18,7 @@ for (const [label, source, terms] of [
   ['README badge', embed, ['README badge Markdown', 'previewQuery', 'architecture field guide']],
   ['repository publication', publication, ['Continue to Lachesis with this snapshot', 'Map another repository']],
   ['shared documentation shell', docsShell, ['Continue to Lachesis', 'Map another repository', 'docs-footer-actions']],
+  ['security witness', trust, ["evidenceStatusLabel('lead')", 'not an adjudicated vulnerability']],
 ]) {
   for (const term of terms) assert.ok(source.includes(term), `${label} is missing ${term}`);
 }
