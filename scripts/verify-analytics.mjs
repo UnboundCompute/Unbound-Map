@@ -6,6 +6,8 @@ const sanitized = sanitizeEventProperties({
   action: 'map_another_repository',
   repository: 'owner/repository',
   source_path: 'src/app.ts',
+  label: 'https://github.com/owner/repository',
+  harmless_path_label: 'src/components/App.tsx',
   revision: 'abc123',
   long_label: longValue,
   finite_count: 3,
