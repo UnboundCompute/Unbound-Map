@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 /** Keep browser titles and social previews aligned with the same document context. */
-export function documentMetadata(title: string, description: string, context: { repository?: string; revision?: string; bundle?: string; flow?: string; finding?: string } = {}): Metadata {
+export function documentMetadata(title: string, description: string, context: { repository?: string; revision?: string; bundle?: string; flow?: string; finding?: string; canonicalPath?: string } = {}): Metadata {
   const imageQuery = new URLSearchParams({ ...(context.repository ? { repository: context.repository } : {}), ...(context.revision ? { revision: context.revision } : {}), ...(context.bundle ? { bundle: context.bundle } : {}), ...(context.flow ? { flow: context.flow } : {}), ...(context.finding ? { finding: context.finding } : {}) }).toString();
   const image = { url: `/opengraph-image${imageQuery ? `?${imageQuery}` : ''}`, alt: `${title} — Unbound Map architecture guide` };
   return {
@@ -11,6 +11,7 @@ export function documentMetadata(title: string, description: string, context: { 
     // approved repository publications. Keep them discoverable through links
     // while withholding them from search until a canonical approval route exists.
     ...(context.repository || context.revision || context.bundle || context.flow ? { robots: { index: false, follow: true } } : {}),
+    ...(context.canonicalPath ? { alternates: { canonical: context.canonicalPath } } : {}),
     openGraph: { title, description, type: 'article', images: [image] },
     twitter: { card: 'summary_large_image', title, description, images: [image] },
   };

@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params; searchParam
   const { bundle, flow } = await params;
   const label = flowLabel(flow);
   const identity = await bundleIdentity(bundle);
-  return documentMetadata(`${label} · Bundle-pinned flow card · Unbound Map`, `Read the ${label} graph-backed flow from its bundle-pinned repository snapshot.`, { ...identity, bundle, flow: label });
+  return documentMetadata(`${label} · Bundle-pinned flow card · Unbound Map`, `Read the ${label} graph-backed flow from its bundle-pinned repository snapshot.`, { ...identity, bundle, flow: label, canonicalPath: `/f/${encodeURIComponent(bundle)}/${encodeURIComponent(flow)}` });
 }
 
 export default async function FlowCardPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {

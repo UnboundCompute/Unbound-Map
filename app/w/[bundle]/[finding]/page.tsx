@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { bundle, finding } = await params;
   const label = findingLabel(finding);
   const identity = await bundleIdentity(bundle);
-  return documentMetadata(`${label} · Security Witness · Unbound Map`, `Read a revision-pinned graph evidence witness for ${identity.repository ?? 'this repository snapshot'}.`, { ...identity, bundle, finding: label });
+  return documentMetadata(`${label} · Security Witness · Unbound Map`, `Read a revision-pinned graph evidence witness for ${identity.repository ?? 'this repository snapshot'}.`, { ...identity, bundle, finding: label, canonicalPath: `/w/${encodeURIComponent(bundle)}/${encodeURIComponent(finding)}` });
 }
 
 export default async function WitnessPage({ params }: { params: Params }) {
