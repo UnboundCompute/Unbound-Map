@@ -6,13 +6,17 @@ export const contentType = 'image/png';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function one(value: string | string[] | undefined) { return Array.isArray(value) ? value[0] : value; }
+function imageLabel(value: string, limit: number) {
+  const singleLine = value.replace(/\s+/g, ' ').trim();
+  return singleLine.length > limit ? `${singleLine.slice(0, limit - 1).trimEnd()}…` : singleLine;
+}
 
 export default async function OpenGraphImage({ searchParams }: { searchParams?: SearchParams } = {}) {
   const query = searchParams ? await searchParams : {};
-  const repository = one(query.repository) ?? 'Repository';
-  const revision = one(query.revision);
-  const flow = one(query.flow);
-  const finding = one(query.finding);
+  const repository = imageLabel(one(query.repository) ?? 'Repository', 44);
+  const revision = one(query.revision) ? imageLabel(one(query.revision)!, 18) : undefined;
+  const flow = one(query.flow) ? imageLabel(one(query.flow)!, 44) : undefined;
+  const finding = one(query.finding) ? imageLabel(one(query.finding)!, 44) : undefined;
   return new ImageResponse(
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%', height: '100%', padding: '68px 78px', color: '#202521', background: '#f4f1ea', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 18, color: '#667067', fontSize: 28, letterSpacing: 2 }}><span style={{ display: 'flex', width: 28, height: 28, border: '2px solid #202521', borderRadius: 99 }} /> UNBOUND MAP · HLD</div>
