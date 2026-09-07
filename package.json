@@ -24,6 +24,7 @@
     "verify:sitemap": "node --experimental-strip-types scripts/verify-sitemap.mjs",
     "verify:seo": "node --experimental-strip-types scripts/verify-seo.mjs",
     "verify:analytics": "node --experimental-strip-types scripts/verify-analytics.mjs",
+    "verify:artifact-contract": "node scripts/verify-artifact-contract.mjs",
     "check": "tsc --noEmit && npm run verify:response-bounds && npm run verify:casefile-links && npm run verify:seo && npm run verify:analytics"
   },
   "dependencies": {
