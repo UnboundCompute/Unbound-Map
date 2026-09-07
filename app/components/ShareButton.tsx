@@ -3,13 +3,13 @@
 import { useState } from 'react';
 
 export function ShareButton({ href }: { href?: string }) {
-  const [state, setState] = useState<'idle' | 'copied' | 'unavailable'>('idle');
+  const [state, setState] = useState<'idle' | 'copied' | 'shared' | 'unavailable'>('idle');
   const copy = async () => {
     try {
       const shareUrl = href ?? window.location.href;
       if (navigator.share) {
         await navigator.share({ title: document.title, url: shareUrl });
-        setState('copied');
+        setState('shared');
         window.setTimeout(() => setState('idle'), 1800);
         return;
       }
@@ -38,7 +38,7 @@ export function ShareButton({ href }: { href?: string }) {
       window.setTimeout(() => setState('idle'), 2600);
     }
   };
-  const label = state === 'copied' ? 'Link ready' : state === 'unavailable' ? 'Copy unavailable' : 'Copy link';
-  const announcement = state === 'copied' ? 'Share link ready.' : state === 'unavailable' ? 'Copy unavailable. Use the browser address bar to copy this page URL.' : '';
-  return <><button type="button" className="share-button" onClick={copy} title={state === 'unavailable' ? 'Copy the page URL from your browser address bar.' : undefined}>{label} <span aria-hidden="true">{state === 'copied' ? '✓' : state === 'unavailable' ? '!' : '↗'}</span></button><span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</span></>;
+  const label = state === 'copied' ? 'Link ready' : state === 'shared' ? 'Shared' : state === 'unavailable' ? 'Copy unavailable' : 'Copy link';
+  const announcement = state === 'copied' ? 'Share link ready.' : state === 'shared' ? 'Link shared.' : state === 'unavailable' ? 'Copy unavailable. Use the browser address bar to copy this page URL.' : '';
+  return <><button type="button" className="share-button" onClick={copy} title={state === 'unavailable' ? 'Copy the page URL from your browser address bar.' : undefined}>{label} <span aria-hidden="true">{state === 'copied' || state === 'shared' ? '✓' : state === 'unavailable' ? '!' : '↗'}</span></button><span className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</span></>;
 }
