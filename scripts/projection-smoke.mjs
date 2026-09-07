@@ -1,4 +1,5 @@
 import { expandSourceUrl, isLachesisBundle, projectTopLevelRegions, toDesignMapSnapshot } from '../lib/design-map.ts';
+import { snapshotFromProjection } from '../lib/view-model.ts';
 
 function snapshot(count, childCount = 0) {
   const modules = Array.from({ length: count }, (_, index) => ({
@@ -155,6 +156,49 @@ if (!conceptRegions.find((region) => region.id === 'concept.entry')?.downstream?
 const coarseConceptSnapshot = { ...conceptSnapshot, concepts: [conceptSnapshot.concepts[0]] };
 if (projectTopLevelRegions(coarseConceptSnapshot, 9)[0]?.id !== 'module.main') throw new Error('one catch-all concept replaced the more useful module projection');
 console.log('ok architectural concepts preferred while preserving authored overlap');
+
+// --- Advisory semantic enrichment (additive; must pass valid, reject malformed) ---
+const enrichedBundle = {
+  format: 'lachesis-explorer-bundle',
+  schema_version: '2.0',
+  meta: { repository: 'fixture', language: 'C', revision: 'test', lines: 2, indexed_nodes: 2 },
+  graph: {
+    nodes: [
+      { id: 'n0', label: 'parseConfig', kind: 'function', file: 'src/config.c', line: 1, related: [{ id: 'n1', score: 0.91 }], tags: ['config', 'parsing'], xy: [0.2, -0.4] },
+      { id: 'n1', label: 'loadConfig', kind: 'function', file: 'src/config.c', line: 8, related: [{ id: 'n0', score: 0.91 }], tags: ['config'], xy: [0.25, -0.35] },
+    ],
+    modules: [{ id: 'm.config', name: 'config', path: 'src/config.c', node_ids: ['n0', 'n1'], definition_count: 2, semantic_label: 'parseConfig', coherence: 0.94, tags: ['config', 'parsing'], summary: 'config, parsing — e.g. parseConfig, loadConfig', exemplars: [{ node_id: 'n0', name: 'parseConfig', score: 0.97 }], outliers: [], affinity: [] }],
+  },
+  // The advisory overlay lives at the top level of the bundle, matching what the
+  // exporter emits and what the reader/explorer consumes — never under `graph`.
+  enrichment: { model: 'BAAI/bge-small-en-v1.5', dimensions: 384, facets: ['config', 'parsing'], near_duplicates: [{ a: 'n0', b: 'n1', score: 0.91 }], cross_cutting: [{ tag: 'config', count: 2, module_spread: 1, node_ids: ['n0', 'n1'] }], reading_order: ['m.config'] },
+};
+if (!isLachesisBundle(enrichedBundle)) throw new Error('valid enriched bundle rejected by the schema guard');
+const enrichedSnapshot = toDesignMapSnapshot(enrichedBundle);
+if (enrichedSnapshot.enrichment?.model !== 'BAAI/bge-small-en-v1.5') throw new Error('enrichment overlay was dropped by the adapter');
+const enrichedRegions = projectTopLevelRegions(enrichedSnapshot, 9);
+if (enrichedRegions[0]?.semanticLabel !== 'parseConfig' || enrichedRegions[0]?.coherence !== 0.94 || !enrichedRegions[0]?.tags?.includes('config')) throw new Error('module semantic annotations were not projected onto the region');
+// The top-level overlay (reading order / cross-cutting / near-duplicates) must
+// reach the rendered snapshot, not just the per-module semantic. This is the
+// regression that previously slipped: the overlay was read from graph.enrichment
+// while the exporter writes it at the bundle's top level, so the whole "Semantic
+// overlay" section silently vanished on real bundles.
+const enrichedView = snapshotFromProjection(enrichedSnapshot, enrichedRegions);
+if (!enrichedView.enrichment) throw new Error('top-level semantic overlay was dropped before the view model');
+if (enrichedView.enrichment.readingOrder?.length !== 1) throw new Error('reading order did not reach the view-model overlay');
+if (enrichedView.enrichment.crossCutting?.[0]?.moduleSpread !== 1) throw new Error('cross-cutting concerns did not reach the view-model overlay');
+if (enrichedView.enrichment.nearDuplicates?.length !== 1) throw new Error('near-duplicates did not reach the view-model overlay');
+if (enrichedView.enrichment.nearDuplicates[0].aHint !== 'config.c:1' || enrichedView.enrichment.nearDuplicates[0].bHint !== 'config.c:8') throw new Error('near-duplicate members did not carry a disambiguating file:line hint');
+console.log('ok semantic enrichment survives the adapter and projection');
+// A bundle with no enrichment must still pass and carry no overlay (degrade to nothing).
+if (toDesignMapSnapshot(conceptBundle).enrichment !== undefined) throw new Error('an un-enriched bundle spuriously reported an overlay');
+if (isLachesisBundle({ ...enrichedBundle, graph: { ...enrichedBundle.graph, nodes: [{ ...enrichedBundle.graph.nodes[0], related: [{ id: 'n1' }] }, enrichedBundle.graph.nodes[1]] } })) throw new Error('node neighbour without a numeric score accepted by the schema guard');
+if (isLachesisBundle({ ...enrichedBundle, graph: { ...enrichedBundle.graph, nodes: [{ ...enrichedBundle.graph.nodes[0], related: [{ id: 'missing', score: 0.5 }] }, enrichedBundle.graph.nodes[1]] } })) throw new Error('node neighbour referencing a missing node accepted by the schema guard');
+if (isLachesisBundle({ ...enrichedBundle, graph: { ...enrichedBundle.graph, nodes: [{ ...enrichedBundle.graph.nodes[0], xy: [0.1] }, enrichedBundle.graph.nodes[1]] } })) throw new Error('malformed node xy coordinate accepted by the schema guard');
+if (isLachesisBundle({ ...enrichedBundle, graph: { ...enrichedBundle.graph, modules: [{ ...enrichedBundle.graph.modules[0], coherence: 'high' }] } })) throw new Error('non-numeric module coherence accepted by the schema guard');
+if (isLachesisBundle({ ...enrichedBundle, enrichment: { ...enrichedBundle.enrichment, near_duplicates: [{ a: 'n0', b: 'missing', score: 0.9 }] } })) throw new Error('near-duplicate referencing a missing node accepted by the schema guard');
+if (isLachesisBundle({ ...enrichedBundle, enrichment: { ...enrichedBundle.enrichment, cross_cutting: [{ tag: 'config', count: 2, module_spread: 1, node_ids: ['missing'] }] } })) throw new Error('cross-cutting concern referencing a missing node accepted by the schema guard');
+console.log('ok malformed enrichment rejected while un-enriched bundles pass');
 const noModuleBundle = { ...validBundle, graph: { nodes: [{ id: 'node-a', label: 'A', kind: 'function', file: '', line: 0 }, { id: 'node-b', label: 'B', kind: 'function', file: 'src/beta/b.c', line: 1, snippet: 'void b() {}' }], edges: [{ source: 'node-a', target: 'node-b', kind: 'calls' }] }, meta: { ...validBundle.meta, indexed_nodes: 2 } };
 if (!isLachesisBundle(noModuleBundle)) throw new Error('valid bundle without modules rejected by the schema guard');
 const noModuleSnapshot = toDesignMapSnapshot(noModuleBundle);

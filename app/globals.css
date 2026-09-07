@@ -363,3 +363,49 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 @media (max-width: 820px) { .hosted-entrypoints li { display: block; } .hosted-entrypoints li > span { justify-content: flex-start; margin-top: 9px; } .hosted-entrypoints .quiet-link { min-height: 44px; display: inline-flex; align-items: center; } }
 @media (max-width: 600px) { .map-entrypoint-list ul { grid-template-columns: 1fr; } }
 .trust-meta .quiet-link { min-height: 44px; }
+
+/* --- Advisory semantic overlay (present only when a model enriched the bundle) --- */
+.semantic-advisory { margin-left: 8px; padding: 2px 6px; border: 1px solid var(--signal-light); border-radius: 999px; color: var(--signal); font: 9px var(--mono); letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; }
+.inspector-semantic { margin: 4px 0 22px; padding-top: 18px; border-top: 1px dashed var(--map-rule); }
+.inspector-semantic .inspector-label { display: block; margin-bottom: 10px; }
+.semantic-summary { margin: 0 0 12px; color: var(--body); font-size: 12px; line-height: 1.5; }
+.semantic-coherence { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin: 0 0 12px; color: var(--map-ink); font-size: 12px; }
+.semantic-coherence span { color: var(--muted); font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.semantic-coherence b { color: var(--signal); font: 600 13px var(--mono); }
+.semantic-coherence small { flex-basis: 100%; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.semantic-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.semantic-tags li { padding: 3px 8px; border: 1px solid var(--map-rule); border-radius: 999px; color: var(--body); background: var(--paper); font: 11px var(--mono); }
+.semantic-affinity span { display: block; margin-bottom: 7px; color: var(--muted); font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.semantic-affinity ul { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.semantic-affinity li { display: flex; justify-content: space-between; gap: 12px; color: var(--map-ink); font-size: 12px; }
+.semantic-affinity li small { color: var(--signal); font: 11px var(--mono); }
+
+.semantic-overlay { max-width: 830px; margin-top: 62px; padding-top: 22px; border-top: 2px solid var(--ink); }
+.semantic-overlay-head { max-width: 700px; }
+.semantic-overlay-head h2 { margin: 12px 0 10px; font: 400 clamp(26px, 3.2vw, 38px)/1.08 var(--serif); letter-spacing: -.025em; }
+.semantic-overlay-head > p { margin: 0; color: var(--body); font-size: 15px; line-height: 1.65; }
+.semantic-block { margin-top: 34px; }
+.semantic-block h3 { margin: 0 0 12px; color: var(--muted); font: 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.semantic-tour { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; counter-reset: tour; border-top: 1px solid var(--rule); }
+.semantic-tour li { counter-increment: tour; border-bottom: 1px solid var(--rule); }
+.semantic-tour li button, .semantic-tour li span { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: baseline; width: 100%; min-height: 50px; padding: 12px 0; border: 0; color: var(--ink); background: transparent; font: inherit; font-size: 14px; text-align: left; }
+.semantic-tour li button { cursor: pointer; }
+.semantic-tour li button::before, .semantic-tour li span::before { content: counter(tour, decimal-leading-zero); color: var(--muted); font: 10px var(--mono); }
+.semantic-tour li button:hover { color: var(--signal); }
+.semantic-crosscut { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.semantic-crosscut li { display: grid; gap: 5px; padding: 11px 12px; border-left: 2px solid var(--signal); background: var(--paper-deep); }
+.semantic-crosscut strong { font: 12px var(--mono); color: var(--ink); overflow-wrap: anywhere; }
+.semantic-crosscut small { color: var(--body); font-size: 12px; line-height: 1.4; }
+.semantic-dupes { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+.semantic-dupes li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.semantic-dupes span { color: var(--ink); font-size: 14px; overflow-wrap: anywhere; }
+.semantic-dupes em { color: var(--signal); font-style: normal; }
+.semantic-dupes small { color: var(--muted); font: 12px var(--mono); white-space: nowrap; }
+.semantic-dupes .dup-loc { color: var(--muted); font: 12px var(--mono); }
+
+.semantic-section .semantic-tags { margin-top: 18px; }
+.semantic-section .region-detail-grid { margin-top: 24px; }
+.semantic-coherence-note { max-width: 650px; margin: 16px 0 0; color: var(--body); font-size: 14px; line-height: 1.6; }
+.semantic-coherence-note b { color: var(--signal); font: 600 14px var(--mono); }
+.region-detail-list code { display: block; margin-top: 5px; color: var(--muted); font: 11px var(--mono); overflow-wrap: anywhere; }
+@media (max-width: 820px) { .semantic-overlay { margin-top: 44px; } .semantic-crosscut { grid-template-columns: 1fr; } }

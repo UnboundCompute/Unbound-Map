@@ -5,6 +5,27 @@
  * reading-oriented projection below; it should never render raw graph nodes
  * directly at repository altitude.
  */
+// --- Additive semantic enrichment (advisory, navigation-only) --------------
+// These fields are produced by an offline embedding pass and only decorate the
+// compiler-precise structure already projected; they never redefine it. They
+// are absent whenever the exporter had no local embedding model, so every
+// consumer must degrade to nothing when they are missing.
+export type NodeNeighbour = { id: string; score: number };
+export type ModuleAffinity = { id: string; score: number };
+export type ModuleExemplar = { node_id: string; name?: string; kind?: string; file?: string; line?: number; score?: number };
+export type CrossCuttingConcern = { tag: string; count: number; module_spread: number; node_ids: string[] };
+export type NearDuplicate = { a: string; b: string; score: number };
+export type BundleEnrichment = {
+  model?: string;
+  dimensions?: number;
+  method?: { similarity?: string; layout?: string; tags?: string };
+  coverage?: { vector_nodes?: number; bundle_nodes?: number; modules_labeled?: number };
+  facets?: string[];
+  near_duplicates?: NearDuplicate[];
+  cross_cutting?: CrossCuttingConcern[];
+  reading_order?: string[];
+};
+
 export type BundleNode = {
   id: string;
   label: string;
@@ -16,6 +37,10 @@ export type BundleNode = {
   snippet?: string;
   source_window?: { start_line?: number; lines: string[] };
   documentation?: string;
+  // Semantic enrichment (optional, advisory).
+  related?: NodeNeighbour[];
+  tags?: string[];
+  xy?: [number, number];
 };
 
 export type BundleModule = {
@@ -30,6 +55,14 @@ export type BundleModule = {
   definition_count?: number;
   symbol_count?: number;
   anchor_node_id?: string;
+  // Semantic enrichment (optional, advisory).
+  semantic_label?: string;
+  coherence?: number;
+  exemplars?: ModuleExemplar[];
+  outliers?: string[];
+  affinity?: ModuleAffinity[];
+  tags?: string[];
+  summary?: string;
 };
 
 export type BundleConcept = {
@@ -37,6 +70,10 @@ export type BundleConcept = {
   label: string;
   description?: string;
   node_ids: string[];
+  // Semantic enrichment (optional, advisory).
+  coherence?: number;
+  outliers?: string[];
+  suggested?: string[];
 };
 
 export type BundleEdge = {
@@ -128,6 +165,10 @@ export type LachesisBundle = {
     values?: unknown[];
   };
   security?: { findings?: BundleFinding[] };
+  // Optional advisory semantic overlay; absent without a local embedding model.
+  // The exporter writes this at the top level of the bundle (the reader/explorer
+  // consumes it there too) — it is NOT nested under `graph`.
+  enrichment?: BundleEnrichment;
 };
 
 export function isLachesisBundle(value: unknown): value is LachesisBundle {
@@ -255,6 +296,37 @@ export function isLachesisBundle(value: unknown): value is LachesisBundle {
       || (witness.steps !== undefined && (!Array.isArray(witness.steps) || witness.steps.some((step) => !step || typeof step !== 'object' || typeof step.node_id !== 'string' || !nodeIds.has(step.node_id) || (step.role !== undefined && typeof step.role !== 'string') || (step.note !== undefined && typeof step.note !== 'string')))))) return true;
     return false;
   })) return false;
+  // --- Optional semantic enrichment (advisory; reject only when malformed) ---
+  // Everything here is additive: a bundle with no enrichment passes untouched,
+  // and a well-formed overlay passes, but a present-but-malformed overlay is
+  // rejected so the reader never renders a broken semantic annotation.
+  const finiteNumber = (value: unknown) => typeof value === 'number' && Number.isFinite(value);
+  const stringArray = (value: unknown) => Array.isArray(value) && value.every((item) => typeof item === 'string' && item.trim().length > 0);
+  const neighbourArray = (value: unknown) => Array.isArray(value) && value.every((item) => !!item && typeof item === 'object' && typeof (item as { id?: unknown }).id === 'string' && !!(item as { id: string }).id.trim() && finiteNumber((item as { score?: unknown }).score));
+  const idArray = (value: unknown) => Array.isArray(value) && value.every((item) => typeof item === 'string' && nodeIds.has(item));
+  if (graph!.nodes.some((node) => (node.related !== undefined && (!neighbourArray(node.related) || (node.related as NodeNeighbour[]).some((item) => !nodeIds.has(item.id))))
+    || (node.tags !== undefined && !stringArray(node.tags))
+    || (node.xy !== undefined && (!Array.isArray(node.xy) || node.xy.length !== 2 || !node.xy.every(finiteNumber))))) return false;
+  if ((graph!.modules ?? []).some((module) => (module.semantic_label !== undefined && typeof module.semantic_label !== 'string')
+    || (module.coherence !== undefined && !finiteNumber(module.coherence))
+    || (module.summary !== undefined && typeof module.summary !== 'string')
+    || (module.tags !== undefined && !stringArray(module.tags))
+    || (module.outliers !== undefined && !idArray(module.outliers))
+    || (module.affinity !== undefined && !neighbourArray(module.affinity))
+    || (module.exemplars !== undefined && (!Array.isArray(module.exemplars) || module.exemplars.some((item) => !item || typeof item !== 'object' || typeof item.node_id !== 'string' || !nodeIds.has(item.node_id)))))) return false;
+  if ((graph!.concepts ?? []).some((concept) => (concept.coherence !== undefined && !finiteNumber(concept.coherence))
+    || (concept.outliers !== undefined && !idArray(concept.outliers))
+    || (concept.suggested !== undefined && !idArray(concept.suggested)))) return false;
+  const enrichment = candidate.enrichment;
+  if (enrichment !== undefined) {
+    if (!enrichment || typeof enrichment !== 'object') return false;
+    if (enrichment.model !== undefined && typeof enrichment.model !== 'string') return false;
+    if (enrichment.dimensions !== undefined && (!Number.isInteger(enrichment.dimensions) || enrichment.dimensions < 0)) return false;
+    if (enrichment.facets !== undefined && !stringArray(enrichment.facets)) return false;
+    if (enrichment.reading_order !== undefined && !Array.isArray(enrichment.reading_order)) return false;
+    if (enrichment.near_duplicates !== undefined && (!Array.isArray(enrichment.near_duplicates) || enrichment.near_duplicates.some((item) => !item || typeof item !== 'object' || !nodeIds.has(item.a) || !nodeIds.has(item.b) || !finiteNumber(item.score)))) return false;
+    if (enrichment.cross_cutting !== undefined && (!Array.isArray(enrichment.cross_cutting) || enrichment.cross_cutting.some((item) => !item || typeof item !== 'object' || typeof item.tag !== 'string' || !item.tag.trim() || !Number.isInteger(item.count) || !Number.isInteger(item.module_spread) || !idArray(item.node_ids)))) return false;
+  }
   const modules = graph!.modules ?? [];
   const moduleIds = new Set(modules.map((module) => module.id));
   if (moduleIds.size !== modules.length) return false;
@@ -292,6 +364,8 @@ export type DesignMapSnapshot = {
   entrypoints: BundleEntrypoint[];
   requestPaths: BundleRequestPath[];
   concepts: BundleConcept[];
+  // Advisory semantic overlay, carried through verbatim; absent without a model.
+  enrichment?: BundleEnrichment;
 };
 
 export type HLDRegion = {
@@ -317,6 +391,21 @@ export type HLDRegion = {
   internalRelationshipCount?: number;
   relationshipKinds?: Record<string, string>;
   incomingRelationshipKinds?: Record<string, string>;
+  // --- Advisory semantic enrichment (absent without a model) ---
+  /** A representative symbol name the embedding pass chose for this area. */
+  semanticLabel?: string;
+  /** How tightly this area's members cohere in embedding space, 0..1. */
+  coherence?: number;
+  /** Behavioural facets ("what this code does") that dominate this area. */
+  tags?: string[];
+  /** One-line templated blurb summarising the area's behaviour. */
+  semanticSummary?: string;
+  /** Conceptually related areas by embedding centroid, most-similar first. */
+  affinity?: { id: string; label: string; score: number }[];
+  /** Representative members closest to the area centroid. */
+  exemplars?: ModuleExemplar[];
+  /** Members that sit unusually far from the area centroid. */
+  outliers?: { id: string; label: string }[];
 };
 
 /** Expand an exporter-provided revision-pinned source URL template. */
@@ -409,6 +498,7 @@ export function toDesignMapSnapshot(bundle: LachesisBundle): DesignMapSnapshot {
     entrypoints: bundle.graph.entrypoints ?? [],
     requestPaths: bundle.paths?.requests ?? [],
     concepts: bundle.graph.concepts ?? [],
+    enrichment: bundle.enrichment,
   };
 }
 
@@ -445,7 +535,11 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
     return bestOverlap > 0 ? best : undefined;
   };
   const modules: BundleModule[] = concepts.length >= 2
-    ? concepts.map((concept) => { const owner = ownerModuleForConcept(concept); return { id: concept.id, name: concept.label, path: owner?.path, description: concept.description, node_ids: concept.node_ids, definition_count: owner?.definition_count, symbol_count: owner?.symbol_count, anchor_node_id: owner?.anchor_node_id }; })
+    // When concepts are the regions, carry the concept's own semantic coherence
+    // and the owning module's advisory annotations (label/tags/exemplars) so the
+    // reading region stays decorated. Module-id-scoped affinity is intentionally
+    // dropped here because region ids are concept ids in this path.
+    ? concepts.map((concept) => { const owner = ownerModuleForConcept(concept); return { id: concept.id, name: concept.label, path: owner?.path, description: concept.description, node_ids: concept.node_ids, definition_count: owner?.definition_count, symbol_count: owner?.symbol_count, anchor_node_id: owner?.anchor_node_id, semantic_label: owner?.semantic_label, coherence: concept.coherence ?? owner?.coherence, tags: owner?.tags, summary: owner?.summary, exemplars: owner?.exemplars, outliers: concept.outliers ?? owner?.outliers }; })
     : snapshot.modules;
   const childProjection = (parentId: string) => {
     const children = modules
@@ -514,6 +608,15 @@ export function projectTopLevelRegions(snapshot: DesignMapSnapshot, limit?: numb
       sourcePaths: sourcePathsFor(module.id),
       anchor: (module.anchor_node_id ? nodeById.get(module.anchor_node_id) : undefined) ?? module.node_ids?.map((id) => nodeById.get(id)).find(Boolean),
       children: childProjection(module.id),
+      // Advisory semantic annotations, resolved to render-ready shapes. Every
+      // one is optional and simply absent when the exporter shipped no overlay.
+      semanticLabel: module.semantic_label,
+      coherence: module.coherence,
+      tags: module.tags,
+      semanticSummary: module.summary,
+      exemplars: module.exemplars,
+      affinity: module.affinity?.map((item) => ({ id: item.id, label: moduleById.get(item.id)?.name ?? item.id, score: item.score })),
+      outliers: module.outliers?.map((id) => ({ id, label: nodeById.get(id)?.label ?? id })),
     }))
     // Order by the real declarations an area owns so the largest-definition
     // areas are the named regions; small recalled areas keep their identity

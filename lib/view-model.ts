@@ -1,4 +1,19 @@
-import { expandSourceUrl, type BundleEntrypoint, type DesignMapSnapshot, type HLDRegion } from './design-map.ts';
+import { expandSourceUrl, type BundleEntrypoint, type DesignMapSnapshot, type HLDRegion, type ModuleExemplar } from './design-map.ts';
+
+/** Render-ready projection of the advisory semantic overlay. Absent without a model. */
+export type SnapshotEnrichment = {
+  model?: string;
+  dimensions?: number;
+  facets?: string[];
+  /** Behavioural facets whose members span many areas — horizontal concerns. */
+  crossCutting?: { tag: string; count: number; moduleSpread: number }[];
+  /** Copy-paste smells: pairs of near-identical members, most-similar first.
+   *  Members often share a name across distinct declarations, so each side
+   *  carries a `file:line` hint that disambiguates which declaration is meant. */
+  nearDuplicates?: { aLabel: string; aHint?: string; bLabel: string; bHint?: string; score: number }[];
+  /** A greedy semantic tour of the areas, resolved to labels where possible. */
+  readingOrder?: { id: string; label: string }[];
+};
 
 export type SnapshotProvenance = 'graph-backed';
 export type CoverageState = 'limited' | 'verified';
@@ -23,6 +38,8 @@ export type RepositorySnapshotView = {
   relationshipCount?: number;
   limitations: string[];
   regions: SystemRegion[];
+  /** Advisory whole-repository semantic overlay; absent without a model. */
+  enrichment?: SnapshotEnrichment;
 };
 
 export const emptySnapshot: RepositorySnapshotView = {
@@ -53,6 +70,14 @@ export type SystemRegion = {
   outputs?: string[];
   structures?: string[];
   anchor?: { id: string; label: string; file: string; line: number };
+  // --- Advisory semantic enrichment (absent without a model) ---
+  semanticLabel?: string;
+  coherence?: number;
+  tags?: string[];
+  semanticSummary?: string;
+  affinity?: { id: string; label: string; score: number }[];
+  exemplars?: ModuleExemplar[];
+  outliers?: { id: string; label: string }[];
 };
 
 export type LachesisHandoff = {
@@ -89,6 +114,30 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
   const displayRegions = regions.some((region) => region.definitionCount > 0)
     ? regions.filter((region) => region.definitionCount > 0)
     : regions;
+  // Resolve the advisory overlay's node/area ids to human labels once, so the
+  // view never has to carry raw ids. Absent overlay → undefined enrichment.
+  const nodeLabel = new Map(snapshot.nodes.map((node) => [node.id, node.label]));
+  // Near-duplicate members frequently share a bare name across separate
+  // declarations (e.g. two `edit` functions in one file). Carry a compact
+  // `file:line` hint per node so the rendered pair is not self-referential.
+  const nodeLoc = new Map(snapshot.nodes.map((node) => {
+    const base = node.file ? node.file.split('/').pop() : undefined;
+    const loc = base ? (node.line ? `${base}:${node.line}` : base) : undefined;
+    return [node.id, loc] as const;
+  }));
+  const areaLabel = new Map<string, string>([
+    ...snapshot.modules.map((module) => [module.id, module.name] as const),
+    ...snapshot.concepts.map((concept) => [concept.id, concept.label] as const),
+  ]);
+  const raw = snapshot.enrichment;
+  const enrichment: SnapshotEnrichment | undefined = raw ? {
+    model: raw.model,
+    dimensions: raw.dimensions,
+    facets: raw.facets,
+    crossCutting: raw.cross_cutting?.map((item) => ({ tag: item.tag, count: item.count, moduleSpread: item.module_spread })),
+    nearDuplicates: raw.near_duplicates?.map((item) => ({ aLabel: nodeLabel.get(item.a) ?? item.a, aHint: nodeLoc.get(item.a), bLabel: nodeLabel.get(item.b) ?? item.b, bHint: nodeLoc.get(item.b), score: item.score })),
+    readingOrder: raw.reading_order?.map((id) => ({ id, label: areaLabel.get(id) ?? id })),
+  } : undefined;
   return {
     provenance: 'graph-backed',
     coverageState: snapshot.includedNodes < snapshot.indexedNodes || snapshot.limitations.length > 0 ? 'limited' : 'verified',
@@ -129,7 +178,15 @@ export function snapshotFromProjection(snapshot: DesignMapSnapshot, regions: HLD
       internalRelationshipCount: region.internalRelationshipCount,
       relationshipKinds: region.relationshipKinds,
       incomingRelationshipKinds: region.incomingRelationshipKinds,
+      semanticLabel: region.semanticLabel,
+      coherence: region.coherence,
+      tags: region.tags,
+      semanticSummary: region.semanticSummary,
+      affinity: region.affinity,
+      exemplars: region.exemplars,
+      outliers: region.outliers,
     })),
+    enrichment,
   };
 }
 
